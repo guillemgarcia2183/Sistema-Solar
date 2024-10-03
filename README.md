@@ -1,6 +1,6 @@
 # Simulació del sistema solar i constel·lacions en Realitat Augmentada
 
-Aquest projecte tracta de fer un simulador interactiu que permet visualitzar les constel·lacions tal com es veurien des de diferents punts del Sistema Solar en un moment determinat. A través d'aquest simulador, podràs desplaçar-te espacialment i temporalment per observar com canvia el cel nocturn en funció de la teva posició i del temps. A més de la representació del Sistema Solar, es vol afegir un mode en el qual se't situï aleatòriament en una posició dins del Sistema Solar, i hagis d'endevinar aproximadament on ets basant-te en la posició de les constel·lacions (tipus GeoGuesser, però només amb constel·lacions).
+Aquest projecte tracta de fer un simulador interactiu que permet visualitzar les constel·lacions tal com es veurien des de diferents punts del Sistema Solar en un moment determinat. A través d'aquest simulador, podràs desplaçar-te espaialment i temporalment per observar com canvia el cel nocturn en funció de la teva posició i del temps. A més de la representació del Sistema Solar, es vol afegir un mode en el qual se't situï aleatòriament en una posició dins del Sistema Solar, i hagis d'endevinar aproximadament on ets basant-te en la posició de les constel·lacions (tipus GeoGuesser, però només amb constel·lacions).
 
 ## 1. Requeriments
 (*Què fa falta per realitzar-lo?)
