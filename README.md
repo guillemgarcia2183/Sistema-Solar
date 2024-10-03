@@ -9,7 +9,7 @@ Aquest projecte tracta de fer un simulador interactiu que permet visualitzar les
 (*Mostrar resultats)
 
 ## 3. Repositoris 
-* /actes: Conté fitxers esmentant les reunions de grup. Els noms dels fitxers corresponen al format XX/XX.pdf, que representen el dia què es van realitzar
+* /actes: Conté fitxers esmentant els comentaris de les reunions de grup. En les actes es pot veure com ha anat evolucionant el treball durant les setmanes de projecte. 
 
 
 ## Referències i Motivacions
