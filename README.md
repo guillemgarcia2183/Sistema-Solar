@@ -19,8 +19,11 @@ Aquest projecte tracta de fer un simulador interactiu que permet visualitzar les
 
 ## Participants - Grup 2
 Guillem Garcia (NIU: 1636279)
+
 Martí Llinés (NIU: 1637804)
+
 David Montaña (NIU: )
+
 Joel Tapia (NIU: 1638962)
 
 
