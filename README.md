@@ -22,7 +22,7 @@ Guillem Garcia (NIU: 1636279)
 
 Martí Llinés (NIU: 1637804)
 
-David Montaña (NIU: )
+David Montaña (NIU: 1564129)
 
 Joel Tapia (NIU: 1638962)
 
