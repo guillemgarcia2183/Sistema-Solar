@@ -9,13 +9,13 @@ Aquest projecte tracta de fer un simulador interactiu que permet visualitzar les
 (*Mostrar resultats)
 
 ## 3. Repositoris 
-· /actes: Conté fitxers esmentant les reunions de grup. Els noms dels fitxers corresponen al format XX/XX.pdf, que representen el dia què es van realitzar
+* /actes: Conté fitxers esmentant les reunions de grup. Els noms dels fitxers corresponen al format XX/XX.pdf, que representen el dia què es van realitzar
 
 
 ## Referències i Motivacions
-· Roman, N.G.; Warren Jr., W.H.; Schofield, N.J. (1983): "The Bright Star Catalogue, 4th Revised Ed." VizieR Online Data Catalog: V/53A. Disponible a https://vizier.cds.unistra.fr/viz-bin/VizieR?-source=V%2F53A. Darrer accés: 3 d'Octubre del 2024.
+* Roman, N.G.; Warren Jr., W.H.; Schofield, N.J. (1983): "The Bright Star Catalogue, 4th Revised Ed." VizieR Online Data Catalog: V/53A. Disponible a https://vizier.cds.unistra.fr/viz-bin/VizieR?-source=V%2F53A. Darrer accés: 3 d'Octubre del 2024.
 
-· "Where Can I Find a Visible Star Dataset?" Astronomy Stack Exchange, 4 Dec. 2017, Disponible a https://astronomy.stackexchange.com/questions/22802/where-can-i-find-a-visible-sta. Darrer accés: 3 d'Octubre del 2024.
+* "Where Can I Find a Visible Star Dataset?" Astronomy Stack Exchange, 4 Dec. 2017, Disponible a https://astronomy.stackexchange.com/questions/22802/where-can-i-find-a-visible-sta. Darrer accés: 3 d'Octubre del 2024.
 
 ## Participants - Grup 2
 Guillem Garcia (NIU: 1636279)
