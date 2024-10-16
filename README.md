@@ -39,6 +39,8 @@ Alguns sistemes de visualització del sistema solar ja existents son els següen
   
 * NASA's Eyes (2024): "Eyes on the Solar System." Disponible a https://eyes.nasa.gov/apps/solar-system/#/home. Darrer accés: 10 d'Octubre del 2024.
 
+* Banerjee, Sourav (2024): "Planet Dataset." Disponible en https://www.kaggle.com/datasets/iamsouravbanerjee/planet-dataset. Darrer accés: 16 de Octubre de 2024.
+
 ## Participants - Grup 2
 Guillem Garcia (NIU: 1636279)
 
