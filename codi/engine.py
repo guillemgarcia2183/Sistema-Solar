@@ -9,6 +9,7 @@ from camera import Camera
 from light import Light
 from axis import Axis
 from object import Sun, Sphere
+import shaders as sh
 
 class GraphicsEngine:
     def __init__(self, win_size=(900,800)):
@@ -35,7 +36,7 @@ class GraphicsEngine:
         # planetes
         # Opcions exemple per crear l'esfera: ["stripes", 1.0, 20, 20] o bé ["octahedron", 2]
         info_sphere = ["octahedron", 3]
-        self.objects.append(Sun(self, info_sphere))
+        self.objects.append(Sun(self, [sh.vertex_shader_SUN, sh.fragment_shader_SUN], info_sphere))
         self.objects.append(Sphere(self, info_sphere)) # la Terra. color, size i posició son els de la Terra by default (de moment)
         self.objects.append(Sphere(self, info_sphere, color=glm.vec3(1,1,1), size=glm.vec3(0.3,0.3,0.3), position = glm.vec3(0,0,6))) # la Lluna
         # Informació relacionada amb el context de l'aplicació

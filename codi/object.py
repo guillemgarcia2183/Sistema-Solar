@@ -4,9 +4,9 @@ import glm
 import sys
 import numpy as np
 import math
-    
+
 class Sun: # EL SOL TÉ LES NORMALS EN NEGATIU, DE MOMENT ÉS L'ÚNIC CANVI RESPECTE LES ALTRES ESFERES
-    def __init__(self, app, info = ["octahedron", 3], render_edges = False):
+    def __init__(self, app, shader, info = ["octahedron", 3]):
         self.app = app
         self.ctx = app.ctx
 
@@ -20,14 +20,8 @@ class Sun: # EL SOL TÉ LES NORMALS EN NEGATIU, DE MOMENT ÉS L'ÚNIC CANVI RESP
             self.subdivisions = info[1]
 
         self.vbo = self.get_vbo()
-        self.faces_shader = self.get_faces_shader_program()
+        self.faces_shader = self.get_faces_shader_program(shader)
         self.vao = self.get_vao()
-
-        # Edges render
-        self.render_edges = render_edges
-        if self.render_edges:
-            self.edges_shader = self.get_edges_shader_program()
-            self.vaoa = self.get_vaoa()
 
         self.m_model = self.get_model_matrix()
         self.on_init()
@@ -45,12 +39,6 @@ class Sun: # EL SOL TÉ LES NORMALS EN NEGATIU, DE MOMENT ÉS L'ÚNIC CANVI RESP
         self.faces_shader['m_view'].write(self.app.camera.m_view)
         self.faces_shader['m_model'].write(self.m_model)
 
-        if self.render_edges:
-            # Render edges
-            self.edges_shader['m_proj'].write(self.app.camera.m_proj)
-            self.edges_shader['m_view'].write(self.app.camera.m_view)
-            self.edges_shader['m_model'].write(self.m_model)
-
     def get_model_matrix(self):
         m_model = glm.rotate(glm.mat4(), glm.radians(0), glm.vec3(0, 1, 0))
         return m_model
@@ -62,16 +50,10 @@ class Sun: # EL SOL TÉ LES NORMALS EN NEGATIU, DE MOMENT ÉS L'ÚNIC CANVI RESP
 
     def render(self):
         self.vao.render()
-        if self.render_edges:
-            self.ctx.line_width = 1.5
-            self.vaoa.render(mgl.LINE_LOOP)
 
     def destroy(self):
         self.vbo.release()
         self.faces_shader.release()
-        if self.render_edges:
-            self.edges_shader.release()
-            self.vaoa.release()
         self.vao.release()
 
     def get_vao(self):
@@ -208,105 +190,12 @@ class Sun: # EL SOL TÉ LES NORMALS EN NEGATIU, DE MOMENT ÉS L'ÚNIC CANVI RESP
         norm = np.linalg.norm(v)
         return v / norm
 
-    def get_faces_shader_program(self):
-        program = self.ctx.program(
-            vertex_shader='''
-                #version 330
-                layout(location = 0) in vec3 in_color;
-                layout(location = 1) in vec3 in_norm;
-                layout(location = 2) in vec3 in_position;
-                
-                out vec3 v_color;
-                out vec3 v_norm;
-                out vec3 v_frag_pos;
-
-                uniform mat4 m_proj;
-                uniform mat4 m_view;
-                uniform mat4 m_model;
-
-                void main() {
-                    vec3 frag_pos = vec3(m_model * vec4(in_position, 1.0));
-                    v_norm = normalize(mat3(transpose(inverse(m_model))) * in_norm);
-                    v_frag_pos = frag_pos;
-                    v_color = in_color;
-                    gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
-                }
-            ''',
-            fragment_shader='''
-                #version 330
-                in vec3 v_color;
-                in vec3 v_norm;
-                in vec3 v_frag_pos;
-
-                out vec4 fragColor;
-                struct Light {
-                    vec3 position;
-                    vec3 Ia;
-                    vec3 Id;
-                    vec3 Is;
-                };
-
-                uniform Light light;  
-
-                uniform vec3 view_pos;
-
-                void main() {
-                    vec3 norm = normalize(v_norm);
-                    vec3 light_dir = normalize(light.position - v_frag_pos);
-                    
-                    // Ambient component
-                    vec3 ambient = light.Ia;
-                    
-                    // Diffuse component
-                    vec3 diffuse = light.Id * max(dot(norm, light_dir), 0.0) * v_color;
-                    
-                    // Specular component
-                    vec3 view_dir = normalize(view_pos - v_frag_pos);
-                    vec3 reflect_dir = reflect(-light_dir, norm);
-                    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);  // Shininess = 32
-                    vec3 specular = light.Is * spec;
-
-                    // Combine all components
-                    vec3 result = ambient + diffuse + specular; 
-                    fragColor = vec4(result, 1.0);
-                }
-            ''',
-        )
+    def get_faces_shader_program(self, shader):
+        program = self.ctx.program(vertex_shader= shader[0], fragment_shader= shader[1])
         return program
     
-    def get_edges_shader_program(self):
-        program = self.ctx.program(    
-            vertex_shader='''
-                #version 330
-                layout(location = 0) in vec3 in_color;
-                layout(location = 1) in vec3 in_norm;
-                layout(location = 2) in vec3 in_position;
-                
-                out vec3 v_color;
-                out vec3 v_void;
-
-                uniform mat4 m_proj;
-                uniform mat4 m_view;
-                uniform mat4 m_model;
-                void main() {
-                    v_void = in_norm + in_color;
-                    v_color = vec3(1,0,1);
-                    gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
-                }
-            ''',
-            fragment_shader='''
-                #version 330
-                in vec3 v_color;
-                out vec4 fragColor;
-                void main() {
-                    fragColor = vec4(v_color, 1.0);
-                }
-            ''',
-        )
-        return program
-
 class Sphere:
-    def __init__(self, app, info = ["stripes", 1.0, 15, 15],color = glm.vec3(0,0,1), size= glm.vec3(0.5,0.5,0.5), position= glm.vec3(4,0,4), render_edges = False):
+    def __init__(self, app, info = ["stripes", 1.0, 15, 15],color = glm.vec3(0,0,1), size= glm.vec3(0.5,0.5,0.5), position= glm.vec3(4,0,4)):
         self.app = app
         self.ctx = app.ctx
 
@@ -327,13 +216,6 @@ class Sphere:
         self.vbo = self.get_vbo()
         self.faces_shader = self.get_faces_shader_program()
         self.vao = self.get_vao()
-
-        # Edges render
-        self.render_edges = render_edges
-        if self.render_edges:
-            self.edges_shader = self.get_edges_shader_program()
-            self.vaoa = self.get_vaoa()
-
         self.m_model = self.get_model_matrix()
         self.on_init()
 
@@ -349,11 +231,6 @@ class Sphere:
         self.faces_shader['m_proj'].write(self.app.camera.m_proj)
         self.faces_shader['m_view'].write(self.app.camera.m_view)
         self.faces_shader['m_model'].write(self.m_model)
-        # Render edges
-        if self.render_edges:
-            self.edges_shader['m_proj'].write(self.app.camera.m_proj)
-            self.edges_shader['m_view'].write(self.app.camera.m_view)
-            self.edges_shader['m_model'].write(self.m_model)
 
     def get_model_matrix(self):
         m_model = glm.rotate(glm.mat4(), glm.radians(0), glm.vec3(0, 1, 0))
@@ -368,16 +245,10 @@ class Sphere:
 
     def render(self):
         self.vao.render()
-        if self.render_edges:
-            self.ctx.line_width = 1.5
-            self.vaoa.render(mgl.LINE_LOOP)
 
     def destroy(self):
         self.vbo.release()
         self.faces_shader.release()
-        if self.render_edges:
-            self.edges_shader.release()
-            self.vaoa.release()
         self.vao.release()
 
     def get_vao(self):
@@ -613,3 +484,13 @@ class Sphere:
         return program
     
 
+class Object:
+    def __init__(self, app):
+        self.app = app
+        self.ctx = app.ctx
+
+class Planet(Object):
+    pass
+
+class Constelation(Object):
+    pass
