@@ -259,6 +259,3 @@ class Planet(Object):
 
         return np.array(data, dtype='f4')
 
-
-        program = self.ctx.program(vertex_shader= shader[0], fragment_shader= shader[1])
-        return program        
