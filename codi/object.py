@@ -2,7 +2,16 @@ import glm
 import numpy as np
 
 class Object:
+    """Classe per crear un objecte dintre del Sistema Solar (classe pare)
+    """
     def __init__(self, app, shader, info = ["octahedron", 3]):
+        """Inicialització de la classe Object
+
+        Args:
+            app (GraphicsEngine()): Instància de la classe GraphicsEngine()
+            shader (list): Llista que conté el vertex_shader i fragment_shader a utilitzar 
+            info (list, optional): Informació per crear les esferes (en cas de planetes i sol). Defaults to ["octahedron", 3].
+        """
         self.app = app
         self.ctx = app.ctx
 
@@ -23,6 +32,8 @@ class Object:
         self.on_init()
 
     def on_init(self):
+        """Pos-inicialització de la classe Object. Establiment dels paràmetres del shader 
+        """
         # Related to lighting
         self.faces_shader['light.position'].write(self.app.light.position)
         self.faces_shader['view_pos'].write(self.app.camera.position)
@@ -36,20 +47,37 @@ class Object:
         self.faces_shader['m_model'].write(self.m_model)
 
     def get_vbo(self):
+        """Obtenció del VBO 
+
+        Returns:
+            moderngl.VertexArray: Array VBO
+        """
         data = self.get_data()
         vbo = self.ctx.buffer(data)
         return vbo
     
     def destroy(self):
+        """Neteja de les variables després d'acabar l'execució del programa
+        """
         self.vbo.release()
         self.faces_shader.release()
         self.vao.release()    
 
     def get_vao(self):
+        """Obtenció del VAO 
+
+        Returns:
+            moderngl.VertexArray: Array VAO
+        """
         vao = self.ctx.vertex_array(self.faces_shader,[(self.vbo, '3f 3f 3f', 'in_color', 'in_norm', 'in_position')])
         return vao
 
     def get_octahedron(self):
+        """Creació d'un octaedre (per tal de fer l'esfera per subdivisió)
+
+        Returns:
+            (list, list): Vèrtexs i arestes del octaedre
+        """
         # Create vertices of an octahedron
         v1 = np.array([0.,0.,0.])
         v2 = np.array([1.,0.,0.])
@@ -72,6 +100,15 @@ class Object:
         return vertices, faces
 
     def subdivide_faces(self, vertices, faces):
+        """Mètode de subdivisió 
+
+        Args:
+            vertices (list): Vèrtexs octaedre
+            faces (list): Arestes octaedre
+
+        Returns:
+            list: Arestes actualitzades
+        """
         new_faces = []
         midpoint_cache = {}
 
@@ -116,22 +153,51 @@ class Object:
 
     @staticmethod
     def normalize(v):
+        """Normalitza un vèrtex 
+
+        Args:
+            v (list): Vèrtex amb valors (x,y,z)
+
+        Returns:
+            list: Vèrtex normalitzat en cada posició
+        """
         norm = np.linalg.norm(v)
         return v / norm
 
     def get_faces_shader_program(self, shader):
+        """Obtenció del shader program 
+
+        Args: 
+            shader (list): Valors de vertex_shader i fragment_shader
+
+        Returns:
+            moderngl.Program: Programa que establim com serà el procediment del vertex shader i fragment shader 
+        """
         program = self.ctx.program(vertex_shader= shader[0], fragment_shader= shader[1])
         return program
     
-class Sun(Object): # EL SOL TÉ LES NORMALS EN NEGATIU, DE MOMENT ÉS L'ÚNIC CANVI RESPECTE LES ALTRES ESFERES
+class Sun(Object): 
+    """Classe filla d'Objecte. Crea el Sol. Es caracteritza per tenir les normals invertides de signe (per termes d'il·luminació)
+    """
     def get_model_matrix(self):
+        """
+        Returns:
+            glm.vec4: Matriu model 
+        """
         m_model = glm.rotate(glm.mat4(), glm.radians(0), glm.vec3(0, 1, 0))
         return m_model
 
     def render(self):
+        """Renderització del VAO
+        """
         self.vao.render()
 
     def get_data(self):
+        """Funció per obtenir l'esfera (coordenades esfèriques / subdivisió)
+
+        Returns:
+            np.array: Dades per renderitzar l'esfera (color, normal, position)
+        """
         color = glm.vec3(1, 1, 0)
         data = []
         if self.method == "stripes":
@@ -188,7 +254,16 @@ class Sun(Object): # EL SOL TÉ LES NORMALS EN NEGATIU, DE MOMENT ÉS L'ÚNIC CA
         return np.array(data, dtype='f4')
 
 class Planet(Object):
+    """Classe filla d'Objecte. Crea els Planetes.
+    """
     def __init__(self, app, shader, info, color, size, position):
+        """Inicialització de la classe Planet. Tindrà els atributs de Object i els següents
+
+        Args:
+            color (glm.vec3): Color del planeta
+            size (glm.vec3): Tamany del planeta
+            position (glm.vec3): Posició del planeta
+        """
         # Característiques de l'esfera
         self.color = color
         self.size = size
@@ -196,15 +271,28 @@ class Planet(Object):
         super().__init__(app, shader, info)
 
     def get_model_matrix(self):
+        """
+        Returns:
+            glm.vec4: Matriu model 
+        """
         m_model = glm.rotate(glm.mat4(), glm.radians(0), glm.vec3(0, 1, 0))
         m_model = glm.scale(m_model, self.size)  
         m_model = glm.translate(m_model, self.position)   
         return m_model
     
     def render(self):
+        """Renderització del VAO i rotació dels planetes
+        """
+        self.rotate_self()
+        self.rotate_sun()
         self.vao.render()
     
     def get_data(self):
+        """Funció per obtenir l'esfera (coordenades esfèriques / subdivisió)
+
+        Returns:
+            np.array: Dades per renderitzar l'esfera (color, normal, position)
+        """
         data = []
         if self.method == "stripes":
             vertices = []
@@ -259,3 +347,43 @@ class Planet(Object):
 
         return np.array(data, dtype='f4')
 
+    def rotate_self(self):
+        """Rotació del planeta sobre sí mateix.
+        """
+        # Inclinación en el eje de rotación (por ejemplo, ligeramente inclinada)
+        inclined_axis = glm.vec3(1, 0.5, 0)  # Puedes ajustar los valores según la inclinación deseada
+
+        # Normalizar el eje para que el vector tenga longitud 1
+        inclined_axis = glm.normalize(inclined_axis)
+
+        self.m_model = glm.rotate(self.m_model, self.app.time*3, inclined_axis)
+        self.faces_shader['m_model'].write(self.m_model)
+    
+    def rotate_sun(self):
+        """Rotació del planeta sobre el sol.
+        """
+        # Crear una matriz de transformación inicial (identidad)
+        m_model = glm.mat4()
+
+        # Semieje mayor y menor basados en la distancia inicial del planeta al Sol
+        a = glm.length(glm.vec2(self.position.x, self.position.z))  # La magnitud en XZ como semieje mayor
+        b = a * 0.8  # Semieje menor (ajústalo según el grado de excentricidad que desees)
+
+        # Calcular el ángulo en función del tiempo
+        theta = self.app.time * 0.5  # Ajusta la velocidad de la órbita
+
+        # Posición del planeta en la órbita elíptica (plano XZ)
+        x = a * glm.cos(theta)
+        z = b * glm.sin(theta)
+        y = self.position.y  # Mantener la altura constante o ajustarla si deseas órbitas inclinadas
+
+        # Trasladar el planeta a la nueva posición calculada (órbita elíptica respecto al Sol en (0, 0, 0))
+        new_position = glm.vec3(x, y, z)
+
+        # Aplicar la traslación y escalado
+        m_model = glm.translate(m_model, new_position)
+        m_model = glm.scale(m_model, self.size)
+
+        # Actualizar la matriz de modelo
+        self.m_model = m_model
+        self.faces_shader['m_model'].write(self.m_model)

@@ -10,7 +10,14 @@ from object import Sun, Planet
 import shaders as sh
 
 class GraphicsEngine:
+    """Classe que farà corre l'aplicació controlant instàcies de les altres classes 
+    """
     def __init__(self, win_size=(900,800)):
+        """Inicialització de la classe GraphicsEngine
+
+        Args:
+            win_size (tuple, optional): Tamany de finestra de l'aplicació. Defaults to (900,800).
+        """
         # init pygame modules
         pg.init()
         # window size
@@ -29,6 +36,8 @@ class GraphicsEngine:
         # light
         self.light = Light()
         self.objects = []
+        self.clock = pg.time.Clock()
+        self.time = 0
         # axis 
         self.objects.append(Axis(self))
         # planetes
@@ -36,19 +45,29 @@ class GraphicsEngine:
         info_sphere = ["octahedron", 3]
         self.objects.append(Sun(self, [sh.vertex_shader_SUN, sh.fragment_shader_SUN], ["stripes", 1.25, 20, 20]))
         self.objects.append(Planet(self, [sh.vertex_shader_EARTH, sh.fragment_shader_EARTH], info_sphere, glm.vec3(0,0,1), glm.vec3(0.5,0.5,0.5), glm.vec3(4,0,4))) # la Terra. color, size i posició son els de la Terra by default (de moment)
-        self.objects.append(Planet(self, [sh.vertex_shader_EARTH, sh.fragment_shader_EARTH], info_sphere, glm.vec3(1,1,1), glm.vec3(0.3,0.3,0.3), glm.vec3(0,0,6))) # la Lluna
+        self.objects.append(Planet(self, [sh.vertex_shader_EARTH, sh.fragment_shader_EARTH], info_sphere, glm.vec3(1,1,1), glm.vec3(0.3,0.3,0.3), glm.vec3(0,0,8))) # la Lluna
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
-        
+    
+    def get_time(self):
+        """Funció per obtenir el temps (en ticks) - Ús: Fer rotar objectes
+        """
+        self.time =pg.time.get_ticks() * 0.001
+
     def check_events(self):
+        """Funcionalitat per controlar els events durant el temps de vida del programa.
+        """
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
                 for objecte in self.objects:
                     objecte.destroy()
+
                 pg.quit()
                 sys.exit()
-
+                
     def render(self):
+        """Renderització dels objectes 
+        """
         # clear framebuffer
         self.ctx.clear(color=(0,0,0))
 
@@ -61,7 +80,11 @@ class GraphicsEngine:
         pg.display.flip()
 
     def run(self):
+        """Funció per corre el programa frame a frame.
+        """
         while True:
+            self.get_time()
             self.check_events()
             self.render()
+            self.clock.tick(60)
             
