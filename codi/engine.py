@@ -57,7 +57,7 @@ class GraphicsEngine:
         self.button_manager.batch_add_buttons(gui_layout)
 
         # axis
-        self.objects.append(Axis(self))
+        # self.objects.append(Axis(self))
 
         # planetes
 
@@ -82,14 +82,14 @@ class GraphicsEngine:
             glm.vec3(4, 0, 4)
         ))
 
-        self.objects.append(Planet(
-            self,
-            [sh.vertex_shader_EARTH, sh.fragment_shader_EARTH],
-            info_sphere,
-            glm.vec3(1, 1, 1),
-            glm.vec3(0.3, 0.3, 0.3),
-            glm.vec3(0, 0, 8)
-        ))  # la Lluna
+        # self.objects.append(Planet(
+        #     self,
+        #     [sh.vertex_shader_EARTH, sh.fragment_shader_EARTH],
+        #     info_sphere,
+        #     glm.vec3(1, 1, 1),
+        #     glm.vec3(0.3, 0.3, 0.3),
+        #     glm.vec3(0, 0, 8)
+        # ))  # la Lluna
 
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
@@ -165,3 +165,4 @@ class GraphicsEngine:
             self.check_events()
             self.render()
             self.clock.tick(60)
+

@@ -122,3 +122,31 @@ fragment_shader_EARTH = '''
                     fragColor = vec4(result, 1.0);
                 }
             '''
+
+vertex_shader_STAR = '''
+        #version 330
+
+        layout(location = 0) in vec3 in_position;
+
+        uniform mat4 m_proj;
+        uniform mat4 m_view;
+        uniform mat4 m_model;
+
+        void main() {
+            gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
+        }
+    '''
+fragment_shader_STAR = '''
+        #version 330
+
+        uniform vec3 star_color;
+
+        out vec4 fragColor;
+
+        void main() {
+            if (distance(gl_PointCoord, vec2(0.5, 0.5)) > 0.5) {
+                discard;
+            }
+            fragColor = vec4(star_color, 1.0);
+        }
+    '''
