@@ -1,0 +1,89 @@
+{
+    "day_picker": {
+        "class": "rectangular",
+        "kwargs": {
+            "x": 752,
+            "y": 28,
+            "width": 120,
+            "height": 30,
+            "default_color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false
+        }
+    },
+    "zoom_in": {
+        "class": "rectangular",
+        "kwargs": {
+            "x": 28,
+            "y": 696,
+            "width": 24,
+            "height": 24,
+            "default_color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false
+        }
+    },
+    "zoom_out": {
+        "class": "rectangular",
+        "kwargs": {
+            "x": 28,
+            "y": 720,
+            "width": 24,
+            "height": 24,
+            "default_color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false
+        }
+    },
+    "constellations_visibility": {
+        "class": "circular",
+        "kwargs": {
+            "x": 40,
+            "y": 760,
+            "radius": 12,
+            "default_color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false
+        }
+    }
+}
