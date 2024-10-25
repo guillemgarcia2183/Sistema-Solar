@@ -144,9 +144,19 @@ fragment_shader_STAR = '''
         out vec4 fragColor;
 
         void main() {
-            if (distance(gl_PointCoord, vec2(0.5, 0.5)) > 0.5) {
+
+            vec2 center = vec2(0.5);
+            float inner_radius = 0.25;
+            float outer_radius = 0.5;
+
+            float distance = distance(gl_PointCoord, center);
+
+            if (distance < inner_radius) {
+                fragColor = vec4(star_color, 1.0);
+            } else if (distance < outer_radius){
+                fragColor = vec4(1.0, 1.0, 1.0, 1-distance/outer_radius);
+            } else {
                 discard;
             }
-            fragColor = vec4(star_color, 1.0);
         }
     '''
