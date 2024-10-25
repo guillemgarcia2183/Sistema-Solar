@@ -409,14 +409,8 @@ class Star(Object):
         # in-world placement of the star
         rads = glm.radians(23.44)
         #m_model *= glm.translate(self.position) #TODO: Is this correct?
-        m_model = glm.translate(-self.app.objects[2].position)
+        m_model = glm.translate(-self.app.objects[1].position)
         m_model *= glm.rotate(glm.mat4(), rads, glm.vec3(0, 0, 1))
-
-        # make it look like a square
-        m_model *= glm.translate(self.position)  
-        m_model *= glm.rotate(glm.mat4(), glm.acos(glm.dot(glm.normalize(self.normal), glm.normalize(self.app.camera.position))), glm.vec3(0, 1, 0))
-        m_model *= glm.translate(-self.position) #first
-
         return m_model
     
     def render(self):
