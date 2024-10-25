@@ -427,3 +427,6 @@ class Star(Object):
     def get_data(self):
         data = np.array([self.position.x, self.position.y, self.position.z], dtype='f4')
         return data
+
+    def get_vao(self):
+        return self.ctx.vertex_array(self.faces_shader, [(self.vbo, '3f', 'in_position')])
