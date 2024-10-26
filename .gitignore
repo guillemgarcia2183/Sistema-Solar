@@ -162,3 +162,5 @@ cython_debug/
 # Zip
 *.zip
 
+#.gitignore 
+/codi/data/
