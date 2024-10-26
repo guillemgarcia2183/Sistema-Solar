@@ -7,9 +7,12 @@ import sys
 from camera import Camera
 from light import Light
 from axis import Axis
-from object import Sun, Planet
+from object import Sun, Planet, Star
 import shaders as sh
+from starReader import StarReader
 from gui import ButtonManager
+
+_DATA_PATH = "./codi/data/hygdata_v41.csv"
 
 
 class GraphicsEngine:
@@ -51,7 +54,7 @@ class GraphicsEngine:
         # gui
         self.button_manager = ButtonManager(self)
 
-        with open("gui_layout.json", "r") as file:
+        with open(r"./codi/gui_layout.json", "r") as file:
             gui_layout = json.load(file)
 
         self.button_manager.batch_add_buttons(gui_layout)
@@ -91,6 +94,17 @@ class GraphicsEngine:
         #     glm.vec3(0, 0, 8)
         # ))  # la Lluna
 
+        # stars
+        # self.st = Star(self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None", glm.vec3(3.5, 2.5, 0))
+        star_reader = StarReader.from_csv(_DATA_PATH)
+
+        # TODO: PARALELIZE STAR CONSTRUCTION
+
+        self.stars = [
+            Star(self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None", glm.vec3(star)) for star in star_reader
+        ]
+
+
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
 
@@ -106,10 +120,6 @@ class GraphicsEngine:
                 self.end()
 
             if event.type == pg.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left click
-                    self.camera.left_button_held = True
-                    self.camera.last_mouse_pos = pg.mouse.get_pos()
-
                 button_event = self.button_manager.check_click(
                     pg.mouse.get_pos())
                 if button_event == "day_picker":
@@ -120,25 +130,6 @@ class GraphicsEngine:
                     print("Zoom out pressed.")
                 elif button_event == "constellations_visibility":
                     print("Constelations visibility pressed.")
-            
-            # Mouse button released
-            elif event.type == pg.MOUSEBUTTONUP:
-                if event.button == 1:  # Left click
-                    self.camera.left_button_held = False
-            
-            # Mouse movement
-            elif event.type == pg.MOUSEMOTION and self.camera.left_button_held:
-                current_mouse_pos = pg.mouse.get_pos()
-                if self.camera.last_mouse_pos is not None:
-                    # Calculate difference in mouse movement
-                    dx = current_mouse_pos[0] - self.camera.last_mouse_pos[0]
-                    dy = current_mouse_pos[1] - self.camera.last_mouse_pos[1]
-
-                    # Process the mouse movement to update camera rotation
-                    self.camera.process_mouse_movement(dx, dy)
-
-                # Update last mouse position
-                self.camera.last_mouse_pos = current_mouse_pos
 
     def end(self):
         """
@@ -176,6 +167,11 @@ class GraphicsEngine:
         for objecte in self.objects:
             objecte.render()
 
+        # TODO: Are stars that can't be seen being processed/rendered?
+        if 0:
+            for star in self.stars:
+                star.render()
+
         # Swap buffers + display caption
         pg.display.set_caption(self.info)
         pg.display.flip()
@@ -186,7 +182,5 @@ class GraphicsEngine:
         while True:
             self.get_time()
             self.check_events()
-            self.camera.process_keyboard()
             self.render()
             self.clock.tick(60)
-
