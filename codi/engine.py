@@ -140,7 +140,7 @@ class GraphicsEngine:
             elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:  # Left click
                     self.camera.left_button_held = False
-                    
+
             elif event.type == pg.MOUSEMOTION and self.camera.left_button_held:
                 current_mouse_pos = pg.mouse.get_pos()
                 if self.camera.last_mouse_pos is not None:
@@ -167,6 +167,9 @@ class GraphicsEngine:
 
         for objecte in self.objects:
             objecte.destroy()
+
+        for estrella in self.stars:
+            estrella.destroy()
 
         pg.quit()
         sys.exit()
