@@ -106,6 +106,10 @@ class GraphicsEngine:
                 self.end()
 
             if event.type == pg.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Left click
+                    self.camera.left_button_held = True
+                    self.camera.last_mouse_pos = pg.mouse.get_pos()
+
                 button_event = self.button_manager.check_click(
                     pg.mouse.get_pos())
                 if button_event == "day_picker":
@@ -116,6 +120,25 @@ class GraphicsEngine:
                     print("Zoom out pressed.")
                 elif button_event == "constellations_visibility":
                     print("Constelations visibility pressed.")
+            
+            # Mouse button released
+            elif event.type == pg.MOUSEBUTTONUP:
+                if event.button == 1:  # Left click
+                    self.camera.left_button_held = False
+            
+            # Mouse movement
+            elif event.type == pg.MOUSEMOTION and self.camera.left_button_held:
+                current_mouse_pos = pg.mouse.get_pos()
+                if self.camera.last_mouse_pos is not None:
+                    # Calculate difference in mouse movement
+                    dx = current_mouse_pos[0] - self.camera.last_mouse_pos[0]
+                    dy = current_mouse_pos[1] - self.camera.last_mouse_pos[1]
+
+                    # Process the mouse movement to update camera rotation
+                    self.camera.process_mouse_movement(dx, dy)
+
+                # Update last mouse position
+                self.camera.last_mouse_pos = current_mouse_pos
 
     def end(self):
         """
@@ -163,6 +186,7 @@ class GraphicsEngine:
         while True:
             self.get_time()
             self.check_events()
+            self.camera.process_keyboard()
             self.render()
             self.clock.tick(60)
 
