@@ -37,7 +37,7 @@ class GraphicsEngine:
         # create opengl context
         pg.display.set_mode(self.WIN_SIZE, flags=pg.OPENGL | pg.DOUBLEBUF)
         self.ctx = mgl.create_context()
-        self.ctx.enable(flags=mgl.DEPTH_TEST)
+        self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.BLEND)
 
         # camera
         self.camera = Camera(self)
