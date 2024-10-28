@@ -7,7 +7,7 @@ import sys
 from camera import Camera
 from light import Light
 from axis import Axis
-from object import Sun, Planet, Star
+from object import Sun, Planet, StarBatch
 import shaders as sh
 from starReader import StarReader
 from gui import ButtonManager
@@ -97,13 +97,7 @@ class GraphicsEngine:
         # stars
         # self.st = Star(self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None", glm.vec3(3.5, 2.5, 0))
         star_reader = StarReader.from_csv(_DATA_PATH)
-
-        # TODO: PARALELIZE STAR CONSTRUCTION
-
-        self.stars = [
-            Star(self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None", glm.vec3(star)) for star in star_reader
-        ]
-
+        self.stars = star_reader.make_stars_parallel(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None"])
 
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
@@ -193,9 +187,7 @@ class GraphicsEngine:
             objecte.render()
 
         # TODO: Are stars that can't be seen being processed/rendered?
-        if 0:
-            for star in self.stars:
-                star.render()
+        self.stars.render()
 
         # Swap buffers + display caption
         pg.display.set_caption(self.info)
