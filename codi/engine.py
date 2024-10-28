@@ -97,7 +97,7 @@ class GraphicsEngine:
         # stars
         # self.st = Star(self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None", glm.vec3(3.5, 2.5, 0))
         star_reader = StarReader.from_csv(_DATA_PATH)
-        self.stars = star_reader.make_stars_parallel(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None"])
+        self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None"])
 
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
@@ -162,8 +162,7 @@ class GraphicsEngine:
         for objecte in self.objects:
             objecte.destroy()
 
-        for estrella in self.stars:
-            estrella.destroy()
+        self.stars.destroy()
 
         pg.quit()
         sys.exit()
