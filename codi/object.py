@@ -388,12 +388,11 @@ class Planet(Object):
         # Actualizar la matriz de modelo
         self.m_model = m_model
         self.faces_shader['m_model'].write(self.m_model)
-
-class Star(Object):
-    def __init__(self, app, shader, info, position):
-        self.position = position
+    
+class StarBatch(Object):
+    def __init__(self, app, shader, info, positions):
+        self.positions = positions
         self.color = glm.vec3(1.0, 1.0, 1.0)
-        self.normal = glm.vec3(0, 0, 1)
         super().__init__(app, shader, info)
     
     def on_init(self):
@@ -411,16 +410,18 @@ class Star(Object):
         #m_model *= glm.translate(self.position) #TODO: Is this correct?
         m_model = glm.translate(-self.app.objects[1].position)
         m_model *= glm.rotate(glm.mat4(), rads, glm.vec3(0, 0, 1))
+
         return m_model
     
     def render(self):
         self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
-        self.ctx.point_size = 10
+        self.ctx.point_size = 20
         self.vao.render(mgl.POINTS)
 
     def get_data(self):
-        data = np.array([self.position.x, self.position.y, self.position.z], dtype='f4')
+        #data = np.array([self.position.x, self.position.y, self.position.z], dtype='f4')
+        data = np.array([(x, y, z) for x, z, y in self.positions], dtype='f4')
         return data
-
+    
     def get_vao(self):
         return self.ctx.vertex_array(self.faces_shader, [(self.vbo, '3f', 'in_position')])
