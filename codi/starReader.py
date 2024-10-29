@@ -1,6 +1,5 @@
 import pandas as pd
 
-# TODO: PARALELIZE STAR READING
 
 class StarReader():
 
