@@ -11,7 +11,7 @@ from object import Sun, Planet, StarBatch
 import shaders as sh
 from starReader import StarReader
 from gui import ButtonManager
-
+import os
 _DATA_PATH = "./codi/data/hygdata_v41.csv"
 
 
@@ -66,18 +66,18 @@ class GraphicsEngine:
 
         # Opcions exemple per crear l'esfera: ["stripes", 1.0, 20, 20] o bé
         # ["octahedron", 2]
-        info_sphere = ["octahedron", 3]
-
         self.objects.append(Sun(
             self,
             [sh.vertex_shader_SUN, sh.fragment_shader_SUN],
+            "textures/sun.jpg",
             ["stripes", 1.25, 20, 20],
         ))
 
         self.objects.append(Planet(
             self,
             [sh.vertex_shader_EARTH, sh.fragment_shader_EARTH],
-            info_sphere,
+            "textures/earth.jpg",
+            ["stripes", 0.5, 15, 15],
             # la Terra. color, size i posició son els de la Terra by default
             # (de moment)
             glm.vec3(0, 0, 1),
@@ -96,8 +96,8 @@ class GraphicsEngine:
 
         # stars
         # self.st = Star(self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None", glm.vec3(3.5, 2.5, 0))
-        star_reader = StarReader.from_csv(_DATA_PATH)
-        self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None"])
+        # star_reader = StarReader.from_csv(_DATA_PATH)
+        # self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None"])
 
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
@@ -162,7 +162,7 @@ class GraphicsEngine:
         for objecte in self.objects:
             objecte.destroy()
 
-        self.stars.destroy()
+        # self.stars.destroy()
 
         pg.quit()
         sys.exit()
@@ -186,7 +186,7 @@ class GraphicsEngine:
             objecte.render()
 
         # TODO: Are stars that can't be seen being processed/rendered?
-        self.stars.render()
+        #self.stars.render()
 
         # Swap buffers + display caption
         pg.display.set_caption(self.info)

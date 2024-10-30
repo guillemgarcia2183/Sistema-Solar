@@ -1,11 +1,13 @@
 import glm
 import numpy as np
 import moderngl as mgl
+import os
+from PIL import Image
 
 class Object:
     """Classe per crear un objecte dintre del Sistema Solar (classe pare)
     """
-    def __init__(self, app, shader, info = ["octahedron", 3]):
+    def __init__(self, app, shader, texture, info = ["octahedron", 3]):
         """Inicialització de la classe Object
 
         Args:
@@ -15,6 +17,7 @@ class Object:
         """
         self.app = app
         self.ctx = app.ctx
+        self.texture = self.load_texture(texture)
 
         self.method = info[0]
         if self.method == "stripes":
@@ -47,6 +50,16 @@ class Object:
         self.faces_shader['m_view'].write(self.app.camera.m_view)
         self.faces_shader['m_model'].write(self.m_model)
 
+    def load_texture(self, filepath):
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+        image = Image.open(filepath).transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.FLIP_LEFT_RIGHT)
+        texture = self.ctx.texture(image.size, 3, image.tobytes())
+        texture.filter = (mgl.LINEAR_MIPMAP_LINEAR, mgl.LINEAR)
+        texture.build_mipmaps()
+        texture.repeat_x = False
+        texture.repeat_y = False
+        return texture
+
     def get_vbo(self):
         """Obtenció del VBO 
 
@@ -62,6 +75,7 @@ class Object:
         """
         self.vbo.release()
         self.faces_shader.release()
+        self.texture.release()
         self.vao.release()    
 
     def get_vao(self):
@@ -70,7 +84,7 @@ class Object:
         Returns:
             moderngl.VertexArray: Array VAO
         """
-        vao = self.ctx.vertex_array(self.faces_shader,[(self.vbo, '3f 3f 3f', 'in_color', 'in_norm', 'in_position')])
+        vao = self.ctx.vertex_array(self.faces_shader,[(self.vbo, '3f 3f 3f 2f', 'in_color', 'in_norm', 'in_position', 'in_tex_coord')])
         return vao
 
     def get_octahedron(self):
@@ -191,6 +205,7 @@ class Sun(Object):
     def render(self):
         """Renderització del VAO
         """
+        self.texture.use()
         self.vao.render()
 
     def get_data(self):
@@ -204,32 +219,45 @@ class Sun(Object):
         if self.method == "stripes":
             vertices = []
             indices = []
+            
             # Latitude and longitude angles in radians
             for lat in range(self.lat + 1):
                 theta = np.pi * lat / self.lat
-                for lon in range(self.lon):
+                for lon in range(self.lon + 1):  # Increase by 1 to close the loop
                     phi = 2 * np.pi * lon / self.lon
+                    
                     # Spherical to Cartesian conversion
                     x = self.radius * np.sin(theta) * np.cos(phi)
                     y = self.radius * np.cos(theta)
                     z = self.radius * np.sin(theta) * np.sin(phi)
-                    vertices.append((x, y, z))
-
+                    
+                    # Calculate texture coordinates with improved wrap handling
+                    s = lon / self.lon
+                    t = 1 - (lat / self.lat)
+                    
+                    vertices.append((x, y, z, s, t))
+            
             # Create faces (triangles) between vertices (latitude-longitude stripes)
             for lat in range(self.lat):
                 for lon in range(self.lon):
-                    current = lat * self.lon + lon
-                    next = current + self.lon
+                    current = lat * (self.lon + 1) + lon
+                    next = current + self.lon + 1
+                    
+                    # Triangles for the quad strip
                     indices.append((current, next, current + 1))
                     indices.append((current + 1, next, next + 1))
 
             for face in indices:
                 for idx in face:
-                    vertex = glm.vec3(vertices[idx-1])
+                    x, y, z, s, t = vertices[idx]
+                    vertex = glm.vec3(x, y, z)
                     normalized_v = self.normalize(vertex)
-                    data.extend([color.x, color.y, color.z]) # in_color
-                    data.extend([-normalized_v.x, -normalized_v.y, -normalized_v.z]) # in_norm
-                    data.extend([vertex.x, vertex.y, vertex.z]) # in_position
+                    
+                    # Add vertex data
+                    data.extend([color.x, color.y, color.z])  # in_color
+                    data.extend([-normalized_v.x, -normalized_v.y, -normalized_v.z])  # in_norm
+                    data.extend([vertex.x, vertex.y, vertex.z])  # in_position
+                    data.extend([s, t])  # Texture coordinates
 
         elif self.method == "octahedron":
             # Generate the octahedron and subdivide it into a sphere
@@ -257,7 +285,7 @@ class Sun(Object):
 class Planet(Object):
     """Classe filla d'Objecte. Crea els Planetes.
     """
-    def __init__(self, app, shader, info, color, size, position):
+    def __init__(self, app, shader, texture, info, color, size, position):
         """Inicialització de la classe Planet. Tindrà els atributs de Object i els següents
 
         Args:
@@ -269,7 +297,7 @@ class Planet(Object):
         self.color = color
         self.size = size
         self.position = position
-        super().__init__(app, shader, info)
+        super().__init__(app, shader, texture, info)
 
     def get_model_matrix(self):
         """
@@ -280,10 +308,11 @@ class Planet(Object):
         m_model = glm.scale(m_model, self.size)  
         m_model = glm.translate(m_model, self.position)   
         return m_model
-    
+          
     def render(self):
         """Renderització del VAO i rotació dels planetes
         """
+        self.texture.use()
         self.rotate_self()
         self.rotate_sun()
         self.vao.render()
@@ -298,32 +327,45 @@ class Planet(Object):
         if self.method == "stripes":
             vertices = []
             indices = []
+            
             # Latitude and longitude angles in radians
             for lat in range(self.lat + 1):
                 theta = np.pi * lat / self.lat
-                for lon in range(self.lon):
+                for lon in range(self.lon + 1):  # Increase by 1 to close the loop
                     phi = 2 * np.pi * lon / self.lon
+                    
                     # Spherical to Cartesian conversion
                     x = self.radius * np.sin(theta) * np.cos(phi)
                     y = self.radius * np.cos(theta)
                     z = self.radius * np.sin(theta) * np.sin(phi)
-                    vertices.append((x, y, z))
-
+                    
+                    # Calculate texture coordinates with improved wrap handling
+                    s = lon / self.lon
+                    t = 1 - (lat / self.lat)
+                    
+                    vertices.append((x, y, z, s, t))
+            
             # Create faces (triangles) between vertices (latitude-longitude stripes)
             for lat in range(self.lat):
                 for lon in range(self.lon):
-                    current = lat * self.lon + lon
-                    next = current + self.lon
+                    current = lat * (self.lon + 1) + lon
+                    next = current + self.lon + 1
+                    
+                    # Triangles for the quad strip
                     indices.append((current, next, current + 1))
                     indices.append((current + 1, next, next + 1))
 
             for face in indices:
                 for idx in face:
-                    vertex = glm.vec3(vertices[idx-1])
+                    x, y, z, s, t = vertices[idx]
+                    vertex = glm.vec3(x, y, z)
                     normalized_v = self.normalize(vertex)
-                    data.extend([self.color.x, self.color.y, self.color.z]) # in_color
-                    data.extend([normalized_v.x, normalized_v.y, normalized_v.z]) # in_norm
-                    data.extend([vertex.x, vertex.y, vertex.z]) # in_position
+                    
+                    # Add vertex data
+                    data.extend([self.color.x, self.color.y, self.color.z])  # in_color
+                    data.extend([normalized_v.x, normalized_v.y, normalized_v.z])  # in_norm
+                    data.extend([vertex.x, vertex.y, vertex.z])  # in_position
+                    data.extend([s, t])  # Texture coordinates
 
         elif self.method == "octahedron":
             # Generate the octahedron and subdivide it into a sphere
@@ -350,14 +392,13 @@ class Planet(Object):
 
     def rotate_self(self):
         """Rotació del planeta sobre sí mateix.
-        """
-        # Inclinación en el eje de rotación (por ejemplo, ligeramente inclinada)
+        """        # Inclinación en el eje de rotación (por ejemplo, ligeramente inclinada)
         inclined_axis = glm.vec3(1, 0.5, 0)  # Puedes ajustar los valores según la inclinación deseada
 
         # Normalizar el eje para que el vector tenga longitud 1
         inclined_axis = glm.normalize(inclined_axis)
 
-        self.m_model = glm.rotate(self.m_model, self.app.time*3, inclined_axis)
+        self.m_model = glm.rotate(self.m_model, 0.25, inclined_axis)
         self.faces_shader['m_model'].write(self.m_model)
     
     def rotate_sun(self):
@@ -381,7 +422,6 @@ class Planet(Object):
         # Trasladar el planeta a la nueva posición calculada (órbita elíptica respecto al Sol en (0, 0, 0))
         new_position = glm.vec3(x, y, z)
 
-        # Aplicar la traslación y escalado
         m_model = glm.translate(m_model, new_position)
         m_model = glm.scale(m_model, self.size)
 
