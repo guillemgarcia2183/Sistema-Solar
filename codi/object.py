@@ -453,7 +453,13 @@ class StarBatch(Object):
 
         return m_model
     
+   def update(self):
+        self.faces_shader['m_view'].write(self.app.camera.m_view)
+
     def render(self):
+
+        self.update()
+        
         self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
         self.ctx.point_size = 20
         self.vao.render(mgl.POINTS)
