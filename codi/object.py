@@ -3,6 +3,7 @@ import numpy as np
 import moderngl as mgl
 import os
 from PIL import Image
+import math
 
 class Object:
     """Classe per crear un objecte dintre del Sistema Solar (classe pare)
@@ -285,7 +286,7 @@ class Sun(Object):
 class Planet(Object):
     """Classe filla d'Objecte. Crea els Planetes.
     """
-    def __init__(self, app, shader, texture, info, color, size, position):
+    def __init__(self, app, shader, texture, info, color, size, position, velocity, inclination, excentrity):
         """Inicialització de la classe Planet. Tindrà els atributs de Object i els següents
 
         Args:
@@ -297,6 +298,9 @@ class Planet(Object):
         self.color = color
         self.size = size
         self.position = position
+        self.velocity = velocity
+        self.inclination = inclination
+        self.excentrity = excentrity
         super().__init__(app, shader, texture, info)
 
     def get_model_matrix(self):
@@ -309,14 +313,6 @@ class Planet(Object):
         m_model = glm.translate(m_model, self.position)   
         return m_model
           
-    def render(self):
-        """Renderització del VAO i rotació dels planetes
-        """
-        self.texture.use()
-        self.rotate_self()
-        self.rotate_sun()
-        self.vao.render()
-    
     def get_data(self):
         """Funció per obtenir l'esfera (coordenades esfèriques / subdivisió)
 
@@ -389,18 +385,28 @@ class Planet(Object):
                     data.extend([vertex.x, vertex.y, vertex.z]) # in_position
 
         return np.array(data, dtype='f4')
+    
+    def render(self):
+        """Renderització del VAO i rotació dels planetes
+        """
+        self.texture.use()
+        self.rotate_sun()
+        self.rotate_self()
+        self.vao.render()
 
     def rotate_self(self):
         """Rotació del planeta sobre sí mateix.
-        """        # Inclinación en el eje de rotación (por ejemplo, ligeramente inclinada)
-        inclined_axis = glm.vec3(1, 0.5, 0)  # Puedes ajustar los valores según la inclinación deseada
+        """        
+        # Inclinación en el eje de rotación (por ejemplo, ligeramente inclinada)
+        inclination_radians = math.radians(self.inclination)
+        inclined_axis = glm.vec3(math.sin(inclination_radians), math.cos(inclination_radians), 0)
 
         # Normalizar el eje para que el vector tenga longitud 1
         inclined_axis = glm.normalize(inclined_axis)
 
-        self.m_model = glm.rotate(self.m_model, 0.25, inclined_axis)
+        self.m_model = glm.rotate(self.m_model, self.app.time*10, inclined_axis)
         self.faces_shader['m_model'].write(self.m_model)
-    
+        
     def rotate_sun(self):
         """Rotació del planeta sobre el sol.
         """
@@ -409,10 +415,10 @@ class Planet(Object):
 
         # Semieje mayor y menor basados en la distancia inicial del planeta al Sol
         a = glm.length(glm.vec2(self.position.x, self.position.z))  # La magnitud en XZ como semieje mayor
-        b = a * 0.8  # Semieje menor (ajústalo según el grado de excentricidad que desees)
+        b = a * (1 - self.excentrity ** 2) ** 0.5 # Semieje menor (ajústalo según el grado de excentricidad que desees)
 
         # Calcular el ángulo en función del tiempo
-        theta = self.app.time * 0.5  # Ajusta la velocidad de la órbita
+        theta = self.app.time * self.velocity   # Ajusta la velocidad de la órbita
 
         # Posición del planeta en la órbita elíptica (plano XZ)
         x = a * glm.cos(theta)
@@ -424,16 +430,14 @@ class Planet(Object):
 
         m_model = glm.translate(m_model, new_position)
         m_model = glm.scale(m_model, self.size)
-
+        
         # Actualizar la matriz de modelo
-        self.m_model = m_model
-        self.faces_shader['m_model'].write(self.m_model)
-    
+        self.m_model = m_model    
 class StarBatch(Object):
-    def __init__(self, app, shader, info, positions):
+    def __init__(self, app, shader, texture, info, positions):
         self.positions = positions
         self.color = glm.vec3(1.0, 1.0, 1.0)
-        super().__init__(app, shader, info)
+        super().__init__(app, shader, texture, info)
     
     def on_init(self):
         # Essential for viewing
@@ -457,11 +461,9 @@ class StarBatch(Object):
         self.faces_shader['m_view'].write(self.app.camera.m_view)
 
     def render(self):
-
         self.update()
-        
         self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
-        self.ctx.point_size = 20
+        self.ctx.point_size = 3
         self.vao.render(mgl.POINTS)
 
     def get_data(self):

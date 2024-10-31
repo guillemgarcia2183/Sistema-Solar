@@ -13,7 +13,7 @@ class Camera:
         """
         self.app = app
         self.aspec_ratio = app.WIN_SIZE[0]/app.WIN_SIZE[1]
-        self.position = glm.vec3(8,3,0)
+        self.position = glm.vec3(40,3,0)
         self.up = glm.vec3(0,1,0)
 
         # Moviment de la càmera
@@ -46,7 +46,7 @@ class Camera:
         Returns:
             glm.vec4: Matriu projecció 
         """
-        return glm.perspective(glm.radians(45), self.aspec_ratio, 0.1, 100)
+        return glm.perspective(glm.radians(45), self.aspec_ratio, 0.1, 500)
     
     def calculate_initial_orientation(self, position, target):
         # Calculate the direction vector from the camera to the target

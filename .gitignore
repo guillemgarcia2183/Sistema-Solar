@@ -163,4 +163,4 @@ cython_debug/
 *.zip
 
 #.gitignore 
-/codi/data/
+/codi/data/hygdata_v41.csv
