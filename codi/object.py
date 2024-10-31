@@ -453,7 +453,7 @@ class StarBatch(Object):
 
         return m_model
     
-   def update(self):
+    def update(self):
         self.faces_shader['m_view'].write(self.app.camera.m_view)
 
     def render(self):
