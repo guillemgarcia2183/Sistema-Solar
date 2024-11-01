@@ -404,7 +404,7 @@ class Planet(Object):
         # Normalizar el eje para que el vector tenga longitud 1
         inclined_axis = glm.normalize(inclined_axis)
 
-        self.m_model = glm.rotate(self.m_model, self.app.time*10, inclined_axis)
+        self.m_model = glm.rotate(self.m_model, self.app.time*self.velocity*20, inclined_axis)
         self.faces_shader['m_model'].write(self.m_model)
         
     def rotate_sun(self):
