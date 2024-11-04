@@ -7,7 +7,7 @@ import sys
 from camera import Camera
 from light import Light
 from axis import Axis
-from object import Sun, Planet, StarBatch
+from object import Sun, Planet, Orbit, StarBatch
 import shaders as sh
 from reader import Reader
 from gui import ButtonManager
@@ -68,6 +68,7 @@ class GraphicsEngine:
         planets_textures = ["textures/mercury.jpg", 
                             "textures/venus.jpg",
                             "textures/earth.jpg",
+                            "textures/mars.jpg",
                             "textures/jupiter.jpg",
                             "textures/saturn.jpg",
                             "textures/uranus.jpg",
@@ -83,7 +84,7 @@ class GraphicsEngine:
 
         #! IMPORTANT ANNOTATION: SUBJECTE A CANVIS
         # Scale radius: 1:100.000km 
-        # Scale distance: 1:15*(10^6)km
+        # Scale distance: 1:10*(10^6)km
         # Scale distance: 1:100km/h
         # Escalat planeta: x5 
         
@@ -96,27 +97,25 @@ class GraphicsEngine:
         for planet, texture in zip(planets_list, planets_textures):
             self.objects.append(Planet(
                 self,
-                [sh.vertex_shader_EARTH, sh.fragment_shader_EARTH],
+                [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
                 ["stripes", planets_data[planet].data["Diameter (km)"]/200000, 15, 15],
-                # la Terra. color, size i posició son els de la Terra by default
-                # (de moment)
-                glm.vec3(0, 0, 1),
-                glm.vec3(5, 5, 5), 
-                glm.vec3(planets_data[planet].data["Distance from Sun (10^6 km)"]/15, 0, planets_data[planet].data["Distance from Sun (10^6 km)"]/15),
+                glm.vec3(7, 7, 7), 
+                glm.vec3(planets_data[planet].data["Distance from Sun (10^6 km)"]/10, 0, planets_data[planet].data["Distance from Sun (10^6 km)"]/10),
                 planets_data[planet].data["Orbital Velocity (km/s)"]/100,
                 planets_data[planet].data["Orbital Inclination (degrees)"],
+                planets_data[planet].data["Orbital Eccentricity"],
+            ))
+
+            self.objects.append(Orbit(
+                self,
+                [sh.vertex_shader_ELLIPSE, sh.fragment_shader_ELLIPSE],
+                texture,
+                "None", 
+                glm.vec3(planets_data[planet].data["Distance from Sun (10^6 km)"]/10, 0, planets_data[planet].data["Distance from Sun (10^6 km)"]/10),
                 planets_data[planet].data["Orbital Eccentricity"]
             ))
 
-        # self.objects.append(Planet(
-        #     self,
-        #     [sh.vertex_shader_EARTH, sh.fragment_shader_EARTH],
-        #     info_sphere,
-        #     glm.vec3(1, 1, 1),
-        #     glm.vec3(0.3, 0.3, 0.3),
-        #     glm.vec3(0, 0, 8)
-        # ))  # la Lluna
 
         # stars
         # self.st = Star(self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None", glm.vec3(3.5, 2.5, 0))
@@ -212,7 +211,7 @@ class GraphicsEngine:
 
         # TODO: Are stars that can't be seen being processed/rendered?
         self.stars.render()
-
+ 
         # Swap buffers + display caption
         pg.display.set_caption(self.info)
         pg.display.flip()

@@ -65,7 +65,7 @@ fragment_shader_SUN = '''
                 }
             '''
 
-vertex_shader_EARTH ='''
+vertex_shader_PLANET ='''
                 #version 330
                 layout(location = 0) in vec3 in_norm;
                 layout(location = 1) in vec3 in_position;
@@ -87,7 +87,7 @@ vertex_shader_EARTH ='''
                     gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
                 }
             '''
-fragment_shader_EARTH = '''
+fragment_shader_PLANET = '''
                 #version 330
                 in vec3 v_norm;
                 in vec3 v_frag_pos;
@@ -167,3 +167,32 @@ fragment_shader_STAR = '''
             }
         }
     '''
+
+vertex_shader_ELLIPSE = '''
+        #version 330 core
+
+        layout(location = 0) in vec3 in_position;
+
+        uniform mat4 m_proj;   // Matriz de proyección
+        uniform mat4 m_view;   // Matriz de vista
+        uniform mat4 m_model;  // Matriz del modelo, que aquí sería la identidad
+
+        void main() {
+            // Transformación del vértice
+            gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
+        }
+    '''
+fragment_shader_ELLIPSE = '''
+        #version 330 core
+
+        out vec4 FragColor;
+
+        uniform vec3 orbit_color;  // Color de la órbita, como un vector RGB
+
+        void main() {
+            // Define el color de la órbita
+            FragColor = vec4(orbit_color, 1.0);  // Alpha de 1.0 para opacidad completa
+        }
+
+    '''
+

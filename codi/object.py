@@ -298,23 +298,24 @@ class Sun(Object):
 class Planet(Object):
     """Classe filla d'Objecte. Crea els Planetes.
     """
-    def __init__(self, app, shader, texture, info, color, size, position, velocity, inclination, excentrity):
+    def __init__(self, app, shader, texture, info, size, position, velocity, inclination, excentrity):
         """Inicialització de la classe Planet. Tindrà els atributs de Object i els següents
 
         Args:
-            color (glm.vec3): Color del planeta
             size (glm.vec3): Tamany del planeta
             position (glm.vec3): Posició del planeta
+            velocity (float): Velocitat del planeta
+            inclination (float): Inclinació de rotació
+            excentrity (float): Excentritat de l'el·lipse
         """
         # Característiques de l'esfera
-        #self.color = color
         self.size = size
         self.position = position
         self.velocity = velocity
         self.inclination = inclination
         self.excentrity = excentrity
         super().__init__(app, shader, texture, info)
-
+        
     def get_model_matrix(self):
         """
         Returns:
@@ -324,7 +325,7 @@ class Planet(Object):
         m_model = glm.scale(m_model, self.size)  
         m_model = glm.translate(m_model, self.position)   
         return m_model
-          
+            
     def get_data(self):
         """Funció per obtenir l'esfera (coordenades esfèriques / subdivisió)
 
@@ -404,7 +405,7 @@ class Planet(Object):
         self.texture.use()
         self.rotate_sun()
         self.rotate_self()
-        self.vao.render()
+        self.vao.render()    
 
     def rotate_self(self):
         """Rotació del planeta sobre sí mateix.
@@ -446,6 +447,64 @@ class Planet(Object):
         # Actualizar la matriz de modelo
         self.m_model = m_model    
 
+class Orbit(Object):
+    def __init__(self, app, shader, texture, info, position, excentrity):
+        self.position = position
+        self.excentrity = excentrity
+        super().__init__(app, shader, texture, info)
+
+    def on_init(self):
+        # Essential for viewing
+        self.faces_shader['m_proj'].write(self.app.camera.m_proj)
+        self.faces_shader['m_view'].write(self.app.camera.m_view)
+        self.faces_shader['m_model'].write(self.m_model)
+        orbit_color = glm.vec3(1.0, 1.0, 1.0)  # RGB blanco
+        self.faces_shader['orbit_color'].write(orbit_color)
+
+    def get_vao(self):
+        return self.ctx.vertex_array(self.faces_shader, [(self.vbo, '3f', 'in_position')])
+    
+    def get_model_matrix(self):
+        """
+        Returns:
+            glm.vec4: Matriu model 
+        """
+        m_model = glm.rotate(glm.mat4(), glm.radians(0), glm.vec3(0, 1, 0))
+        return m_model
+
+    def update(self):
+        self.faces_shader['m_view'].write(self.app.camera.m_view)
+
+    def render(self):
+        """Renderització del VAO
+        """
+        self.update()
+        self.vao.render(mgl.LINE_LOOP) 
+
+
+    def get_data(self, num_points = 200):
+        """Genera los puntos de la órbita del planeta alrededor del sol.
+    
+        Args:
+            num_points (int): Número de puntos que describen la órbita.
+        
+        Returns:
+            np.array: Array con los puntos en la órbita.
+        """
+        # Parámetros de la órbita
+        a = glm.length(glm.vec2(self.position.x, self.position.z))  # Semieje mayor
+        b = a * (1 - self.excentrity ** 2) ** 0.5  # Semieje menor
+
+        orbit_points = []
+
+        for i in range(num_points):
+            theta = 2 * np.pi * i / num_points  # Ángulo en radianes
+            x = a * np.cos(theta)
+            z = b * np.sin(theta)
+            orbit_points.append((x, 0, z))
+
+        return np.array(orbit_points, dtype='f4')
+    
 class StarBatch(Object):
     def __init__(self, app, shader, texture, info, positions):
         self.positions = positions
