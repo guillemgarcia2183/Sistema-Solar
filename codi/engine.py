@@ -46,6 +46,7 @@ class GraphicsEngine:
         # light
         self.light = Light()
         self.objects = []
+        self.orbits = []
         self.clock = pg.time.Clock()
         self.time = 0
 
@@ -107,7 +108,7 @@ class GraphicsEngine:
                 planets_data[planet].data["Orbital Eccentricity"],
             ))
 
-            self.objects.append(Orbit(
+            self.orbits.append(Orbit(
                 self,
                 [sh.vertex_shader_ELLIPSE, sh.fragment_shader_ELLIPSE],
                 texture,
@@ -124,6 +125,7 @@ class GraphicsEngine:
 
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
+        self.ellipse = True
 
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.
@@ -136,6 +138,9 @@ class GraphicsEngine:
             ):
                 self.end()
 
+            if event.type == pg.KEYDOWN and event.key == pg.K_p:
+                self.ellipse = not self.ellipse
+                    
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
                     self.camera.left_button_held = True
@@ -185,6 +190,9 @@ class GraphicsEngine:
 
         for objecte in self.objects:
             objecte.destroy()
+        
+        for orbit in self.orbits:
+            orbit.destroy()
 
         self.stars.destroy()
 
@@ -208,6 +216,10 @@ class GraphicsEngine:
         # render scene + axis
         for objecte in self.objects:
             objecte.render()
+        
+        if self.ellipse:
+            for orbit in self.orbits:
+                orbit.render()
 
         # TODO: Are stars that can't be seen being processed/rendered?
         self.stars.render()
