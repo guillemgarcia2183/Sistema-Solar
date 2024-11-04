@@ -85,7 +85,8 @@ class Object:
         Returns:
             moderngl.VertexArray: Array VAO
         """
-        vao = self.ctx.vertex_array(self.faces_shader,[(self.vbo, '3f 3f 3f 2f', 'in_color', 'in_norm', 'in_position', 'in_tex_coord')])
+        #vao = self.ctx.vertex_array(self.faces_shader,[(self.vbo, '3f 3f 3f 2f', 'in_color', 'in_norm', 'in_position', 'in_tex_coord')])
+        vao = self.ctx.vertex_array(self.faces_shader,[(self.vbo, '3f 3f 2f', 'in_norm', 'in_position', 'in_tex_coord')])
         return vao
 
     def get_octahedron(self):
@@ -109,7 +110,13 @@ class Object:
         v5-=c
         v6-=c
         vertices = [v1, v2, v3, v4, v5, v6]
- 
+
+        for i in range(len(vertices)):
+            n_v = self.normalize(vertices[i])
+            s = (0.5 + (np.arctan2(n_v[2], n_v[0]) / (2 * np.pi))) % 1.0
+            t = 0.5 - (np.arcsin(n_v[1]) / np.pi)
+            vertices[i] = [vertices[i], s,t]
+
         # Octahedron faces (triangles)
         faces = [(0,4,1), (0,3,4), (0,1,5), (0,5,3), (2,4,3), (2,1,4), (2,3,5), (2,5,1)]
 
@@ -137,16 +144,18 @@ class Object:
             if key in midpoint_cache:
                 return midpoint_cache[key]
 
-            v1 = vertices[v1_idx]
-            v2 = vertices[v2_idx]
+            v1 = vertices[v1_idx][0]
+            v2 = vertices[v2_idx][0]
             midpoint = (v1 + v2) / 2.0
 
             # Normalize the midpoint to lie on the unit sphere
             midpoint = self.normalize(midpoint)
+            s = (0.5 + (np.arctan2(midpoint[2], midpoint[0]) / (2 * np.pi))) % 1.0
+            t = 0.5 - (np.arcsin(midpoint[1]) / np.pi)
 
             # Add the new vertex and return its index
             midpoint_idx = len(vertices)
-            vertices.append(midpoint)
+            vertices.append([midpoint, s, t])
             midpoint_cache[key] = midpoint_idx
             return midpoint_idx
 
@@ -215,7 +224,7 @@ class Sun(Object):
         Returns:
             np.array: Dades per renderitzar l'esfera (color, normal, position)
         """
-        color = glm.vec3(1, 1, 0)
+        #color = glm.vec3(1, 1, 0)
         data = []
         if self.method == "stripes":
             vertices = []
@@ -255,10 +264,10 @@ class Sun(Object):
                     normalized_v = self.normalize(vertex)
                     
                     # Add vertex data
-                    data.extend([color.x, color.y, color.z])  # in_color
+                    #data.extend([color.x, color.y, color.z])  # in_color
                     data.extend([-normalized_v.x, -normalized_v.y, -normalized_v.z])  # in_norm
                     data.extend([vertex.x, vertex.y, vertex.z])  # in_position
-                    data.extend([s, t])  # Texture coordinates
+                    data.extend([s, t])  # in_tex_coord
 
         elif self.method == "octahedron":
             # Generate the octahedron and subdivide it into a sphere
@@ -270,16 +279,19 @@ class Sun(Object):
 
             # Normalize all vertices to project them onto a unit sphere
             for i in range(len(octahedron_vertices)):
-                octahedron_vertices[i] = self.normalize(octahedron_vertices[i])
+                octahedron_vertices[i][0] = self.normalize(octahedron_vertices[i][0])
 
             for face in octahedron_faces:
                 for idx in face:
-                    vertex = glm.vec3(octahedron_vertices[idx])
+                    v, s, t = octahedron_vertices[idx]
+                    vertex =  glm.vec3(v)
                     normalized_v = self.normalize(vertex)
 
-                    data.extend([color.x, color.y, color.z]) # in_color
+                    #data.extend([color.x, color.y, color.z]) # in_color
                     data.extend([-normalized_v.x, -normalized_v.y, -normalized_v.z]) # in_norm
                     data.extend([vertex.x, vertex.y, vertex.z]) # in_position
+                    
+                    data.extend([s,t]) # in_tex_coord
 
         return np.array(data, dtype='f4')
 
@@ -295,7 +307,7 @@ class Planet(Object):
             position (glm.vec3): Posició del planeta
         """
         # Característiques de l'esfera
-        self.color = color
+        #self.color = color
         self.size = size
         self.position = position
         self.velocity = velocity
@@ -358,7 +370,7 @@ class Planet(Object):
                     normalized_v = self.normalize(vertex)
                     
                     # Add vertex data
-                    data.extend([self.color.x, self.color.y, self.color.z])  # in_color
+                    #data.extend([self.color.x, self.color.y, self.color.z])  # in_color
                     data.extend([normalized_v.x, normalized_v.y, normalized_v.z])  # in_norm
                     data.extend([vertex.x, vertex.y, vertex.z])  # in_position
                     data.extend([s, t])  # Texture coordinates
@@ -380,7 +392,7 @@ class Planet(Object):
                     vertex = glm.vec3(octahedron_vertices[idx])
                     normalized_v = self.normalize(vertex)
 
-                    data.extend([self.color.x, self.color.y, self.color.z]) # in_color
+                    #data.extend([self.color.x, self.color.y, self.color.z]) # in_color
                     data.extend([normalized_v.x, normalized_v.y, normalized_v.z]) # in_norm
                     data.extend([vertex.x, vertex.y, vertex.z]) # in_position
 
@@ -433,6 +445,7 @@ class Planet(Object):
         
         # Actualizar la matriz de modelo
         self.m_model = m_model    
+
 class StarBatch(Object):
     def __init__(self, app, shader, texture, info, positions):
         self.positions = positions

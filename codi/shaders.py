@@ -1,15 +1,13 @@
 
 vertex_shader_SUN ='''
                 #version 330
-                layout(location = 0) in vec3 in_color;
-                layout(location = 1) in vec3 in_norm;
-                layout(location = 2) in vec3 in_position;
-                layout(location = 3) in vec2 in_tex_coord; // NOVA ADDICIO
+                layout(location = 0) in vec3 in_norm;
+                layout(location = 1) in vec3 in_position;
+                layout(location = 2) in vec2 in_tex_coord;
                 
-                out vec3 v_color;
                 out vec3 v_norm;
                 out vec3 v_frag_pos;
-                out vec2 v_tex_coord; // NOVA ADDICIO
+                out vec2 v_tex_coord; 
 
                 uniform mat4 m_proj;
                 uniform mat4 m_view;
@@ -19,18 +17,16 @@ vertex_shader_SUN ='''
                     vec3 frag_pos = vec3(m_model * vec4(in_position, 1.0));
                     v_norm = normalize(mat3(transpose(inverse(m_model))) * in_norm);
                     v_frag_pos = frag_pos;
-                    v_color = in_color;
-                    v_tex_coord = in_tex_coord; // NOVA ADDICIO
+                    v_tex_coord = in_tex_coord;
                     gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
                 }
             '''
 fragment_shader_SUN = '''
                 #version 330
-                in vec3 v_color;
                 in vec3 v_norm;
                 in vec3 v_frag_pos;
 
-                in vec2 v_tex_coord; // NOVA ADDICIO
+                in vec2 v_tex_coord;
 
                 out vec4 fragColor;
                 struct Light {
@@ -43,7 +39,7 @@ fragment_shader_SUN = '''
                 uniform Light light;
                 uniform vec3 view_pos;
 
-                uniform sampler2D texture0; // NOVA ADDICIO
+                uniform sampler2D texture0;
 
                 void main() {
                     vec3 norm = normalize(v_norm);
@@ -53,7 +49,7 @@ fragment_shader_SUN = '''
                     vec3 ambient = light.Ia;
                     
                     // Diffuse component
-                    vec3 diffuse = light.Id * max(dot(norm, light_dir), 0.0) * v_color;
+                    vec3 diffuse = light.Id * max(dot(norm, light_dir), 0.0);
                     
                     // Specular component
                     vec3 view_dir = normalize(view_pos - v_frag_pos);
@@ -61,25 +57,23 @@ fragment_shader_SUN = '''
                     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);  // Shininess = 32
                     vec3 specular = light.Is * spec;
 
-                    vec4 tex_color = texture(texture0, v_tex_coord); // NOVA ADDICIO
+                    vec4 tex_color = texture(texture0, v_tex_coord);
 
                     // Combine all components
                     vec3 result = ambient + diffuse + specular;
-                    fragColor = tex_color * vec4(result, 1.0); // NOVA ADDICIO
+                    fragColor = tex_color * vec4(result, 1.0);
                 }
             '''
 
 vertex_shader_EARTH ='''
                 #version 330
-                layout(location = 0) in vec3 in_color;
-                layout(location = 1) in vec3 in_norm;
-                layout(location = 2) in vec3 in_position;
-                layout(location = 3) in vec2 in_tex_coord; // NOVA ADDICIO
-                
-                out vec3 v_color;
+                layout(location = 0) in vec3 in_norm;
+                layout(location = 1) in vec3 in_position;
+                layout(location = 2) in vec2 in_tex_coord;
+
                 out vec3 v_norm;
                 out vec3 v_frag_pos;
-                out vec2 v_tex_coord; // NOVA ADDICIO
+                out vec2 v_tex_coord;
 
                 uniform mat4 m_proj;
                 uniform mat4 m_view;
@@ -89,18 +83,15 @@ vertex_shader_EARTH ='''
                     vec3 frag_pos = vec3(m_model * vec4(in_position, 1.0));
                     v_norm = normalize(mat3(transpose(inverse(m_model))) * in_norm);
                     v_frag_pos = frag_pos;
-                    v_color = in_color;
-                    v_tex_coord = in_tex_coord; // NOVA ADDICIO
+                    v_tex_coord = in_tex_coord;
                     gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
                 }
             '''
 fragment_shader_EARTH = '''
                 #version 330
-                in vec3 v_color;
                 in vec3 v_norm;
                 in vec3 v_frag_pos;
-
-                in vec2 v_tex_coord; // NOVA ADDICIO
+                in vec2 v_tex_coord;
 
                 out vec4 fragColor;
                 struct Light {
@@ -113,7 +104,7 @@ fragment_shader_EARTH = '''
                 uniform Light light;
                 uniform vec3 view_pos;
 
-                uniform sampler2D texture0; // NOVA ADDICIO
+                uniform sampler2D texture0;
 
                 void main() {
                     vec3 norm = normalize(v_norm);
@@ -123,7 +114,7 @@ fragment_shader_EARTH = '''
                     vec3 ambient = light.Ia;
                     
                     // Diffuse component
-                    vec3 diffuse = light.Id * max(dot(norm, light_dir), 0.0) * v_color;
+                    vec3 diffuse = light.Id * max(dot(norm, light_dir), 0.0);
                     
                     // Specular component
                     vec3 view_dir = normalize(view_pos - v_frag_pos);
@@ -131,11 +122,11 @@ fragment_shader_EARTH = '''
                     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);  // Shininess = 32
                     vec3 specular = light.Is * spec;
 
-                    vec4 tex_color = texture(texture0, v_tex_coord); // NOVA ADDICIO
+                    vec4 tex_color = texture(texture0, v_tex_coord);
 
                     // Combine all components
                     vec3 result = ambient + diffuse + specular;
-                    fragColor = tex_color * vec4(result, 1.0); // NOVA ADDICIO
+                    fragColor = tex_color * vec4(result, 1.0);
                 }
             '''
 

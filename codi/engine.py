@@ -171,6 +171,7 @@ class GraphicsEngine:
 
                 # Update last mouse position
                 self.camera.last_mouse_pos = current_mouse_pos
+
     def end(self):
         """
         Destruir tots els objectes i finalitzar la simulació.
