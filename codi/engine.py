@@ -97,24 +97,24 @@ class GraphicsEngine:
 
         #! IMPORTANT ANNOTATION: SUBJECTE A CANVIS
         # Scale radius: 1:100.000km 
-        # Scale distance: 1:10*(10^6)km
-        # Scale distance: 1:100km/h
-        # Escalat planeta: x5 
+        # Scale distance: 1:8*(10^6)km
+        # Scale velocity: 1:100km/h
+        # Escalat planeta: x7 
         
         self.objects.append(Sun(
             self,
             [sh.vertex_shader_SUN, sh.fragment_shader_SUN],
             "textures/sun.jpg",
-            ["stripes", 7, 20, 20], 
+            [7, 15, 15], 
         ))
         for planet, texture in zip(planets_list, planets_textures):
             self.objects.append(Planet(
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                ["stripes", planets_data[planet].data["Diameter (km)"]/200000, 15, 15],
+                [planets_data[planet].data["Diameter (km)"]/200000, 15, 15],
                 glm.vec3(7, 7, 7), 
-                glm.vec3(planets_data[planet].data["Distance from Sun (10^6 km)"]/10, 0, planets_data[planet].data["Distance from Sun (10^6 km)"]/10),
+                glm.vec3(planets_data[planet].data["Distance from Sun (10^6 km)"]/8, 0, planets_data[planet].data["Distance from Sun (10^6 km)"]/8),
                 planets_data[planet].data["Orbital Velocity (km/s)"]/100,
                 planets_data[planet].data["Orbital Inclination (degrees)"],
                 planets_data[planet].data["Orbital Eccentricity"],
@@ -124,8 +124,8 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_ELLIPSE, sh.fragment_shader_ELLIPSE],
                 texture,
-                "None", 
-                glm.vec3(planets_data[planet].data["Distance from Sun (10^6 km)"]/10, 0, planets_data[planet].data["Distance from Sun (10^6 km)"]/10),
+                [planets_data[planet].data["Diameter (km)"]/200000, 15, 15], 
+                glm.vec3(planets_data[planet].data["Distance from Sun (10^6 km)"]/8, 0, planets_data[planet].data["Distance from Sun (10^6 km)"]/8),
                 planets_data[planet].data["Orbital Eccentricity"]
             ))
 

@@ -14,56 +14,66 @@ class Object:
                "lon",
                "subdivisions",
                "vbo",
-               "faces_shader",
+               "shader",
                "vao",
-               "m_model"
+               "m_model",
+               "radius"
                ]
+    
     """Classe per crear un objecte dintre del Sistema Solar (classe pare)
     """
-    def __init__(self, app, shader, texture, info = ["octahedron", 3]):
+    def __init__(self, app, shader, texture, info):
         """Inicialització de la classe Object
 
         Args:
             app (GraphicsEngine()): Instància de la classe GraphicsEngine()
             shader (list): Llista que conté el vertex_shader i fragment_shader a utilitzar 
+            texture (str): Path de l'imatge que texturitzarem l'objecte
             info (list, optional): Informació per crear les esferes (en cas de planetes i sol). Defaults to ["octahedron", 3].
         """
+        #App variables
         self.app = app
         self.ctx = app.ctx
-        self.texture = self.load_texture(texture)
-
-        self.method = info[0]
-        if self.method == "stripes":
-            self.radius = info[1]
-            self.lat = info[2]
-            self.lon = info[3]
         
-        elif self.method == "octahedron": 
-            self.subdivisions = info[1]
+        #Sphere parameters
+        self.radius = info[0]
+        self.lat = info[1]
+        self.lon = info[2]
 
+        # Object variables
+        self.texture = self.load_texture(texture)
         self.vbo = self.get_vbo()
-        self.faces_shader = self.get_faces_shader_program(shader)
+        self.shader = self.get_shader_program(shader)
         self.vao = self.get_vao()
-
         self.m_model = self.get_model_matrix()
+
+        #Shader initialization
         self.on_init()
 
     def on_init(self):
         """Pos-inicialització de la classe Object. Establiment dels paràmetres del shader 
         """
         # Related to lighting
-        self.faces_shader['light.position'].write(self.app.light.position)
-        self.faces_shader['view_pos'].write(self.app.camera.position)
-        self.faces_shader['light.Ia'].write(self.app.light.Ia)
-        self.faces_shader['light.Id'].write(self.app.light.Id)
-        self.faces_shader['light.Is'].write(self.app.light.Is)
+        self.shader['light.position'].write(self.app.light.position)
+        self.shader['view_pos'].write(self.app.camera.position)
+        self.shader['light.Ia'].write(self.app.light.Ia)
+        self.shader['light.Id'].write(self.app.light.Id)
+        self.shader['light.Is'].write(self.app.light.Is)
 
         # Essential for viewing
-        self.faces_shader['m_proj'].write(self.app.camera.m_proj)
-        self.faces_shader['m_view'].write(self.app.camera.m_view)
-        self.faces_shader['m_model'].write(self.m_model)
+        self.shader['m_proj'].write(self.app.camera.m_proj)
+        self.shader['m_view'].write(self.app.camera.m_view)
+        self.shader['m_model'].write(self.m_model)
 
     def load_texture(self, filepath):
+        """Carregar la textura d'entrada 
+
+        Args:
+            filepath (str): Path on està la imatge a texturitzar l'objecte
+
+        Returns:
+            mgl.texture: Textura
+        """
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         image = Image.open(filepath).transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.FLIP_LEFT_RIGHT)
         texture = self.ctx.texture(image.size, 3, image.tobytes())
@@ -87,7 +97,7 @@ class Object:
         """Neteja de les variables després d'acabar l'execució del programa
         """
         self.vbo.release()
-        self.faces_shader.release()
+        self.shader.release()
         self.texture.release()
         self.vao.release()    
 
@@ -97,96 +107,62 @@ class Object:
         Returns:
             moderngl.VertexArray: Array VAO
         """
-        #vao = self.ctx.vertex_array(self.faces_shader,[(self.vbo, '3f 3f 3f 2f', 'in_color', 'in_norm', 'in_position', 'in_tex_coord')])
-        vao = self.ctx.vertex_array(self.faces_shader,[(self.vbo, '3f 3f 2f', 'in_norm', 'in_position', 'in_tex_coord')])
+        vao = self.ctx.vertex_array(self.shader,[(self.vbo, '3f 3f 2f', 'in_norm', 'in_position', 'in_tex_coord')])
         return vao
 
-    def get_octahedron(self):
-        """Creació d'un octaedre (per tal de fer l'esfera per subdivisió)
+    def create_sphere(self, sun):
+        """Crear esfera per coordenades esfèriques
 
         Returns:
-            (list, list): Vèrtexs i arestes del octaedre
+            np.array: Vector de coordenades (normal, position, texture)
         """
-        # Create vertices of an octahedron
-        v1 = np.array([0.,0.,0.])
-        v2 = np.array([1.,0.,0.])
-        v3 = np.array([1.,0.,1.])
-        v4 = np.array([0.,0.,1.])
-        v5 = np.array([0.5,1.,0.5])
-        v6 = np.array([0.5,-1.,0.5])
-        c = (v1+v2+v3+v4+v5+v6)/6.0  # calculo el centre per treure'l i centrar la figura
-        v1-=c
-        v2-=c
-        v3-=c
-        v4-=c
-        v5-=c
-        v6-=c
-        vertices = [v1, v2, v3, v4, v5, v6]
+        data = []
+        vertices = []
+        indices = []
+        
+        # Latitude and longitude angles in radians
+        for lat in range(self.lat + 1):
+            theta = np.pi * lat / self.lat
+            for lon in range(self.lon + 1):  # Increase by 1 to close the loop
+                phi = 2 * np.pi * lon / self.lon
+                
+                # Spherical to Cartesian conversion
+                x = self.radius * np.sin(theta) * np.cos(phi)
+                y = self.radius * np.cos(theta)
+                z = self.radius * np.sin(theta) * np.sin(phi)
+                
+                # Calculate texture coordinates with improved wrap handling
+                s = lon / self.lon
+                t = 1 - (lat / self.lat)
+                
+                vertices.append((x, y, z, s, t))
+        
+        # Create faces (triangles) between vertices (latitude-longitude stripes)
+        for lat in range(self.lat):
+            for lon in range(self.lon):
+                current = lat * (self.lon + 1) + lon
+                next = current + self.lon + 1
+                
+                # Triangles for the quad strip
+                indices.append((current, next, current + 1))
+                indices.append((current + 1, next, next + 1))
 
-        for i in range(len(vertices)):
-            n_v = self.normalize(vertices[i])
-            s = (0.5 + (np.arctan2(n_v[2], n_v[0]) / (2 * np.pi))) % 1.0
-            t = 0.5 - (np.arcsin(n_v[1]) / np.pi)
-            vertices[i] = [vertices[i], s,t]
+        for face in indices:
+            for idx in face:
+                x, y, z, s, t = vertices[idx]
+                vertex = glm.vec3(x, y, z)
+                normalized_v = self.normalize(vertex)
+                
+                # Add vertex data
+                #data.extend([self.color.x, self.color.y, self.color.z])  # in_color
+                if sun:
+                    data.extend([-normalized_v.x, -normalized_v.y, -normalized_v.z])  # Case: Sun
+                else:
+                    data.extend([normalized_v.x, normalized_v.y, normalized_v.z])  # Case: Others
+                data.extend([vertex.x, vertex.y, vertex.z])  # in_position
+                data.extend([s, t])  # Texture coordinates
 
-        # Octahedron faces (triangles)
-        faces = [(0,4,1), (0,3,4), (0,1,5), (0,5,3), (2,4,3), (2,1,4), (2,3,5), (2,5,1)]
-
-        return vertices, faces
-
-    def subdivide_faces(self, vertices, faces):
-        """Mètode de subdivisió 
-
-        Args:
-            vertices (list): Vèrtexs octaedre
-            faces (list): Arestes octaedre
-
-        Returns:
-            list: Arestes actualitzades
-        """
-        new_faces = []
-        midpoint_cache = {}
-
-        def get_midpoint(v1_idx, v2_idx):
-            """ Return the midpoint between two vertices, caching the result to avoid duplicates. """
-            smaller_idx = min(v1_idx, v2_idx)
-            larger_idx = max(v1_idx, v2_idx)
-            key = (smaller_idx, larger_idx)
-
-            if key in midpoint_cache:
-                return midpoint_cache[key]
-
-            v1 = vertices[v1_idx][0]
-            v2 = vertices[v2_idx][0]
-            midpoint = (v1 + v2) / 2.0
-
-            # Normalize the midpoint to lie on the unit sphere
-            midpoint = self.normalize(midpoint)
-            s = (0.5 + (np.arctan2(midpoint[2], midpoint[0]) / (2 * np.pi))) % 1.0
-            t = 0.5 - (np.arcsin(midpoint[1]) / np.pi)
-
-            # Add the new vertex and return its index
-            midpoint_idx = len(vertices)
-            vertices.append([midpoint, s, t])
-            midpoint_cache[key] = midpoint_idx
-            return midpoint_idx
-
-        # Subdivide each face
-        for v1, v2, v3 in faces:
-            # Calculate midpoints
-            m1 = get_midpoint(v1, v2)
-            m2 = get_midpoint(v2, v3)
-            m3 = get_midpoint(v3, v1)
-
-            # Create 4 new faces
-            new_faces.extend([
-                (v1, m1, m3),
-                (v2, m2, m1),
-                (v3, m3, m2),
-                (m1, m2, m3)
-            ])
-
-        return new_faces
+        return np.array(data, dtype='f4')
 
     @staticmethod
     def normalize(v):
@@ -201,7 +177,7 @@ class Object:
         norm = np.linalg.norm(v)
         return v / norm
 
-    def get_faces_shader_program(self, shader):
+    def get_shader_program(self, shader):
         """Obtenció del shader program 
 
         Args: 
@@ -217,7 +193,7 @@ class Sun(Object):
     """Classe filla d'Objecte. Crea el Sol. Es caracteritza per tenir les normals invertides de signe (per termes d'il·luminació)
     """
     def get_model_matrix(self):
-        """
+        """Obtenció de la model matrix
         Returns:
             glm.vec4: Matriu model 
         """
@@ -231,88 +207,13 @@ class Sun(Object):
         self.vao.render()
 
     def get_data(self):
-        """Funció per obtenir l'esfera (coordenades esfèriques / subdivisió)
-
-        Returns:
-            np.array: Dades per renderitzar l'esfera (color, normal, position)
-        """
-        #color = glm.vec3(1, 1, 0)
-        data = []
-        if self.method == "stripes":
-            vertices = []
-            indices = []
-            
-            # Latitude and longitude angles in radians
-            for lat in range(self.lat + 1):
-                theta = np.pi * lat / self.lat
-                for lon in range(self.lon + 1):  # Increase by 1 to close the loop
-                    phi = 2 * np.pi * lon / self.lon
-                    
-                    # Spherical to Cartesian conversion
-                    x = self.radius * np.sin(theta) * np.cos(phi)
-                    y = self.radius * np.cos(theta)
-                    z = self.radius * np.sin(theta) * np.sin(phi)
-                    
-                    # Calculate texture coordinates with improved wrap handling
-                    s = lon / self.lon
-                    t = 1 - (lat / self.lat)
-                    
-                    vertices.append((x, y, z, s, t))
-            
-            # Create faces (triangles) between vertices (latitude-longitude stripes)
-            for lat in range(self.lat):
-                for lon in range(self.lon):
-                    current = lat * (self.lon + 1) + lon
-                    next = current + self.lon + 1
-                    
-                    # Triangles for the quad strip
-                    indices.append((current, next, current + 1))
-                    indices.append((current + 1, next, next + 1))
-
-            for face in indices:
-                for idx in face:
-                    x, y, z, s, t = vertices[idx]
-                    vertex = glm.vec3(x, y, z)
-                    normalized_v = self.normalize(vertex)
-                    
-                    # Add vertex data
-                    #data.extend([color.x, color.y, color.z])  # in_color
-                    data.extend([-normalized_v.x, -normalized_v.y, -normalized_v.z])  # in_norm
-                    data.extend([vertex.x, vertex.y, vertex.z])  # in_position
-                    data.extend([s, t])  # in_tex_coord
-
-        elif self.method == "octahedron":
-            # Generate the octahedron and subdivide it into a sphere
-            octahedron_vertices, octahedron_faces = self.get_octahedron()
-
-            # Subdivide the octahedron faces to form the sphere
-            for _ in range(self.subdivisions):
-                octahedron_faces = self.subdivide_faces(octahedron_vertices, octahedron_faces)
-
-            # Normalize all vertices to project them onto a unit sphere
-            for i in range(len(octahedron_vertices)):
-                octahedron_vertices[i][0] = self.normalize(octahedron_vertices[i][0])
-
-            for face in octahedron_faces:
-                for idx in face:
-                    v, s, t = octahedron_vertices[idx]
-                    vertex =  glm.vec3(v)
-                    normalized_v = self.normalize(vertex)
-
-                    #data.extend([color.x, color.y, color.z]) # in_color
-                    data.extend([-normalized_v.x, -normalized_v.y, -normalized_v.z]) # in_norm
-                    data.extend([vertex.x, vertex.y, vertex.z]) # in_position
-                    
-                    data.extend([s,t]) # in_tex_coord
-
-        return np.array(data, dtype='f4')
+        return self.create_sphere(True)
 
 class Planet(Object):
     __slots__=["size",
                "position",
                "velocity",
                "inclination",
-               "radius",
                "excentrity"]
     
     """Classe filla d'Objecte. Crea els Planetes.
@@ -336,7 +237,7 @@ class Planet(Object):
         super().__init__(app, shader, texture, info)
         
     def get_model_matrix(self):
-        """
+        """Obtenció de la model matrix
         Returns:
             glm.vec4: Matriu model 
         """
@@ -346,77 +247,7 @@ class Planet(Object):
         return m_model
             
     def get_data(self):
-        """Funció per obtenir l'esfera (coordenades esfèriques / subdivisió)
-
-        Returns:
-            np.array: Dades per renderitzar l'esfera (color, normal, position)
-        """
-        data = []
-        if self.method == "stripes":
-            vertices = []
-            indices = []
-            
-            # Latitude and longitude angles in radians
-            for lat in range(self.lat + 1):
-                theta = np.pi * lat / self.lat
-                for lon in range(self.lon + 1):  # Increase by 1 to close the loop
-                    phi = 2 * np.pi * lon / self.lon
-                    
-                    # Spherical to Cartesian conversion
-                    x = self.radius * np.sin(theta) * np.cos(phi)
-                    y = self.radius * np.cos(theta)
-                    z = self.radius * np.sin(theta) * np.sin(phi)
-                    
-                    # Calculate texture coordinates with improved wrap handling
-                    s = lon / self.lon
-                    t = 1 - (lat / self.lat)
-                    
-                    vertices.append((x, y, z, s, t))
-            
-            # Create faces (triangles) between vertices (latitude-longitude stripes)
-            for lat in range(self.lat):
-                for lon in range(self.lon):
-                    current = lat * (self.lon + 1) + lon
-                    next = current + self.lon + 1
-                    
-                    # Triangles for the quad strip
-                    indices.append((current, next, current + 1))
-                    indices.append((current + 1, next, next + 1))
-
-            for face in indices:
-                for idx in face:
-                    x, y, z, s, t = vertices[idx]
-                    vertex = glm.vec3(x, y, z)
-                    normalized_v = self.normalize(vertex)
-                    
-                    # Add vertex data
-                    #data.extend([self.color.x, self.color.y, self.color.z])  # in_color
-                    data.extend([normalized_v.x, normalized_v.y, normalized_v.z])  # in_norm
-                    data.extend([vertex.x, vertex.y, vertex.z])  # in_position
-                    data.extend([s, t])  # Texture coordinates
-
-        elif self.method == "octahedron":
-            # Generate the octahedron and subdivide it into a sphere
-            octahedron_vertices, octahedron_faces = self.get_octahedron()
-
-            # Subdivide the octahedron faces to form the sphere
-            for _ in range(self.subdivisions):
-                octahedron_faces = self.subdivide_faces(octahedron_vertices, octahedron_faces)
-
-            # Normalize all vertices to project them onto a unit sphere
-            for i in range(len(octahedron_vertices)):
-                octahedron_vertices[i] = self.normalize(octahedron_vertices[i])
-
-            for face in octahedron_faces:
-                for idx in face:
-                    vertex = glm.vec3(octahedron_vertices[idx])
-                    normalized_v = self.normalize(vertex)
-
-                    #data.extend([self.color.x, self.color.y, self.color.z]) # in_color
-                    data.extend([normalized_v.x, normalized_v.y, normalized_v.z]) # in_norm
-                    data.extend([vertex.x, vertex.y, vertex.z]) # in_position
-
-        return np.array(data, dtype='f4')
+        return self.create_sphere(False)
     
     def render(self):
         """Renderització del VAO i rotació dels planetes
@@ -437,7 +268,7 @@ class Planet(Object):
         inclined_axis = glm.normalize(inclined_axis)
 
         self.m_model = glm.rotate(self.m_model, self.app.time*self.velocity*20, inclined_axis)
-        self.faces_shader['m_model'].write(self.m_model)
+        self.shader['m_model'].write(self.m_model)
         
     def rotate_sun(self):
         """Rotació del planeta sobre el sol.
@@ -469,21 +300,32 @@ class Planet(Object):
 class Orbit(Object):
     __slots__=["position", "excentrity"]
 
+    """Classe filla d'Objecte. Crea les òrbites dels planetes (traça el·lipses del seu moviment).
+    """
     def __init__(self, app, shader, texture, info, position, excentrity):
+        """Inicialització de la classe Orbit
+
+        Args:
+            position (glm.vec3): Posició del planeta
+            excentrity (float): Excentritat de l'el·lipse
+        """
         self.position = position
         self.excentrity = excentrity
         super().__init__(app, shader, texture, info)
 
     def on_init(self):
-        # Essential for viewing
-        self.faces_shader['m_proj'].write(self.app.camera.m_proj)
-        self.faces_shader['m_view'].write(self.app.camera.m_view)
-        self.faces_shader['m_model'].write(self.m_model)
-        orbit_color = glm.vec3(1.0, 1.0, 1.0)  # RGB blanco
-        self.faces_shader['orbit_color'].write(orbit_color)
+        """Post-inicialització de la classe Orbit.
+        """
+        self.shader['m_proj'].write(self.app.camera.m_proj)
+        self.shader['m_view'].write(self.app.camera.m_view)
+        self.shader['m_model'].write(self.m_model)
+        orbit_color = glm.vec3(1.0, 1.0, 1.0)  # RGB blanc
+        self.shader['orbit_color'].write(orbit_color)
 
     def get_vao(self):
-        return self.ctx.vertex_array(self.faces_shader, [(self.vbo, '3f', 'in_position')])
+        """Obtenció VAO òrbites
+        """
+        return self.ctx.vertex_array(self.shader, [(self.vbo, '3f', 'in_position')])
     
     def get_model_matrix(self):
         """
@@ -494,7 +336,7 @@ class Orbit(Object):
         return m_model
 
     def update(self):
-        self.faces_shader['m_view'].write(self.app.camera.m_view)
+        self.shader['m_view'].write(self.app.camera.m_view)
 
     def render(self):
         """Renderització del VAO
@@ -504,17 +346,17 @@ class Orbit(Object):
 
 
     def get_data(self, num_points = 200):
-        """Genera los puntos de la órbita del planeta alrededor del sol.
+        """Genera els punts de la òrbita del planeta al voltant del sol.
     
         Args:
-            num_points (int): Número de puntos que describen la órbita.
+            num_points (int): Nombre de punts a traçar l'el·lipse
         
         Returns:
-            np.array: Array con los puntos en la órbita.
+            np.array: Array amb els punts de la òrbita
         """
-        # Parámetros de la órbita
-        a = glm.length(glm.vec2(self.position.x, self.position.z))  # Semieje mayor
-        b = a * (1 - self.excentrity ** 2) ** 0.5  # Semieje menor
+        # Paràmetres de la òrbita
+        a = glm.length(glm.vec2(self.position.x, self.position.z))  # Semieix major
+        b = a * (1 - self.excentrity ** 2) ** 0.5  # Semieix menor
 
         orbit_points = []
 
@@ -528,20 +370,31 @@ class Orbit(Object):
     
 class StarBatch(Object):
     __slots__=["positions", "color"]
-
+    
+    """Classe filla d'Objecte. Crea les estrelles que envoltarà tot el Sistema Solar.
+    """
     def __init__(self, app, shader, texture, info, positions):
+        """Inicialització de la classe StarBatch
+
+        Args:
+            positions (glm.vec3): Posició en l'espai de l'estrella 
+        """
         self.positions = positions
         self.color = glm.vec3(1.0, 1.0, 1.0)
         super().__init__(app, shader, texture, info)
     
     def on_init(self):
+        """Post-inicialització de la classe StarBatch
+        """
         # Essential for viewing
-        self.faces_shader['m_proj'].write(self.app.camera.m_proj)
-        self.faces_shader['m_view'].write(self.app.camera.m_view)
-        self.faces_shader['m_model'].write(self.m_model)
-        self.faces_shader['star_color'].write(self.color)
+        self.shader['m_proj'].write(self.app.camera.m_proj)
+        self.shader['m_view'].write(self.app.camera.m_view)
+        self.shader['m_model'].write(self.m_model)
+        self.shader['star_color'].write(self.color)
 
     def get_model_matrix(self):
+        """Obtenció del model_matrix
+        """
         # NOTE: Order of operations is from last -> first
 
         # in-world placement of the star
@@ -553,18 +406,29 @@ class StarBatch(Object):
         return m_model
     
     def update(self):
-        self.faces_shader['m_view'].write(self.app.camera.m_view)
+        """Actualització de la càmera al moure-la
+        """
+        self.shader['m_view'].write(self.app.camera.m_view)
 
     def render(self):
+        """Renderització de l'estrella
+        """
         self.update()
         self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
         self.ctx.point_size = 3
         self.vao.render(mgl.POINTS)
 
     def get_data(self):
+        """Obtenció de les dades per generar el VBO
+
+        Returns:
+            np.array: Coordenades de les estrelles (position)
+        """
         #data = np.array([self.position.x, self.position.y, self.position.z], dtype='f4')
         data = np.array([(x, y, z) for x, z, y in self.positions], dtype='f4')
         return data
     
     def get_vao(self):
-        return self.ctx.vertex_array(self.faces_shader, [(self.vbo, '3f', 'in_position')])
+        """Obtenció del VAO
+        """
+        return self.ctx.vertex_array(self.shader, [(self.vbo, '3f', 'in_position')])

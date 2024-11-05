@@ -84,7 +84,7 @@ class Camera:
         # Update the view matrix with new yaw and pitch
         self.m_view = self.get_view_matrix()
         for object in self.app.objects:
-            object.faces_shader['m_view'].write(self.m_view)
+            object.shader['m_view'].write(self.m_view)
     
     def process_keyboard(self):
         # Get the current key state
@@ -114,7 +114,7 @@ class Camera:
         self.position += direction * speed
         self.m_view = self.get_view_matrix()
         for object in self.app.objects:
-            object.faces_shader['m_view'].write(self.m_view)
+            object.shader['m_view'].write(self.m_view)
     
     def strafe(self, speed):
         # Strafe movement is based on the yaw only (moving perpendicular to the direction we're facing)
@@ -127,4 +127,4 @@ class Camera:
         self.position += right * speed
         self.m_view = self.get_view_matrix()
         for object in self.app.objects:
-            object.faces_shader['m_view'].write(self.m_view)
+            object.shader['m_view'].write(self.m_view)
