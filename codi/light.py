@@ -1,6 +1,8 @@
 import glm
 
 class Light:
+    __slots__ = ["position", "color", "Ia", "Id", "Is"]
+
     """Classe per establir l'il·luminació dels objectes
     """
     def __init__(self, position=(0,0,0), color=(1,1,1)):

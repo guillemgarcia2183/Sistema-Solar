@@ -3,6 +3,18 @@ import math
 import pygame as pg
 
 class Camera:
+    __slots__ = ["app", 
+                 "aspec_ratio",
+                 "position",
+                 "up",
+                 "yaw",
+                 "pitch",
+                 "sensitivity",
+                 "speed",
+                 "last_mouse_pos",
+                 "left_button_held",
+                 "m_view",
+                 "m_proj"]
     """Classe que estableix la càmara en escena
     """
     def __init__(self, app):

@@ -2,6 +2,8 @@ import pandas as pd
 
 
 class Reader():
+    __slots__=["data_path", "_data", "_iter"]
+
     def __init__(self, data_path):
         self.data_path = data_path
         self._data = None

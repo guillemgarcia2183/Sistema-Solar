@@ -6,6 +6,18 @@ from PIL import Image
 import math
 
 class Object:
+    __slots__=["app",
+               "ctx",
+               "texture",
+               "method",
+               "lat",
+               "lon",
+               "subdivisions",
+               "vbo",
+               "faces_shader",
+               "vao",
+               "m_model"
+               ]
     """Classe per crear un objecte dintre del Sistema Solar (classe pare)
     """
     def __init__(self, app, shader, texture, info = ["octahedron", 3]):
@@ -296,6 +308,13 @@ class Sun(Object):
         return np.array(data, dtype='f4')
 
 class Planet(Object):
+    __slots__=["size",
+               "position",
+               "velocity",
+               "inclination",
+               "radius",
+               "excentrity"]
+    
     """Classe filla d'Objecte. Crea els Planetes.
     """
     def __init__(self, app, shader, texture, info, size, position, velocity, inclination, excentrity):
@@ -448,6 +467,8 @@ class Planet(Object):
         self.m_model = m_model    
 
 class Orbit(Object):
+    __slots__=["position", "excentrity"]
+
     def __init__(self, app, shader, texture, info, position, excentrity):
         self.position = position
         self.excentrity = excentrity
@@ -506,6 +527,8 @@ class Orbit(Object):
         return np.array(orbit_points, dtype='f4')
     
 class StarBatch(Object):
+    __slots__=["positions", "color"]
+
     def __init__(self, app, shader, texture, info, positions):
         self.positions = positions
         self.color = glm.vec3(1.0, 1.0, 1.0)

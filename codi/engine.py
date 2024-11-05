@@ -6,7 +6,7 @@ import sys
 
 from camera import Camera
 from light import Light
-from axis import Axis
+#from axis import Axis
 from object import Sun, Planet, Orbit, StarBatch
 import shaders as sh
 from reader import Reader
@@ -14,6 +14,18 @@ from gui import ButtonManager
 import os
 
 class GraphicsEngine:
+    __slots__ = ["WIN_SIZE", 
+                 "ctx",
+                 "camera",
+                 "light",
+                 "objects",
+                 "orbits",
+                 "clock",
+                 "time",
+                 "button_manager",
+                 "stars",
+                 "info",
+                 "ellipse"]
     """Classe que farà corre l'aplicació controlant instàcies de les altres classes 
     """
 
