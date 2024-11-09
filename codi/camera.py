@@ -25,13 +25,13 @@ class Camera:
         """
         self.app = app
         self.aspec_ratio = app.WIN_SIZE[0]/app.WIN_SIZE[1]
-        self.position = glm.vec3(67.5445,26.7694,7.71201)
+        self.position = glm.vec3(2.67697,3.39169,2.5595)
         self.up = glm.vec3(0,1,0)
 
         # Moviment de la càmera
         self.yaw, self.pitch = self.calculate_initial_orientation(self.position, glm.vec3(0, 0, 0))
         self.sensitivity = 0.1  # Mouse sensitivity for camera movement
-        self.speed = 0.5  # Camera movement speed for WASD
+        self.speed = 0.1  # Camera movement speed for WASD
         # Mouse control
         self.last_mouse_pos = None
         self.left_button_held = False
@@ -58,7 +58,7 @@ class Camera:
         Returns:
             glm.vec4: Matriu projecció 
         """
-        return glm.perspective(glm.radians(45), self.aspec_ratio, 0.1, 700)
+        return glm.perspective(glm.radians(45), self.aspec_ratio, 0.001, 10000000)
     
     def calculate_initial_orientation(self, position, target):
         # Calculate the direction vector from the camera to the target

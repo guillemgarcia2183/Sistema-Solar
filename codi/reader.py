@@ -28,9 +28,16 @@ class Reader():
     def read_planets(data_path: str, name: str):
         planets = Reader(data_path)
         planets.data = pd.read_csv(data_path)
-        # Per ara nomes les coordenades i les n primeres estrelles
         planets.data = planets.data[planets.data["Planet"] == name].iloc[0]
         return planets
+    
+    @staticmethod
+    def read_satellites(data_path: str):
+        satellites = Reader(data_path)
+        satellites.data = pd.read_csv(data_path)
+        satellites.data = satellites.data[["planet", "radius", "Distance (10^6km)", "Velocity (km/s)"]]
+        return satellites
+
 
     def __iter__(self):
         self._iter = self._data.itertuples(index=False)

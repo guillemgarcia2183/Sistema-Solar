@@ -7,11 +7,14 @@ import sys
 from camera import Camera
 from light import Light
 #from axis import Axis
-from object import Sun, Planet, Orbit, StarBatch
+from object import Sun, Planet, Satellite, Orbit, StarBatch
 import shaders as sh
 from reader import Reader
 from gui import ButtonManager
 import os
+
+# Unitat astronòmica = 149600000 km
+UA = 149600000
 
 class GraphicsEngine:
     __slots__ = ["WIN_SIZE", 
@@ -70,6 +73,7 @@ class GraphicsEngine:
 
         self.button_manager.batch_add_buttons(gui_layout)
 
+        self.create_objects()
         # axis
         # self.objects.append(Axis(self))
 
@@ -77,6 +81,12 @@ class GraphicsEngine:
 
         # Opcions exemple per crear l'esfera: ["stripes", 1.0, 20, 20] o bé
         # ["octahedron", 2]
+
+        # Informació relacionada amb el context de l'aplicació
+        self.info = "Visualització del sol"
+        self.ellipse = True
+
+    def create_objects(self):
         planets_list = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
         planets_textures = ["textures/mercury.jpg", 
                             "textures/venus.jpg",
@@ -86,8 +96,14 @@ class GraphicsEngine:
                             "textures/saturn.jpg",
                             "textures/uranus.jpg",
                             "textures/neptune.jpg"]
+        satellites_textures = {"Earth": "textures/satellites/moon.jpg",
+                               "Mars":  "textures/satellites/phobos.jpg",
+                               "Jupiter": "textures/satellites/europa.jpg",
+                               "Saturn": "textures/satellites/titan.jpg",
+                               "Uranus": "textures/satellites/ariel.jpg",
+                               "Neptune": "textures/satellites/triton.jpg"}
         planets_data = dict()
-
+        
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         for planet in planets_list:
             read_data = Reader.read_planets("data/planets.csv", planet) 
@@ -95,27 +111,35 @@ class GraphicsEngine:
 
         #print(planets_data["Earth"].data["Mass (10^24kg)"], type(planets_data["Earth"].data["Mass (10^24kg)"]))
 
-        #! IMPORTANT ANNOTATION: SUBJECTE A CANVIS
-        # Scale radius: 1:100.000km 
-        # Scale distance: 1:8*(10^6)km
-        # Scale velocity: 1:100km/h
-        # Escalat planeta: x7 
+        #! IMPORTANT ANNOTATION:
+        ### MODE 1 - Visualització realista ###
+        # Radius, distance: UA
+        # Orbit Speed: UA/s
+        # Escalat: x1 
+
+        ### MODE 2 - Versió corregida - No implementat ###
+        # Radius: log() 
+        # distance: sqrt()
         
+
+        # Crear Sol
         self.objects.append(Sun(
             self,
             [sh.vertex_shader_SUN, sh.fragment_shader_SUN],
             "textures/sun.jpg",
-            [7, 15, 15], 
+            [(696000/UA), 15, 15], 
         ))
+
+        # Llista de planetes i òrbites
         for planet, texture in zip(planets_list, planets_textures):
             self.objects.append(Planet(
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [planets_data[planet].data["Diameter (km)"]/200000, 15, 15],
-                glm.vec3(7, 7, 7), 
-                glm.vec3(planets_data[planet].data["Distance from Sun (10^6 km)"]/8, 0, planets_data[planet].data["Distance from Sun (10^6 km)"]/8),
-                planets_data[planet].data["Orbital Velocity (km/s)"]/100,
+                [(planets_data[planet].data["Diameter (km)"]/2)/UA, 15, 15],
+                glm.vec3(1, 1, 1), 
+                glm.vec3((planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA, 0, (planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA),
+                planets_data[planet].data["Orbital Velocity (km/s)"]/UA,
                 planets_data[planet].data["Orbital Inclination (degrees)"],
                 planets_data[planet].data["Orbital Eccentricity"],
             ))
@@ -124,20 +148,37 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_ELLIPSE, sh.fragment_shader_ELLIPSE],
                 texture,
-                [planets_data[planet].data["Diameter (km)"]/200000, 15, 15], 
-                glm.vec3(planets_data[planet].data["Distance from Sun (10^6 km)"]/8, 0, planets_data[planet].data["Distance from Sun (10^6 km)"]/8),
+                [(planets_data[planet].data["Diameter (km)"]/2)/UA, 15, 15], 
+                glm.vec3((planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA, 0, (planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA),
                 planets_data[planet].data["Orbital Eccentricity"]
             ))
 
+        satellites_reader = Reader.read_satellites("data/satellites_modified.csv") 
+        for index, row in satellites_reader.data.iterrows():
+            planet = row['planet']
+            radius = row['radius']
+            distance = row['Distance (10^6km)']
+            velocity = row['Velocity (km/s)']
+            texture = satellites_textures[planet]
 
-        # stars
-        # self.st = Star(self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "None", glm.vec3(3.5, 2.5, 0))
+            # Quan més lluny del planeta serà més asimétric 
+            self.objects.append(Satellite(
+                self,
+                [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
+                texture,
+                [radius/UA, 15, 15],
+                glm.vec3(1, 1, 1),
+                glm.vec3((planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA, 0, (planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA),
+                (distance*1000000)/UA,
+                planets_data[planet].data["Orbital Velocity (km/s)"]/UA,
+                velocity/UA,
+                planets_data[planet].data["Orbital Inclination (degrees)"],
+                planets_data[planet].data["Orbital Eccentricity"],
+            ))
+
+        # Crear Estrelles
         star_reader = Reader.read_stars("data/hygdata_v41.csv")
         self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "textures/earth.jpg", "None"]) #Won't put a texture
-
-        # Informació relacionada amb el context de l'aplicació
-        self.info = "Visualització del sol"
-        self.ellipse = True
 
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.
@@ -246,6 +287,7 @@ class GraphicsEngine:
         while True:
             self.get_time()
             self.check_events()
+            #print(self.camera.position)
             self.camera.process_keyboard()
             self.render()
             self.clock.tick(60)
