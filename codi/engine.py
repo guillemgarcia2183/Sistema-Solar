@@ -13,9 +13,8 @@ from reader import Reader
 from gui import ButtonManager
 import os
 
-# Unitat astronòmica = 149600000 km
-UA = 149600000
-
+# Conversión a unidades astronómicas (UA)
+ua_conversion = 149_600_000  # 1 UA en kilómetros
 class GraphicsEngine:
     __slots__ = ["WIN_SIZE", 
                  "ctx",
@@ -28,7 +27,11 @@ class GraphicsEngine:
                  "button_manager",
                  "stars",
                  "info",
-                 "ellipse"]
+                 "ellipse",
+                 "planets_list",
+                 "planets_textures",
+                 "satellites_textures",
+                 "planets_data"]
     """Classe que farà corre l'aplicació controlant instàcies de les altres classes 
     """
 
@@ -73,22 +76,59 @@ class GraphicsEngine:
 
         self.button_manager.batch_add_buttons(gui_layout)
 
-        self.create_objects()
+        #self.create_objects()
+        self.create_objects_modified()
         # axis
         # self.objects.append(Axis(self))
-
-        # planetes
-
-        # Opcions exemple per crear l'esfera: ["stripes", 1.0, 20, 20] o bé
-        # ["octahedron", 2]
 
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
         self.ellipse = True
 
-    def create_objects(self):
-        planets_list = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
-        planets_textures = ["textures/mercury.jpg", 
+    def obtain_data_planets(self):
+        planets_data = dict()
+        
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+        for planet in self.planets_list:
+            read_data = Reader.read_planets("data/planets.csv", planet) 
+            planets_data[planet] = read_data
+
+        return planets_data
+    
+    @staticmethod
+    def normalize(value, min_value, max_value, new_min, new_max):
+        # Normalización min-max
+        return ((value - min_value) / (max_value - min_value)) * (new_max - new_min) + new_min
+
+    def radius_distance_objects(self):        
+        # Radios y distancias sin escalar (en UA) para calcular valores min y max
+        raw_radii = {"Sun": 696000 / ua_conversion}
+        raw_distances = {}
+
+        for planet in self.planets_list:
+            # Almacenar radios y distancias en UA sin normalizar
+            raw_radii[planet] = (self.planets_data[planet].data["Diameter (km)"] / 2) / ua_conversion
+            raw_distances[planet] = (self.planets_data[planet].data["Distance from Sun (10^6 km)"] * 1e6) / ua_conversion
+
+        # Satélites
+        satellites_reader = Reader.read_satellites("data/satellites_modified.csv") 
+        for index, row in satellites_reader.data.iterrows():
+            name = row['name']
+            raw_radii[name] = row['radius'] / ua_conversion
+
+        # Encontrar los valores mínimo y máximo para normalización
+        min_radius, max_radius = min(raw_radii.values()), max(raw_radii.values())
+        min_distance, max_distance = min(raw_distances.values()), max(raw_distances.values())
+
+        # Normalizar a los rangos deseados
+        normalized_radii = {name: self.normalize(radius, min_radius, max_radius, 0.0001, 20) for name, radius in raw_radii.items()}
+        normalized_distances = {name: self.normalize(distance, min_distance, max_distance, 25, 300) for name, distance in raw_distances.items()}
+
+        return normalized_radii, normalized_distances
+
+    def create_objects_modified(self):
+        self.planets_list = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
+        self.planets_textures = ["textures/mercury.jpg", 
                             "textures/venus.jpg",
                             "textures/earth.jpg",
                             "textures/mars.jpg",
@@ -96,89 +136,75 @@ class GraphicsEngine:
                             "textures/saturn.jpg",
                             "textures/uranus.jpg",
                             "textures/neptune.jpg"]
-        satellites_textures = {"Earth": "textures/satellites/moon.jpg",
+        self.satellites_textures = {"Earth": "textures/satellites/moon.jpg",
                                "Mars":  "textures/satellites/phobos.jpg",
                                "Jupiter": "textures/satellites/europa.jpg",
                                "Saturn": "textures/satellites/titan.jpg",
                                "Uranus": "textures/satellites/ariel.jpg",
                                "Neptune": "textures/satellites/triton.jpg"}
-        planets_data = dict()
         
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        for planet in planets_list:
-            read_data = Reader.read_planets("data/planets.csv", planet) 
-            planets_data[planet] = read_data
-
-        #print(planets_data["Earth"].data["Mass (10^24kg)"], type(planets_data["Earth"].data["Mass (10^24kg)"]))
+        self.planets_data = self.obtain_data_planets()
+        radius_objects, distance_objects = self.radius_distance_objects()
 
         #! IMPORTANT ANNOTATION:
         ### MODE 1 - Visualització realista ###
         # Radius, distance: UA
-        # Orbit Speed: UA/s
         # Escalat: x1 
-
-        ### MODE 2 - Versió corregida - No implementat ###
-        # Radius: log() 
-        # distance: sqrt()
-        
 
         # Crear Sol
         self.objects.append(Sun(
             self,
             [sh.vertex_shader_SUN, sh.fragment_shader_SUN],
             "textures/sun.jpg",
-            [(696000/UA), 15, 15], 
+            [radius_objects["Sun"], 15, 15], 
         ))
 
         # Llista de planetes i òrbites
-        for planet, texture in zip(planets_list, planets_textures):
+        for planet, texture in zip(self.planets_list, self.planets_textures):
             self.objects.append(Planet(
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [(planets_data[planet].data["Diameter (km)"]/2)/UA, 15, 15],
+                [radius_objects[planet], 15, 15],
                 glm.vec3(1, 1, 1), 
-                glm.vec3((planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA, 0, (planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA),
-                planets_data[planet].data["Orbital Velocity (km/s)"]/UA,
-                planets_data[planet].data["Orbital Inclination (degrees)"],
-                planets_data[planet].data["Orbital Eccentricity"],
+                glm.vec3(distance_objects[planet], 0, distance_objects[planet]),
+                self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
+                self.planets_data[planet].data["Orbital Inclination (degrees)"],
+                self.planets_data[planet].data["Orbital Eccentricity"],
             ))
 
             self.orbits.append(Orbit(
                 self,
                 [sh.vertex_shader_ELLIPSE, sh.fragment_shader_ELLIPSE],
                 texture,
-                [(planets_data[planet].data["Diameter (km)"]/2)/UA, 15, 15], 
-                glm.vec3((planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA, 0, (planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA),
-                planets_data[planet].data["Orbital Eccentricity"]
+                [radius_objects[planet], 15, 15], 
+                glm.vec3(distance_objects[planet], 0, distance_objects[planet]),
+                self.planets_data[planet].data["Orbital Eccentricity"]
             ))
 
         satellites_reader = Reader.read_satellites("data/satellites_modified.csv") 
         for index, row in satellites_reader.data.iterrows():
+            name = row['name']
             planet = row['planet']
-            radius = row['radius']
-            distance = row['Distance (10^6km)']
+            planet_distance = distance_objects[planet]
+            distance = row['Distance (10^6km)'] 
             velocity = row['Velocity (km/s)']
-            texture = satellites_textures[planet]
+            texture = self.satellites_textures[planet]
 
             # Quan més lluny del planeta serà més asimétric 
             self.objects.append(Satellite(
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [radius/UA, 15, 15],
+                [radius_objects[name], 15, 15],
                 glm.vec3(1, 1, 1),
-                glm.vec3((planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA, 0, (planets_data[planet].data["Distance from Sun (10^6 km)"]*1000000)/UA),
-                (distance*1000000)/UA,
-                planets_data[planet].data["Orbital Velocity (km/s)"]/UA,
-                velocity/UA,
-                planets_data[planet].data["Orbital Inclination (degrees)"],
-                planets_data[planet].data["Orbital Eccentricity"],
+                glm.vec3(planet_distance, 0, planet_distance),
+                (distance/ua_conversion) +  radius_objects[planet],
+                self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
+                velocity*1e5,
+                self.planets_data[planet].data["Orbital Inclination (degrees)"],
+                self.planets_data[planet].data["Orbital Eccentricity"],
             ))
-
-        # Crear Estrelles
-        star_reader = Reader.read_stars("data/hygdata_v41.csv")
-        self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "textures/earth.jpg", "None"]) #Won't put a texture
 
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.
@@ -247,7 +273,7 @@ class GraphicsEngine:
         for orbit in self.orbits:
             orbit.destroy()
 
-        self.stars.destroy()
+        # self.stars.destroy()
 
         pg.quit()
         sys.exit()
@@ -275,7 +301,7 @@ class GraphicsEngine:
                 orbit.render()
 
         # TODO: Are stars that can't be seen being processed/rendered?
-        self.stars.render()
+        # self.stars.render()
  
         # Swap buffers + display caption
         pg.display.set_caption(self.info)
@@ -287,7 +313,6 @@ class GraphicsEngine:
         while True:
             self.get_time()
             self.check_events()
-            #print(self.camera.position)
             self.camera.process_keyboard()
             self.render()
             self.clock.tick(60)

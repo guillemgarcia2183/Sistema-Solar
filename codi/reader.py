@@ -35,7 +35,7 @@ class Reader():
     def read_satellites(data_path: str):
         satellites = Reader(data_path)
         satellites.data = pd.read_csv(data_path)
-        satellites.data = satellites.data[["planet", "radius", "Distance (10^6km)", "Velocity (km/s)"]]
+        satellites.data = satellites.data[["planet", "name", "radius", "Distance (10^6km)", "Velocity (km/s)"]]
         return satellites
 
 

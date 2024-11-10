@@ -8,7 +8,6 @@ setwd(path)
 
 satellites <- read.csv("satellites.csv")
 view(satellites)
-
 # Distancias de los satélites en millones de km (10^6 km)
 
 distancias <- c(
@@ -30,7 +29,7 @@ distancias <- c(
   0.085, 0.118, 5.331, 5.828, 23.54, 23.56, 48.17, 0.105)
 
 satellites['Distance (10^6km)'] = distancias
-satellites['Distance (m)'] = satellites['Distance (10^6km)'] * 10^6 * 10^3 
+
 
 gm_numeric <- as.numeric(gsub("±.*", "", satellites[['gm']]))
 radius_numeric <- as.numeric(gsub("±.*", "", satellites[['radius']]))

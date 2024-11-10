@@ -360,7 +360,7 @@ class Satellite(Object):
         """
         a = glm.length(glm.vec2(self.distance_to_planet, self.distance_to_planet))
         b = a * (1 - self.excentrity ** 2) ** 0.5  # Excentricidad de la órbita del satélite
-        theta = self.app.time * self.velocity_satellite 
+        theta = self.app.time * self.velocity_satellite
 
         # Calcular la posición en la órbita alrededor del planeta (eje XZ)
         x = a * glm.cos(theta)
