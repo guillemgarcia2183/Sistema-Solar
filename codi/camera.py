@@ -2,6 +2,8 @@ import glm
 import math
 import pygame as pg
 
+from enum import Enum
+
 class Camera:
     __slots__ = ["app", 
                  "aspec_ratio",
@@ -128,3 +130,68 @@ class Camera:
         self.m_view = self.get_view_matrix()
         for object in self.app.objects:
             object.shader['m_view'].write(self.m_view)
+
+class Planets(Enum):
+    SUN     = 0
+    MERCURY = 1 
+    VENUS   = 3
+    EARTH   = 5
+    MART    = 7
+    JUPITER = 9
+    SATURN  = 11
+    URANUS  = 13
+    NEPTUNE = 15
+
+class PlanetaryCamera():
+
+    def __init__(self, app: object, 
+                 planet: int = Planets.JUPITER,
+                 height_of_camera: float = 10.0):
+         
+        self.app = app
+        self.aspect_ratio = app.WIN_SIZE[0]/app.WIN_SIZE[1]
+        self.planet = planet.value
+        self.height = height_of_camera
+        self.position = self.app.objects[self.planet].position \
+                            + glm.vec3(0, self.height, 0)
+        self.up = glm.vec3(0, 1, 0)
+
+        self.m_view = self.get_view_matrix()
+        self.m_proj = self.get_projection_matrix()
+               
+    def get_view_matrix(self) -> glm.mat4x4:
+        # For now let's look at the sun
+        # TODO: Sun has NO position artibute wich makes no sense
+        return glm.lookAt(self.position, glm.vec3(0), self.up)
+    
+    def get_projection_matrix(self) -> glm.mat4x4:
+        return glm.perspective(glm.radians(45), self.aspect_ratio, 0.1, 700)
+
+    def update(self) -> None:
+        """Rotació dela camara sobre el sol.
+        """
+        
+        planet = self.app.objects[self.planet]
+
+        # Semieje mayor y menor basados en la distancia inicial del planeta al Sol
+        a = glm.length(glm.vec2(planet.position.x, planet.position.z))  # La magnitud en XZ como semieje mayor
+        b = a * (1 - planet.excentrity ** 2) ** 0.5 # Semieje menor (ajústalo según el grado de excentricidad que desees)
+
+        # Calcular el ángulo en función del tiempo
+        theta = self.app.time * planet.velocity   # Ajusta la velocidad de la órbita
+
+        # Posición del planeta en la órbita elíptica (plano XZ)
+        x = a * glm.cos(theta)
+        z = b * glm.sin(theta)
+        y = 0
+
+        # Trasladar el planeta a la nueva posición calculada (órbita elíptica respecto al Sol en (0, 0, 0))
+        new_position = glm.vec3(x, y, z)
+        self.position = new_position + glm.vec3(0, self.height, 0)
+        self.m_view = self.get_view_matrix()
+
+        for object in self.app.objects:
+            object.faces_shader['m_view'].write(self.m_view)
+
+    def process_keyboard(self):
+        pass
