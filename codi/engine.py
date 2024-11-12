@@ -117,7 +117,7 @@ class GraphicsEngine:
             raw_distances[planet] = (self.planets_data[planet].data["Distance from Sun (10^6 km)"] * 1e6) / ua_conversion
 
         # Satélites
-        satellites_reader = Reader.read_satellites("data/satellites_modified.csv") 
+        satellites_reader = Reader.read_satellites("data/satellites.csv") 
         for index, row in satellites_reader.data.iterrows():
             name = row['name']
             raw_radii[name] = row['radius'] / ua_conversion
@@ -188,7 +188,7 @@ class GraphicsEngine:
                 self.planets_data[planet].data["Orbital Eccentricity"]
             ))
 
-        satellites_reader = Reader.read_satellites("data/satellites_modified.csv") 
+        satellites_reader = Reader.read_satellites("data/satellites.csv") 
         for index, row in satellites_reader.data.iterrows():
             name = row['name']
             planet = row['planet']
@@ -212,7 +212,7 @@ class GraphicsEngine:
                 self.planets_data[planet].data["Orbital Eccentricity"],
             ))
 
-             # stars
+        # stars
         star_reader = Reader.read_stars("data/hygdata_v41.csv")
         self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "textures/earth.jpg", "None"]) #Won't put a texture
             

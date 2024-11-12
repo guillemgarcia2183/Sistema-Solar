@@ -87,6 +87,7 @@ class Camera:
         self.m_view = self.get_view_matrix()
         for object in self.app.objects:
             object.shader['m_view'].write(self.m_view)
+        self.app.stars.shader['m_view'].write(self.m_view)  
     
     def process_keyboard(self):
         # Get the current key state
@@ -117,6 +118,7 @@ class Camera:
         self.m_view = self.get_view_matrix()
         for object in self.app.objects:
             object.shader['m_view'].write(self.m_view)
+        self.app.stars.shader['m_view'].write(self.m_view)  
     
     def strafe(self, speed):
         # Strafe movement is based on the yaw only (moving perpendicular to the direction we're facing)
@@ -130,6 +132,7 @@ class Camera:
         self.m_view = self.get_view_matrix()
         for object in self.app.objects:
             object.shader['m_view'].write(self.m_view)
+        self.app.stars.shader['m_view'].write(self.m_view)  
 
 class Planets(Enum):
     SUN     = 0
