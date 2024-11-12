@@ -15,25 +15,31 @@ import os
 
 # Conversión a unidades astronómicas (UA)
 ua_conversion = 149_600_000  # 1 UA en kilómetros
+
+
 class GraphicsEngine:
-    __slots__ = ["WIN_SIZE", 
-                 "ctx",
-                 "camera",
-                 "light",
-                 "objects",
-                 "orbits",
-                 "clock",
-                 "time",
-                 "button_manager",
-                 "stars",
-                 "info",
-                 "ellipse",
-                 "planets_list",
-                 "planets_textures",
-                 "satellites_textures",
-                 "planets_data"]
+
     """Classe que farà corre l'aplicació controlant instàcies de les altres classes 
     """
+
+    __slots__ = (
+        "WIN_SIZE", 
+        "ctx",
+        "camera",
+        "light",
+        "objects",
+        "orbits",
+        "clock",
+        "time",
+        "button_manager",
+        "stars",
+        "info",
+        "ellipse",
+        "planets_list",
+        "planets_textures",
+        "satellites_textures",
+        "planets_data"
+    )
 
     def __init__(self, win_size=(900, 800)):
         """Inicialització de la classe GraphicsEngine
@@ -206,6 +212,11 @@ class GraphicsEngine:
                 self.planets_data[planet].data["Orbital Eccentricity"],
             ))
 
+             # stars
+        star_reader = Reader.read_stars("data/hygdata_v41.csv")
+        self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "textures/earth.jpg", "None"]) #Won't put a texture
+            
+
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.
         """
@@ -295,6 +306,8 @@ class GraphicsEngine:
         # render scene + axis
         for objecte in self.objects:
             objecte.render()
+
+        self.stars.render()
         
         if self.ellipse:
             for orbit in self.orbits:
