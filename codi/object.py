@@ -6,19 +6,20 @@ from PIL import Image
 import math
 
 class Object:
-    __slots__=["app",
-               "ctx",
-               "texture",
-               "method",
-               "lat",
-               "lon",
-               "subdivisions",
-               "vbo",
-               "shader",
-               "vao",
-               "m_model",
-               "radius"
-               ]
+    __slots__ = (
+        "app",
+        "ctx",
+        "texture",
+        "method",
+        "lat",
+        "lon",
+        "subdivisions",
+        "vbo",
+        "shader",
+        "vao",
+        "m_model",
+        "radius"
+    )
     
     """Classe per crear un objecte dintre del Sistema Solar (classe pare)
     """
@@ -463,7 +464,10 @@ class Orbit(Object):
         return np.array(orbit_points, dtype='f4')
     
 class StarBatch(Object):
-    __slots__=["positions", "color"]
+    __slots__ = (
+        "positions", 
+        "color"
+    )
     
     """Classe filla d'Objecte. Crea les estrelles que envoltarà tot el Sistema Solar.
     """
@@ -509,7 +513,7 @@ class StarBatch(Object):
         """
         self.update()
         self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
-        self.ctx.point_size = 3
+        self.ctx.point_size = 5
         self.vao.render(mgl.POINTS)
 
     def get_data(self):
