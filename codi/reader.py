@@ -2,7 +2,12 @@ import pandas as pd
 
 
 class Reader():
-    __slots__=["data_path", "_data", "_iter"]
+
+    __slots__ = (
+        "data_path", 
+        "_data", 
+        "_iter"
+    )
 
     def __init__(self, data_path):
         self.data_path = data_path
@@ -18,10 +23,16 @@ class Reader():
 
     @staticmethod
     def read_stars(data_path: str):
+        """ Un parsec son 206265 UA pero es impossible renderitzar estrelles com
+            punts ja que la distancia es massa gran aixi que he triat un nombre
+            arbitari 100, el cual es pot canviar, per millorar la visualització.
+        """
         stars = Reader(data_path)
         stars.data = pd.read_csv(data_path)
-        # Per ara nomes les coordenades i les n primeres estrelles
-        stars.data = stars.data[["x", "y", "z"]].head(5000)
+
+        distance_scale_factor = 100
+        stars.data = stars.data[["x", "y", "z"]] * distance_scale_factor
+        
         return stars
 
     @staticmethod
