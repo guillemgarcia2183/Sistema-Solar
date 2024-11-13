@@ -131,42 +131,45 @@ fragment_shader_PLANET = '''
             '''
 
 vertex_shader_STAR = '''
-        #version 330
+    #version 330
 
-        layout(location = 0) in vec3 in_position;
+    layout(location = 0) in vec3 in_color;     // Color of the star (passed from VAO)
+    layout(location = 1) in vec3 in_position;  // Position of the star
 
-        uniform mat4 m_proj;
-        uniform mat4 m_view;
-        uniform mat4 m_model;
+    uniform mat4 m_proj;
+    uniform mat4 m_view;
+    uniform mat4 m_model;
 
-        void main() {
-            gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
-        }
-    '''
+    out vec3 star_color;  // Output the color to the fragment shader
+
+    void main() {
+        gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
+        star_color = in_color;  // Pass color to fragment shader
+    }
+'''
 fragment_shader_STAR = '''
-        #version 330
+    #version 330
 
-        uniform vec3 star_color;
+    in vec3 star_color;  // Input color from the vertex shader
 
-        out vec4 fragColor;
+    out vec4 fragColor;
 
-        void main() {
+    void main() {
+        vec2 center = vec2(0.5);
+        float inner_radius = 0.25;
+        float outer_radius = 0.5;
 
-            vec2 center = vec2(0.5);
-            float inner_radius = 0.25;
-            float outer_radius = 0.5;
+        float distance = distance(gl_PointCoord, center);
 
-            float distance = distance(gl_PointCoord, center);
-
-            if (distance < inner_radius) {
-                fragColor = vec4(star_color, 1.0);
-            } else if (distance < outer_radius){
-                fragColor = vec4(1.0, 1.0, 1.0, 1-distance/outer_radius);
-            } else {
-                discard;
-            }
+        if (distance < inner_radius) {
+            fragColor = vec4(star_color, 1.0);  // Color the star with the passed color
+        } else if (distance < outer_radius){
+            fragColor = vec4(1.0, 1.0, 1.0, 1.0 - distance / outer_radius);  // Fade effect
+        } else {
+            discard;
         }
-    '''
+    }
+'''
 
 vertex_shader_ELLIPSE = '''
         #version 330 core

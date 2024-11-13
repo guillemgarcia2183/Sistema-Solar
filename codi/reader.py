@@ -23,16 +23,9 @@ class Reader():
 
     @staticmethod
     def read_stars(data_path: str):
-        """ Un parsec son 206265 UA pero es impossible renderitzar estrelles com
-            punts ja que la distancia es massa gran aixi que he triat un nombre
-            arbitari 100, el cual es pot canviar, per millorar la visualització.
-        """
         stars = Reader(data_path)
         stars.data = pd.read_csv(data_path)
-
-        distance_scale_factor = 100
-        stars.data = stars.data[["x", "y", "z"]] * distance_scale_factor
-        
+        stars.data = stars.data[["x","y","z","mag"]] 
         return stars
 
     @staticmethod
@@ -58,7 +51,7 @@ class Reader():
         row = next(self._iter)
         # NOTE: It is very important that we change dataset(x, y ,z) -> (y, z, x)
         # because of the way star coordinates are described
-        return row.y, row.z, row.x
+        return row.y, row.z, row.x, row.mag
     
     def make_stars(self, star_object, args):
         stars = star_object(*args, self)

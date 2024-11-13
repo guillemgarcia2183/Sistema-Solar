@@ -466,7 +466,6 @@ class Orbit(Object):
 class StarBatch(Object):
     __slots__ = (
         "positions", 
-        "color"
     )
     
     """Classe filla d'Objecte. Crea les estrelles que envoltarà tot el Sistema Solar.
@@ -478,9 +477,17 @@ class StarBatch(Object):
             positions (glm.vec3): Posició en l'espai de l'estrella 
         """
         self.positions = positions
-        self.color = glm.vec3(1.0, 1.0, 1.0)
         super().__init__(app, shader, texture, info)
     
+    def get_vao(self):
+        """Obtenció del VAO 
+
+        Returns:
+            moderngl.VertexArray: Array VAO
+        """
+        vao = self.ctx.vertex_array(self.shader,[(self.vbo, '3f 3f', 'in_color', 'in_position')])
+
+        return vao
     def on_init(self):
         """Post-inicialització de la classe StarBatch
         """
@@ -488,7 +495,22 @@ class StarBatch(Object):
         self.shader['m_proj'].write(self.app.camera.m_proj)
         self.shader['m_view'].write(self.app.camera.m_view)
         self.shader['m_model'].write(self.m_model)
-        self.shader['star_color'].write(self.color)
+    
+    def get_color_from_mag(self, mag):
+        """
+        Mapea la magnitud de la estrella a un color.
+        Las estrellas más brillantes (magnitudes bajas) serán de color blanco,
+        y las más tenues (magnitudes altas) se acercarán a colores más oscuros.
+        """
+        # Definimos un rango de magnitudes y un rango de colores
+        min_mag = -1.44  # Máxima luminosidad
+        max_mag = 21   # Mínima luminosidad visible (estrellas más tenues)
+
+        # Interpolamos entre 1.0 (blanco) y un valor más bajo (oscuro)
+        intensity = (max_mag - mag) / (max_mag - min_mag)  # Intensidad proporcional a la magnitud
+        color = glm.vec3(intensity, intensity, intensity)  # Generamos un color gris, entre blanco y gris oscuro
+
+        return color
 
     def get_model_matrix(self):
         """Obtenció del model_matrix
@@ -513,7 +535,7 @@ class StarBatch(Object):
         """
         self.update()
         self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
-        self.ctx.point_size = 5
+        self.ctx.point_size = 2
         self.vao.render(mgl.POINTS)
 
     def get_data(self):
@@ -523,10 +545,10 @@ class StarBatch(Object):
             np.array: Coordenades de les estrelles (position)
         """
         #data = np.array([self.position.x, self.position.y, self.position.z], dtype='f4')
-        data = np.array([(x, y, z) for x, z, y in self.positions], dtype='f4')
+        data = []
+        for x,z,y,mag in self.positions:
+            color = self.get_color_from_mag(mag)
+            data.append((color.x, color.y, color.z, x, y, z))
+        data = np.array(data, dtype='f4')
         return data
     
-    def get_vao(self):
-        """Obtenció del VAO
-        """
-        return self.ctx.vertex_array(self.shader, [(self.vbo, '3f', 'in_position')])

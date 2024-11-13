@@ -16,7 +16,6 @@ import os
 # Conversión a unidades astronómicas (UA)
 ua_conversion = 149_600_000  # 1 UA en kilómetros
 
-
 class GraphicsEngine:
 
     """Classe que farà corre l'aplicació controlant instàcies de les altres classes 
@@ -82,8 +81,7 @@ class GraphicsEngine:
 
         self.button_manager.batch_add_buttons(gui_layout)
 
-        #self.create_objects()
-        self.create_objects_modified()
+        self.create_objects()
         # axis
         # self.objects.append(Axis(self))
 
@@ -132,7 +130,7 @@ class GraphicsEngine:
 
         return normalized_radii, normalized_distances
 
-    def create_objects_modified(self):
+    def create_objects(self):
         self.planets_list = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
         self.planets_textures = ["textures/mercury.jpg", 
                             "textures/venus.jpg",
@@ -151,7 +149,7 @@ class GraphicsEngine:
         
         self.planets_data = self.obtain_data_planets()
         radius_objects, distance_objects = self.radius_distance_objects()
-
+  
         #! IMPORTANT ANNOTATION:
         ### MODE 1 - Visualització realista ###
         # Radius, distance: UA
@@ -211,11 +209,11 @@ class GraphicsEngine:
                 self.planets_data[planet].data["Orbital Inclination (degrees)"],
                 self.planets_data[planet].data["Orbital Eccentricity"],
             ))
-
-        # stars
-        star_reader = Reader.read_stars("data/hygdata_v41.csv")
+        
+        # Implement stars
+        star_reader = Reader.read_stars("data/stars.csv")
         self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "textures/earth.jpg", "None"]) #Won't put a texture
-            
+
 
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.
