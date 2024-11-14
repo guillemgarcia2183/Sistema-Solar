@@ -535,7 +535,7 @@ class StarBatch(Object):
         """
         self.update()
         self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
-        self.ctx.point_size = 2
+        self.ctx.point_size = 4
         self.vao.render(mgl.POINTS)
 
     def get_data(self):

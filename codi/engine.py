@@ -126,7 +126,7 @@ class GraphicsEngine:
 
         # Normalizar a los rangos deseados
         normalized_radii = {name: self.normalize(radius, min_radius, max_radius, 0.0001, 20) for name, radius in raw_radii.items()}
-        normalized_distances = {name: self.normalize(distance, min_distance, max_distance, 25, 300) for name, distance in raw_distances.items()}
+        normalized_distances = {name: self.normalize(distance, min_distance, max_distance, 20.38, 300) for name, distance in raw_distances.items()}
 
         return normalized_radii, normalized_distances
 
