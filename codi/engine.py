@@ -282,7 +282,7 @@ class GraphicsEngine:
         for orbit in self.orbits:
             orbit.destroy()
 
-        # self.stars.destroy()
+        self.stars.destroy()
 
         pg.quit()
         sys.exit()
