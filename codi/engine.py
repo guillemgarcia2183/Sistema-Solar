@@ -42,7 +42,7 @@ class GraphicsEngine:
         "aux_orbits"
     )
 
-    def __init__(self, win_size=(1920, 1080)):
+    def __init__(self, fs = True, win_size=(1200, 800)):
         """Inicialització de la classe GraphicsEngine
 
         Args:
@@ -50,9 +50,13 @@ class GraphicsEngine:
         """
         # init pygame modules
         pg.init()
-
         # window size
-        self.WIN_SIZE = win_size
+        if fs: # Fullscreen windowed if enabled
+            screen_sizes = pg.display.get_desktop_sizes() 
+            primary_screen_size = screen_sizes[0] 
+            self.WIN_SIZE = (primary_screen_size[0],primary_screen_size[1]-50) 
+        else: # Input window size
+            self.WIN_SIZE = win_size 
 
         # set opengl attr
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)
