@@ -7,7 +7,7 @@ import sys
 from camera import Camera
 from light import Light
 #from axis import Axis
-from object import Sun, Planet, Satellite, Orbit, StarBatch
+from object import Sun, Planet, Satellite, Orbit, StarBatch, AsteroidBatch
 import shaders as sh
 from reader import Reader
 from gui import ButtonManager
@@ -174,14 +174,14 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_SUN, sh.fragment_shader_SUN],
             "textures/sun.jpg",
-            [radius_objects["Sun"], 25, 25], 
+            [radius_objects["Sun"], 25, 25, False], 
         ))
 
         self.aux_objects.append(Sun(
             self,
             [sh.vertex_shader_SUN, sh.fragment_shader_SUN],
             "textures/sun.jpg",
-            [real_radius["Sun"], 25, 25], 
+            [real_radius["Sun"], 25, 25, False], 
         ))
 
         # Llista de planetes i òrbites
@@ -190,7 +190,7 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [radius_objects[planet], 15, 15],
+                [radius_objects[planet], 15, 15, False],
                 glm.vec3(1, 1, 1), 
                 glm.vec3(distance_objects[planet], 0, distance_objects[planet]),
                 self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
@@ -202,7 +202,7 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [real_radius[planet], 15, 15],
+                [real_radius[planet], 15, 15, False],
                 glm.vec3(1, 1, 1), 
                 glm.vec3(real_distance[planet], 0, real_distance[planet]),
                 self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
@@ -214,7 +214,7 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_ELLIPSE, sh.fragment_shader_ELLIPSE],
                 texture,
-                [radius_objects[planet], 15, 15], 
+                [radius_objects[planet], 15, 15, False], 
                 glm.vec3(distance_objects[planet], 0, distance_objects[planet]),
                 self.planets_data[planet].data["Orbital Eccentricity"]
             ))
@@ -223,7 +223,7 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_ELLIPSE, sh.fragment_shader_ELLIPSE],
                 texture,
-                [real_radius[planet], 15, 15], 
+                [real_radius[planet], 15, 15, False], 
                 glm.vec3(real_distance[planet], 0, real_distance[planet]),
                 self.planets_data[planet].data["Orbital Eccentricity"]
             ))
@@ -241,7 +241,7 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [radius_objects[name], 15, 15],
+                [radius_objects[name], 15, 15, False],
                 glm.vec3(1, 1, 1),
                 glm.vec3(planet_distance, 0, planet_distance),
                 (distance/ua_conversion) +  radius_objects[planet],
@@ -255,7 +255,7 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [real_radius[name], 15, 15],
+                [real_radius[name], 15, 15, False],
                 glm.vec3(1, 1, 1),
                 glm.vec3(planet_distance, 0, planet_distance),
                 (distance/ua_conversion) +  real_radius[planet],
@@ -265,9 +265,35 @@ class GraphicsEngine:
                 self.planets_data[planet].data["Orbital Eccentricity"],
             ))
         
+        #Add asteroids
+        speed_asteroids = (self.planets_data["Mars"].data["Orbital Velocity (km/s)"] + self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"])/200
+        self.objects.append(AsteroidBatch(
+            self,
+            [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
+            "textures/asteroids.jpg",  # You'll need an asteroid texture
+            [0.2, 5, 5, True],  # Adjust these parameters as needed
+            num_asteroids=10000,  # Or however many you want
+            mars_distance=distance_objects["Mars"]+25,
+            jupiter_distance=distance_objects["Jupiter"],
+            velocity=speed_asteroids,
+            eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"]
+            ))
+        
+        self.aux_objects.append(AsteroidBatch(
+            self,
+            [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
+            "textures/asteroids.jpg",  # You'll need an asteroid texture
+            [0.2, 5, 5, True],  # Adjust these parameters as needed
+            num_asteroids=10000,  # Or however many you want
+            mars_distance=real_distance["Mars"]+50,
+            jupiter_distance=real_distance["Jupiter"],
+            velocity=speed_asteroids,
+            eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"] 
+            ))
+
         # Implement stars
         star_reader = Reader.read_stars("data/stars.csv")
-        self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "textures/earth.jpg", "None"]) #Won't put a texture
+        self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "textures/earth.jpg", [0,0,0,False]]) #Won't put a texture
 
 
     def check_events(self):
@@ -287,7 +313,13 @@ class GraphicsEngine:
             if event.type == pg.KEYDOWN and event.key == pg.K_m:
                 self.objects, self.aux_objects = self.aux_objects, self.objects
                 self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
-            
+                
+                # Update the view matrix
+                m_view = self.camera.get_view_matrix()
+                for object in self.objects:
+                    object.shader['m_view'].write(m_view)
+                self.stars.shader['m_view'].write(m_view) 
+
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
                     self.camera.left_button_held = True
