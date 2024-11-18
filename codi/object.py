@@ -555,21 +555,37 @@ class StarBatch(Object):
 
 class AsteroidBatch(Object):
     """Class to create an asteroid belt using instancing."""
-    
-    def __init__(self, app, shader, texture, info, num_asteroids, mars_distance, jupiter_distance, velocity, eccentricity):
+    __slots__=("distance1",
+               "distance2",
+               "num_asteroids",
+               "velocity",
+               "eccentricity",
+               "distances",
+               "scales",
+               "angles",
+               "velocity_asteroids",
+               "y_asteroids",
+               "instance_matrices",
+               "instance_buffer",
+               "type")
+    def __init__(self, app, shader, texture, info, num_asteroids, distance1, distance2, velocity, eccentricity, type):
         """
         Initialize the Asteroid class.
 
         Args:
             num_asteroids (int): Number of asteroids in the belt.
-            mars_distance (float): Minimum distance for the asteroid belt (distance of Mars).
-            jupiter_distance (float): Maximum distance for the asteroid belt (distance of Jupiter).
+            distance1 (float): Minimum distance for the asteroid.
+            distance2 (float): Maximum distance for the asteroid.
+            velocity (float): Maximum velocity of the asteroids 
+            eccentricity (float): Eccentricity of the asteroid belt
+            type (str): Type of asteroids (Belt or Trojan)
         """
-        self.mars_distance = mars_distance
-        self.jupiter_distance = jupiter_distance
+        self.distance1 = distance1
+        self.distance2 = distance2
         self.num_asteroids = num_asteroids
         self.velocity = velocity
         self.eccentricity = eccentricity
+        self.type = type
         super().__init__(app, shader, texture, info) 
 
         # Generate instance-specific transformation matrices
@@ -612,20 +628,41 @@ class AsteroidBatch(Object):
         matrices = []
         self.distances = []
         self.scales = []
+        self.angles = []
+        self.velocity_asteroids=[]
+        self.y_asteroids = []
+
         for _ in range(self.num_asteroids):
             # Ensure the distance is between Mars and Jupiter
-            distance = random.uniform(self.mars_distance, self.jupiter_distance)
+            distance = random.uniform(self.distance1, self.distance2)
+            if self.type == "Belt":
+                velocity = random.uniform(self.velocity/4, self.velocity)
+            else:
+                velocity = self.velocity
+
+            y_asteroid = random.uniform(-5,5)
             self.distances.append(distance)  # Store the distance
+            self.velocity_asteroids.append(velocity)
+            self.y_asteroids.append(y_asteroid)
+
             # Generate a random initial angle for orbit
-            angle = random.uniform(0, 2 * np.pi)
+            if self.type == "Belt":
+                angle = random.uniform(0, 2 * np.pi)
+            elif self.type == "Trojan Right":
+                angle = (np.pi / 3) + random.uniform(-0.5, 0.5)  
+            else:
+                angle = (-np.pi / 3) + random.uniform(-0.5, 0.5)  
+
+            self.angles.append(angle)
+            
             # Calculate semi-major and semi-minor axes
             a = distance  # Semi-major axis (distance from the Sun)
             b = a * (1 - self.eccentricity ** 2) ** 0.5  # Semi-minor axis
-
+        
             # Calculate position in orbit
             x = a * np.cos(angle)
             z = b * np.sin(angle)
-            y = 0  # You can adjust this if you want inclined orbits
+            y = y_asteroid  # You can adjust this if you want inclined orbits
 
             # Create the transformation matrix
             model = glm.mat4(1.0)
@@ -649,15 +686,16 @@ class AsteroidBatch(Object):
             # Calculate semi-major and semi-minor axes
             a = distance  # Semi-major axis
             b = a * (1 - self.eccentricity ** 2) ** 0.5  # Semi-minor axis
-
+            angle = self.angles[i]
             # Increment the angle based on velocity and time
-            theta = self.velocity * self.app.time  # Use velocity and time for orbit speed
-
+            angle += self.velocity_asteroids[i] * self.app.time  # Use velocity and time for orbit speed
+            angle %= 2*np.pi 
             # Update position based on the new angle
-            x = a * np.cos(theta)
-            z = b * np.sin(theta)
-            y = 0  # You can adjust this if needed
+            x = a * np.cos(angle)
+            z = b * np.sin(angle)
+            y = self.y_asteroids[i]  # You can adjust this if needed
 
+    
             # Create the new transformation matrix
             model = glm.mat4(1.0)
             model = glm.translate(model, glm.vec3(x, y, z))  # Position in orbit

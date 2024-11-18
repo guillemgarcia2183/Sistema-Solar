@@ -267,28 +267,84 @@ class GraphicsEngine:
         
         #Add asteroids
         speed_asteroids = (self.planets_data["Mars"].data["Orbital Velocity (km/s)"] + self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"])/200
+        # Main asteroid Belt
         self.objects.append(AsteroidBatch(
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
             [0.2, 5, 5, True],  # Adjust these parameters as needed
-            num_asteroids=10000,  # Or however many you want
-            mars_distance=distance_objects["Mars"]+25,
-            jupiter_distance=distance_objects["Jupiter"],
+            num_asteroids=2500,  # Or however many you want
+            distance1=distance_objects["Mars"]+25,
+            distance2=distance_objects["Jupiter"],
             velocity=speed_asteroids,
-            eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"]
+            eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"],
+            type = "Belt"
             ))
         
         self.aux_objects.append(AsteroidBatch(
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
-            [0.2, 5, 5, True],  # Adjust these parameters as needed
-            num_asteroids=10000,  # Or however many you want
-            mars_distance=real_distance["Mars"]+50,
-            jupiter_distance=real_distance["Jupiter"],
+            [0.01, 5, 5, True],  # Adjust these parameters as needed
+            num_asteroids=2500,  # Or however many you want
+            distance1=real_distance["Mars"]+50,
+            distance2=real_distance["Jupiter"],
             velocity=speed_asteroids,
-            eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"] 
+            eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"],
+            type = "Belt"
+            ))
+        
+        # Trojan Asteroids 
+        self.objects.append(AsteroidBatch(
+            self,
+            [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
+            "textures/asteroids.jpg",  # You'll need an asteroid texture
+            [0.2, 5, 5, True],  # Adjust these parameters as needed
+            num_asteroids=500,  # Or however many you want
+            distance1=distance_objects["Jupiter"]+35,
+            distance2=distance_objects["Jupiter"]+45,
+            velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"]/100,
+            eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
+            type = "Trojan Right"
+            ))
+        
+        self.objects.append(AsteroidBatch(
+            self,
+            [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
+            "textures/asteroids.jpg",  # You'll need an asteroid texture
+            [0.2, 5, 5, True],  # Adjust these parameters as needed
+            num_asteroids=500,  # Or however many you want
+            distance1=distance_objects["Jupiter"]+35,
+            distance2=distance_objects["Jupiter"]+45,
+            velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"]/100,
+            eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
+            type = "Trojan Left"
+            ))
+        
+        self.aux_objects.append(AsteroidBatch(
+            self,
+            [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
+            "textures/asteroids.jpg",  # You'll need an asteroid texture
+            [0.01, 5, 5, True],  # Adjust these parameters as needed
+            num_asteroids=500,  # Or however many you want
+            distance1=distance_objects["Jupiter"]+35,
+            distance2=distance_objects["Jupiter"]+45,
+            velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"]/100,
+            eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
+            type = "Trojan Right"
+            ))
+        
+        self.aux_objects.append(AsteroidBatch(
+            self,
+            [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
+            "textures/asteroids.jpg",  # You'll need an asteroid texture
+            [0.01, 5, 5, True],  # Adjust these parameters as needed
+            num_asteroids=500,  # Or however many you want
+            distance1=distance_objects["Jupiter"]+35,
+            distance2=distance_objects["Jupiter"]+45,
+            velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"]/100,
+            eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
+            type = "Trojan Left"
             ))
 
         # Implement stars
