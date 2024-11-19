@@ -31,12 +31,7 @@ class RectangularButton:
         "__y",
     )
 
-    def __init__(
-        self,
-        app,
-        uuid: str,
-        **kwargs,
-    ):
+    def __init__(self, app, uuid: str, **kwargs):
         default_kwargs = {
             "x": 0,
             "y": 0,
@@ -81,36 +76,6 @@ class RectangularButton:
         self.__is_hovered = False
         self.__is_locked = kwargs["locked"]
 
-        # # Engine
-        # self.__app = app
-
-        # # Button's unique id
-        # self.__uuid = uuid
-
-        # # Position information
-        # self.__x = x
-        # self.__y = y
-        # self.__width = width
-        # self.__height = height
-
-        # # Color information
-        # self.__default_color = default_color
-
-        # if hover_color is None:
-        #     self.__hover_color = default_color
-        # else:
-        #     self.__hover_color = hover_color
-
-        # if locked_color is None:
-        #     self.__locked_color = default_color
-        # else:
-        #     self.__locked_color = locked_color
-
-        # # States information
-        # self.__is_hidden = hidden
-        # self.__is_hovered = False
-        # self.__is_locked = locked
-
         # Write the shader
         self.__shader_programs = self.__get_shader_programs()
 
@@ -136,11 +101,13 @@ class RectangularButton:
         program = self.__app.ctx.program(
             vertex_shader='''
             #version 330
+            
             layout (location = 0) in vec3 in_vert;
 
             uniform vec3 in_colour;
 
             out vec3 frag_color;
+            
             void main() {
                 frag_color = in_colour;
                 gl_Position = vec4(in_vert, 1.0);
@@ -148,8 +115,11 @@ class RectangularButton:
             ''',
             fragment_shader='''
             #version 330
+            
             in vec3 frag_color;
+            
             out vec4 f_color;
+            
             void main() {
                 f_color = vec4(frag_color, 1.0);
             }

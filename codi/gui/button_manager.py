@@ -24,6 +24,24 @@ class ButtonManager():
         }
 
     def __add_button(self, new_button):
+        """
+        Add a Button object with an uuid to the buttons buffer.
+
+        Parameters
+        ----------
+        new_button : Button
+            DESCRIPTION.
+
+        Raises
+        ------
+        ValueError
+            A Button with given uuid alredy exists.
+
+        Returns
+        -------
+        None.
+
+        """
         try:
             self.__buttons_buffer[new_button.uuid]
 
@@ -34,11 +52,33 @@ class ButtonManager():
             self.__buttons_buffer[new_button.uuid] = new_button
 
     def add_button(
-            self,
-            button_type: str,
-            uuid: str,
-            params: Dict[str, object]
+        self,
+        button_type: str,
+        uuid: str,
+        params: Dict[str, object]
     ):
+        """
+        Add a Button of a given type with a given uuid and the parametres.
+
+        Parameters
+        ----------
+        button_type : str
+            DESCRIPTION.
+        uuid : str
+            DESCRIPTION.
+        params : Dict[str, object]
+            DESCRIPTION.
+
+        Raises
+        ------
+        ValueError
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        """
         try:
             self.__types_buttons[button_type]
         except KeyError as error:
@@ -54,16 +94,16 @@ class ButtonManager():
         self.__add_button(new_button)
 
     def add_circular_button(
-            self,
-            uuid: str,
-            x: int,
-            y: int,
-            radius: int,
-            default_color: Tuple[float, float, float],
-            hover_color: Tuple[float, float, float] | None = None,
-            locked_color: Tuple[float, float, float] | None = None,
-            hidden: bool = False,
-            locked: bool = False,
+        self,
+        uuid: str,
+        x: int,
+        y: int,
+        radius: int,
+        default_color: Tuple[float, float, float],
+        hover_color: Tuple[float, float, float] | None = None,
+        locked_color: Tuple[float, float, float] | None = None,
+        hidden: bool = False,
+        locked: bool = False,
 
     ):
         params = {
@@ -140,3 +180,9 @@ class ButtonManager():
     def render(self) -> None:
         for button in self.__buttons_buffer.values():
             button.render()
+
+
+if __name__ == "__main__":
+    print(
+        '\33[31m' + 'You are executing a module file, execute main instead.'
+        + '\33[0m')

@@ -31,12 +31,7 @@ class CircularButton:
         "__y",
     )
 
-    def __init__(
-        self,
-        app,
-        uuid: str,
-        **kwargs,
-    ):
+    def __init__(self, app, uuid: str, **kwargs):
         default_kwargs = {
             "x": 0,
             "y": 0,
@@ -102,11 +97,13 @@ class CircularButton:
         program = self.__app.ctx.program(
             vertex_shader='''
             #version 330
+            
             layout (location = 0) in vec3 in_vert;
 
             uniform vec3 in_colour;
 
             out vec3 frag_color;
+            
             void main() {
                 frag_color = in_colour;
                 gl_Position = vec4(in_vert, 1.0);
@@ -114,8 +111,11 @@ class CircularButton:
             ''',
             fragment_shader='''
             #version 330
+            
             in vec3 frag_color;
+            
             out vec4 f_color;
+            
             void main() {
                 f_color = vec4(frag_color, 1.0);
             }
@@ -186,37 +186,73 @@ class CircularButton:
             dtype='f4'
         ).flatten('C')
 
-    def check_click(self, mouse_pos: Tuple[int, int]) -> bool:
+    def check_click(self, mouse_position: Tuple[int, int]) -> bool:
+        """
+        Check if a click has been on the button,
+
+        Parameters
+        ----------
+        mouse_position : Tuple[int, int]
+            Position of the mouse, tuple of integers (pixels) x, y.
+
+        Returns
+        -------
+        bool
+            If the click has been on the button.
+
+        """
         # Cannot be clicked if is locked
         if self.__is_locked:
             return False
 
         # Get mouse coordinates
-        mx, my = mouse_pos
+        mx, my = mouse_position
 
         # Return True if button is clicked
         return self.__containing(mx, my)
 
-    def check_hover(self, mouse_pos: Tuple[int, int]) -> None:
+    def check_hover(self, mouse_position: Tuple[int, int]):
+        """
+        Check if the mouse is hovering on top of the button.
+
+        Parameters
+        ----------
+        mouse_position : Tuple[int, int]
+            Position of the mouse, tuple of integers (pixels) x, y.
+
+        Returns
+        -------
+        None.
+
+        """
         # Cannot be hovered if is locked
         if self.__is_locked:
             return None
 
         # Get mouse coordinates
-        mx, my = mouse_pos
+        mx, my = mouse_position
 
         # Update hover state
         self.__is_hovered = self.__containing(mx, my)
 
     @property
-    def default_color(self) -> Tuple:
+    def default_color(self) -> Tuple[float, float, float]:
+        """
+        Property of default color of the button.
+
+        Returns
+        -------
+        Tuple[float, float, float]
+            Tuple of float values of color RGB (0-1).
+
+        """
         return self.__default_color
 
     @default_color.setter
-    def default_color(self, new_default_color: Tuple):
+    def default_color(self, new_default_color: Tuple[float, float, float]):
         self.__default_color = new_default_color
 
-    def destroy(self) -> None:
+    def destroy(self):
         self.__vao.release()
         self.__vbo.release()
 
@@ -224,11 +260,11 @@ class CircularButton:
         self.__is_hidden = True
 
     @property
-    def hover_color(self) -> Tuple:
+    def hover_color(self) -> Tuple[float, float, float]:
         return self.__hover_color
 
     @hover_color.setter
-    def hover_color(self, new_hover_color: Tuple):
+    def hover_color(self, new_hover_color: Tuple[float, float, float]):
         self.__hover_color = new_hover_color
 
     @property
@@ -243,11 +279,11 @@ class CircularButton:
         self.__is_locked = True
 
     @property
-    def locked_color(self) -> Tuple:
+    def locked_color(self) -> Tuple[float, float, float]:
         return self.__locked_color
 
     @locked_color.setter
-    def locked_color(self, new_locked_color: Tuple):
+    def locked_color(self, new_locked_color: Tuple[float, float, float]):
         self.__locked_color = new_locked_color
 
     @property
@@ -260,7 +296,7 @@ class CircularButton:
 
         self.__set_vao()
 
-    def render(self) -> None:
+    def render(self):
         if self.__is_hidden:
             return None
 
