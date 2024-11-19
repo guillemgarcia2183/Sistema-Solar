@@ -25,7 +25,7 @@ class Reader():
     def read_stars(data_path: str):
         stars = Reader(data_path)
         stars.data = pd.read_csv(data_path)
-        stars.data = stars.data[["x","y","z","mag"]] 
+        stars.data = stars.data[["x", "y", "z", "mag", "con", "proper"]] 
         return stars
 
     @staticmethod
