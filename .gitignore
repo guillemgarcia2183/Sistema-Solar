@@ -127,6 +127,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+myenv/
 
 # Spyder project settings
 .spyderproject
@@ -161,4 +162,10 @@ cython_debug/
 
 # Zip
 *.zip
+
+#.gitignore 
+/codi/data/hygdata_v41.csv
+/codi/data/original_satellites.csv
+/codi/data/parameters_stars.R
+/codi/data/parameters_satellites.R
 
