@@ -51,7 +51,7 @@ class Reader():
         row = next(self._iter)
         # NOTE: It is very important that we change dataset(x, y ,z) -> (y, z, x)
         # because of the way star coordinates are described
-        return row.y, row.z, row.x, row.mag
+        return row.y, row.z, row.x, row.mag, row.con, row.proper
     
     def make_stars(self, star_object, args):
         stars = star_object(*args, self)
