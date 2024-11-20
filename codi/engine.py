@@ -349,7 +349,15 @@ class GraphicsEngine:
 
         # Implement stars
         star_reader = Reader.read_stars("data/stars.csv")
-        self.stars = star_reader.make_stars(StarBatch, [self, [sh.vertex_shader_STAR, sh.fragment_shader_STAR], "textures/earth.jpg", [0,0,0,False]]) #Won't put a texture
+        self.stars = star_reader.make_stars(
+            StarBatch,
+            self, 
+            [sh.vertex_shader_STAR, sh.fragment_shader_STAR], 
+            "textures/earth.jpg", #Won't put a texture
+            [0, 0, 0, False],
+            constellations = True,
+            constellations_shaders = [sh.vertex_shader_CONSTELLATION, sh.fragment_shader_CONSTELLATION]
+        ) 
 
 
     def check_events(self):
@@ -457,9 +465,6 @@ class GraphicsEngine:
         if self.ellipse:
             for orbit in self.orbits:
                 orbit.render()
-
-        # TODO: Are stars that can't be seen being processed/rendered?
-        # self.stars.render()
  
         # Swap buffers + display caption
         pg.display.set_caption(self.info)
