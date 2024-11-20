@@ -465,20 +465,45 @@ class Orbit(Object):
         return np.array(orbit_points, dtype='f4')
     
 class StarBatch(Object):
+
     __slots__ = (
-        "positions", 
+        "positions",
+        "constellations",
+        "constellations_shader",
+        "constellations_vao"
     )
     
     """Classe filla d'Objecte. Crea les estrelles que envoltarà tot el Sistema Solar.
     """
-    def __init__(self, app, shader, texture, info, positions):
+    def __init__(self, app, shader, texture, info, positions, constellations=True, **kwargs):
+
         """Inicialització de la classe StarBatch
 
         Args:
             positions (glm.vec3): Posició en l'espai de l'estrella 
         """
         self.positions = positions
+        self.constellations = constellations
+        self.constellations_shader = None
+        self.constellations_vao = None
         super().__init__(app, shader, texture, info)
+        
+        if self.constellations:
+            assert "constellations_shaders" in kwargs.keys(), "ERROR: No argument provided for shaders constellation"
+            assert isinstance(kwargs["constellations_shaders"], list), \
+                "ERROR: Bad argument format provided for shaders constellation correct is List[vertex: str, fragment: str]"
+            assert len(kwargs["constellations_shaders"]) == 2, "ERRORt: too many/few arguments is shaders list"
+        
+        self.constellations_shader = self.ctx.program(
+            kwargs["constellations_shaders"][0], #vertex_shader
+            kwargs["constellations_shaders"][1], #fragment_shader
+        )
+
+        assert self.constellations_shader , "FATAL ERROR"
+
+        self.on_init_2()
+
+        self.constellations_vao = self.get_constellations_vao()
     
     def get_vao(self):
         """Obtenció del VAO 
@@ -496,6 +521,13 @@ class StarBatch(Object):
         self.shader['m_proj'].write(self.app.camera.m_proj)
         self.shader['m_view'].write(self.app.camera.m_view)
         self.shader['m_model'].write(self.m_model)
+
+    def on_init_2(self):
+        """Post-Post-inicialització de la classe StarBatch
+        """
+        self.constellations_shader['m_proj'].write(self.app.camera.m_proj)
+        self.constellations_shader['m_view'].write(self.app.camera.m_view)
+        self.constellations_shader['m_model'].write(self.m_model)
     
     def get_color_from_mag(self, mag):
         """
@@ -520,7 +552,6 @@ class StarBatch(Object):
 
         # in-world placement of the star
         rads = glm.radians(23.44)
-        #m_model *= glm.translate(self.position) #TODO: Is this correct?
         m_model = glm.translate(-self.app.objects[1].position)
         m_model *= glm.rotate(glm.mat4(), rads, glm.vec3(0, 0, 1))
 
@@ -530,6 +561,7 @@ class StarBatch(Object):
         """Actualització de la càmera al moure-la
         """
         self.shader['m_view'].write(self.app.camera.m_view)
+        self.constellations_shader['m_view'].write(self.app.camera.m_view)
 
     def render(self):
         """Renderització de l'estrella
@@ -539,17 +571,57 @@ class StarBatch(Object):
         self.ctx.point_size = 3
         self.vao.render(mgl.POINTS)
 
+        if self.constellations:
+            self.constellations_vao.render(mgl.LINES)
+
+    def get_constellations_vao(self):
+        """ This function creates an index buffer object that points to the stars
+            that have a common constellation.
+            Enif -- Biham
+            Biham -- Homam
+            Homam -- Markab
+            Markab -- Algenib
+            Markab -- Scheat
+
+        """
+        star_indices = dict()
+        index = 0
+        for _, _, _, _, con, proper in self.positions:
+            if self.constellations:
+                if (con == "Peg"):
+                    if isinstance(proper, str):
+                        star_indices[proper] = index
+            index += 1
+            
+        constellation_indices = [
+            star_indices["Enif"],   star_indices["Biham"],
+            star_indices["Biham"],  star_indices["Homam"],
+            star_indices["Homam"],  star_indices["Markab"],
+            star_indices["Markab"], star_indices["Algenib"],
+            star_indices["Markab"], star_indices["Scheat"],
+        ]
+
+        ibo = self.ctx.buffer(np.array(constellation_indices, dtype='i4').tobytes())
+        # perform an offset of self.ibo of 3*sizeof(float)
+        # and a stride of 24 = 6*sizeof(float) according to the format -> color vec3f and pos vec3f
+
+        return self.ctx.vertex_array(
+            self.constellations_shader,
+            [(self.vbo, '3f 3f', 'in_color', 'in_position')], 
+            index_buffer=ibo
+        )
+
     def get_data(self):
         """Obtenció de les dades per generar el VBO
 
         Returns:
             np.array: Coordenades de les estrelles (position)
         """
-        #data = np.array([self.position.x, self.position.y, self.position.z], dtype='f4')
-        data = []
-        for x,z,y,mag in self.positions:
+        data = list()
+        for x, z, y, mag, _, _ in self.positions:
             color = self.get_color_from_mag(mag)
-            data.append((color.x, color.y, color.z, x, y, z))
+            data.append((color.x, color.y, color.z,
+                         x, y, z))
         data = np.array(data, dtype='f4')
         return data
 
