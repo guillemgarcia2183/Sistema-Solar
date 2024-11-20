@@ -11,10 +11,10 @@ from object import Sun, Planet, Satellite, Orbit, StarBatch, AsteroidBatch
 import shaders as sh
 from reader import Reader
 from gui import ButtonManager
-import os
+
 
 # Conversión a unidades astronómicas (UA)
-ua_conversion = 149_600_000  # 1 UA en kilómetros
+UA_CONVERSION = 149_600_000  # 1 UA en kilómetros
 
 class GraphicsEngine:
 
@@ -87,7 +87,10 @@ class GraphicsEngine:
         # gui
         self.button_manager = ButtonManager(self)
 
-        with open(r"./codi/gui_layout.json", "r") as file:
+        # with open(r"./codi/gui_layout.json", "r") as file:
+        #     gui_layout = json.load(file)
+
+        with open("gui_layout.json", "r") as file:
             gui_layout = json.load(file)
 
         self.button_manager.batch_add_buttons(gui_layout)
@@ -103,7 +106,6 @@ class GraphicsEngine:
     def obtain_data_planets(self):
         planets_data = dict()
         
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
         for planet in self.planets_list:
             read_data = Reader.read_planets("data/planets.csv", planet) 
             planets_data[planet] = read_data
@@ -117,19 +119,19 @@ class GraphicsEngine:
         
     def radius_distance_objects(self):        
         # Radios y distancias sin escalar (en UA) para calcular valores min y max
-        raw_radii = {"Sun": 696000 / ua_conversion}
+        raw_radii = {"Sun": 696000 / UA_CONVERSION}
         raw_distances = {}
 
         for planet in self.planets_list:
             # Almacenar radios y distancias en UA sin normalizar
-            raw_radii[planet] = (self.planets_data[planet].data["Diameter (km)"] / 2) / ua_conversion
-            raw_distances[planet] = (self.planets_data[planet].data["Distance from Sun (10^6 km)"] * 1e6) / ua_conversion
+            raw_radii[planet] = (self.planets_data[planet].data["Diameter (km)"] / 2) / UA_CONVERSION
+            raw_distances[planet] = (self.planets_data[planet].data["Distance from Sun (10^6 km)"] * 1e6) / UA_CONVERSION
 
         # Satélites
         satellites_reader = Reader.read_satellites("data/satellites.csv") 
         for index, row in satellites_reader.data.iterrows():
             name = row['name']
-            raw_radii[name] = row['radius'] / ua_conversion
+            raw_radii[name] = row['radius'] / UA_CONVERSION
 
         # Encontrar los valores mínimo y máximo para normalización
         min_radius, max_radius = min(raw_radii.values()), max(raw_radii.values())
@@ -139,8 +141,8 @@ class GraphicsEngine:
         normalized_radii = {name: self.normalize(radius, min_radius, max_radius, 0.0001, 20) for name, radius in raw_radii.items()}
         normalized_distances = {name: self.normalize(distance, min_distance, max_distance, 21, 500) for name, distance in raw_distances.items()}
 
-        normalized_radii_real = {name: self.normalize(radius, min_radius, max_radius, 0.0001, 1) for name, radius in raw_radii.items()}
-        normalized_distances_real = {name: self.normalize(distance, min_distance, max_distance, 83.84, 500) for name, distance in raw_distances.items()}
+        normalized_radii_real = {name: radius*100 for name, radius in raw_radii.items()}
+        normalized_distances_real = {name: distance*100 for name, distance in raw_distances.items()}
 
         return normalized_radii, normalized_distances, normalized_radii_real, normalized_distances_real
 
@@ -174,14 +176,14 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_SUN, sh.fragment_shader_SUN],
             "textures/sun.jpg",
-            [radius_objects["Sun"], 25, 25, False], 
+            [radius_objects["Sun"], 25, 25], 
         ))
 
         self.aux_objects.append(Sun(
             self,
             [sh.vertex_shader_SUN, sh.fragment_shader_SUN],
             "textures/sun.jpg",
-            [real_radius["Sun"], 25, 25, False], 
+            [real_radius["Sun"], 25, 25], 
         ))
 
         # Llista de planetes i òrbites
@@ -190,7 +192,7 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [radius_objects[planet], 15, 15, False],
+                [radius_objects[planet], 15, 15],
                 glm.vec3(1, 1, 1), 
                 glm.vec3(distance_objects[planet], 0, distance_objects[planet]),
                 self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
@@ -202,7 +204,7 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [real_radius[planet], 15, 15, False],
+                [real_radius[planet], 15, 15],
                 glm.vec3(1, 1, 1), 
                 glm.vec3(real_distance[planet], 0, real_distance[planet]),
                 self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
@@ -214,7 +216,7 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_ELLIPSE, sh.fragment_shader_ELLIPSE],
                 texture,
-                [radius_objects[planet], 15, 15, False], 
+                [radius_objects[planet], 15, 15], 
                 glm.vec3(distance_objects[planet], 0, distance_objects[planet]),
                 self.planets_data[planet].data["Orbital Eccentricity"]
             ))
@@ -223,7 +225,7 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_ELLIPSE, sh.fragment_shader_ELLIPSE],
                 texture,
-                [real_radius[planet], 15, 15, False], 
+                [real_radius[planet], 15, 15], 
                 glm.vec3(real_distance[planet], 0, real_distance[planet]),
                 self.planets_data[planet].data["Orbital Eccentricity"]
             ))
@@ -241,24 +243,10 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [radius_objects[name], 15, 15, False],
+                [radius_objects[name], 15, 15],
                 glm.vec3(1, 1, 1),
                 glm.vec3(planet_distance, 0, planet_distance),
-                (distance/ua_conversion) +  radius_objects[planet],
-                self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
-                velocity*1e5,
-                self.planets_data[planet].data["Orbital Inclination (degrees)"],
-                self.planets_data[planet].data["Orbital Eccentricity"],
-            ))
-
-            self.aux_objects.append(Satellite(
-                self,
-                [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
-                texture,
-                [real_radius[name], 15, 15, False],
-                glm.vec3(1, 1, 1),
-                glm.vec3(planet_distance, 0, planet_distance),
-                (distance/ua_conversion) +  real_radius[planet],
+                (distance/UA_CONVERSION) +  radius_objects[planet],
                 self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
                 velocity*1e5,
                 self.planets_data[planet].data["Orbital Inclination (degrees)"],
@@ -272,23 +260,10 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
-            [0.2, 5, 5, True],  # Adjust these parameters as needed
+            [0.2, 5, 5],  # Adjust these parameters as needed
             num_asteroids=2500,  # Or however many you want
             distance1=distance_objects["Mars"]+25,
             distance2=distance_objects["Jupiter"],
-            velocity=speed_asteroids,
-            eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"],
-            type = "Belt"
-            ))
-        
-        self.aux_objects.append(AsteroidBatch(
-            self,
-            [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
-            "textures/asteroids.jpg",  # You'll need an asteroid texture
-            [0.01, 5, 5, True],  # Adjust these parameters as needed
-            num_asteroids=2500,  # Or however many you want
-            distance1=real_distance["Mars"]+50,
-            distance2=real_distance["Jupiter"],
             velocity=speed_asteroids,
             eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"],
             type = "Belt"
@@ -299,7 +274,7 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
-            [0.2, 5, 5, True],  # Adjust these parameters as needed
+            [0.2, 5, 5],  # Adjust these parameters as needed
             num_asteroids=500,  # Or however many you want
             distance1=distance_objects["Jupiter"]+35,
             distance2=distance_objects["Jupiter"]+45,
@@ -312,33 +287,7 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
-            [0.2, 5, 5, True],  # Adjust these parameters as needed
-            num_asteroids=500,  # Or however many you want
-            distance1=distance_objects["Jupiter"]+35,
-            distance2=distance_objects["Jupiter"]+45,
-            velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"]/100,
-            eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
-            type = "Trojan Left"
-            ))
-        
-        self.aux_objects.append(AsteroidBatch(
-            self,
-            [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
-            "textures/asteroids.jpg",  # You'll need an asteroid texture
-            [0.01, 5, 5, True],  # Adjust these parameters as needed
-            num_asteroids=500,  # Or however many you want
-            distance1=distance_objects["Jupiter"]+35,
-            distance2=distance_objects["Jupiter"]+45,
-            velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"]/100,
-            eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
-            type = "Trojan Right"
-            ))
-        
-        self.aux_objects.append(AsteroidBatch(
-            self,
-            [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
-            "textures/asteroids.jpg",  # You'll need an asteroid texture
-            [0.01, 5, 5, True],  # Adjust these parameters as needed
+            [0.2, 5, 5],  # Adjust these parameters as needed
             num_asteroids=500,  # Or however many you want
             distance1=distance_objects["Jupiter"]+35,
             distance2=distance_objects["Jupiter"]+45,
@@ -354,7 +303,7 @@ class GraphicsEngine:
             self, 
             [sh.vertex_shader_STAR, sh.fragment_shader_STAR], 
             "textures/earth.jpg", #Won't put a texture
-            [0, 0, 0, False],
+            [0, 0, 0],
             constellations = True,
             constellations_shaders = [sh.vertex_shader_CONSTELLATION, sh.fragment_shader_CONSTELLATION]
         ) 

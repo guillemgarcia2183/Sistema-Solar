@@ -34,6 +34,7 @@ class Camera:
         self.yaw, self.pitch = self.calculate_initial_orientation(self.position, glm.vec3(0, 0, 0))
         self.sensitivity = 0.1  # Mouse sensitivity for camera movement
         self.speed = 0.7  # Camera movement speed for WASD
+        
         # Mouse control
         self.last_mouse_pos = None
         self.left_button_held = False

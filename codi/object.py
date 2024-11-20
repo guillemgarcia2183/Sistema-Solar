@@ -76,7 +76,6 @@ class Object:
         Returns:
             mgl.texture: Textura
         """
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
         image = Image.open(filepath).transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.FLIP_LEFT_RIGHT)
         texture = self.ctx.texture(image.size, 3, image.tobytes())
         texture.filter = (mgl.LINEAR_MIPMAP_LINEAR, mgl.LINEAR)
@@ -767,7 +766,6 @@ class AsteroidBatch(Object):
             z = b * np.sin(angle)
             y = self.y_asteroids[i]  # You can adjust this if needed
 
-    
             # Create the new transformation matrix
             model = glm.mat4(1.0)
             model = glm.translate(model, glm.vec3(x, y, z))  # Position in orbit
