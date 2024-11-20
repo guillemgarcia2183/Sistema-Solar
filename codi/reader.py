@@ -25,7 +25,7 @@ class Reader():
     def read_stars(data_path: str):
         stars = Reader(data_path)
         stars.data = pd.read_csv(data_path)
-        stars.data = stars.data[["x", "y", "z", "mag", "con", "proper"]] 
+        stars.data = stars.data[["x", "y", "z", "mag", "con", "proper"]]
         return stars
 
     @staticmethod
@@ -53,6 +53,6 @@ class Reader():
         # because of the way star coordinates are described
         return row.y, row.z, row.x, row.mag, row.con, row.proper
     
-    def make_stars(self, star_object, args):
-        stars = star_object(*args, self)
+    def make_stars(self, star_object, *args, **kwargs):
+        stars = star_object(*args, self, **kwargs)
         return stars
