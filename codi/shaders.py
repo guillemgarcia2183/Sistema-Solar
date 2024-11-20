@@ -1,4 +1,3 @@
-
 vertex_shader_SUN ='''
                 #version 330
                 layout(location = 0) in vec3 in_norm;
@@ -168,6 +167,34 @@ fragment_shader_STAR = '''
         } else {
             discard;
         }
+    }
+'''
+vertex_shader_CONSTELLATION = '''
+    #version 330
+
+    layout(location = 0) in vec3 in_color;
+    layout(location = 1) in vec3 in_position;
+
+    uniform mat4 m_proj;
+    uniform mat4 m_view;
+    uniform mat4 m_model;
+
+    out vec3 line_color;
+
+    void main() {
+        gl_Position = m_proj * m_view * m_model * vec4(in_position, 1.0);
+        line_color = in_color;
+    }
+'''
+fragment_shader_CONSTELLATION = '''
+    #version 330
+
+    in vec3 line_color;
+
+    out vec4 fragColor;
+
+    void main() {
+        fragColor = vec4(line_color, 1.0);
     }
 '''
 
