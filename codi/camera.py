@@ -199,3 +199,57 @@ class PlanetaryCamera():
 
     def process_keyboard(self):
         pass
+    
+class FollowCamera(Camera):
+    def __init__(self, app, distance):
+        """
+        Initializes the FollowCamera.
+
+        Args:
+            distance (float): The distance from the camera to the planet.
+        """
+        super().__init__(app)
+        self.target = None
+        self.elevation = 0
+        self.azimuth = 0
+        self.distance = distance
+    
+    def get_type(self):
+        return "FollowCamera"
+    
+    def select_target(self, target):
+        """ ----RECORDATORI----
+            SELECCIONAR TARGET 
+            DESPRÉS DE CREAR-LOS
+        """
+        self.target = target
+        self.speed = self.speed * (target.radius)**(-5) # valor arbitrari.
+    
+    def process_keyboard(self):
+        # Get the current key state
+        keys = pg.key.get_pressed()
+
+        # Change the elevation relative to the object 
+        if keys[pg.K_w]:
+            self.elevation = (self.elevation + self.speed) % 360
+        if keys[pg.K_s]:
+            self.elevation = (self.elevation - self.speed) % 360
+
+        # Change the azimuth relative to the object
+        if keys[pg.K_a]:
+            self.azimuth = (self.azimuth + self.speed) % 360
+        if keys[pg.K_d]:
+            self.azimuth = (self.azimuth - self.speed) % 360
+
+    def follow_target(self):
+        """Update the camera's position based on the planet's position and the set distance and angles."""
+        # Calculate Cartesian coordinates from spherical
+
+        x = self.target.actual_pos.x + self.distance * glm.cos(glm.radians(self.elevation)) * glm.cos(glm.radians(self.azimuth))
+        y = self.distance * glm.sin(glm.radians(self.elevation)) # self.target.actual_pos.y serà sempre 0
+        z = self.target.actual_pos.z + self.distance * glm.cos(glm.radians(self.elevation)) * glm.sin(glm.radians(self.azimuth))
+        
+        # Update camera position and direction
+        self.position = glm.vec3(x, y, z)
+        
+        self.update_shaders_m_view()
