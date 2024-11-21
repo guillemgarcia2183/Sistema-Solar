@@ -584,13 +584,18 @@ class StarBatch(Object):
             Markab -- Scheat
 
         """
+        
+        if (not self.constellations):
+            return None
+
         star_indices = dict()
         index = 0
         for _, _, _, _, con, proper in self.positions:
-            if self.constellations:
-                if (con == "Peg"):
-                    if isinstance(proper, str):
-                        star_indices[proper] = index
+            if (con == "Peg"):
+                if isinstance(proper, str):
+                    star_indices[proper] = index
+            if (isinstance(proper, str) and proper== "Alpheratz"):
+                    star_indices[proper] = index
             index += 1
             
         constellation_indices = [
@@ -599,6 +604,8 @@ class StarBatch(Object):
             star_indices["Homam"],  star_indices["Markab"],
             star_indices["Markab"], star_indices["Algenib"],
             star_indices["Markab"], star_indices["Scheat"],
+            star_indices["Scheat"], star_indices["Alpheratz"],
+            star_indices["Algenib"], star_indices["Alpheratz"]
         ]
 
         ibo = self.ctx.buffer(np.array(constellation_indices, dtype='i4').tobytes())
