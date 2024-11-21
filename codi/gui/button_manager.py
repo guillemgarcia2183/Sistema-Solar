@@ -179,8 +179,8 @@ class ButtonManager():
         try:
             self.__buttons_buffer[uuid]
         except KeyError as error:
-            raise ValueError(f'Button with uuid: {
-                             uuid} does not exist.') from error
+            raise ValueError(f'Button with uuid: {uuid} '
+                             + ' does not exist.') from error
 
         self.__buttons_buffer[uuid].destroy()
         del self.__buttons_buffer[uuid]
