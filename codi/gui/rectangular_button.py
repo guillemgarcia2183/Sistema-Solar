@@ -53,8 +53,8 @@ class RectangularButton:
         self.__uuid = uuid
 
         # Position information
-        self.__x = kwargs["x"]
-        self.__y = kwargs["y"]
+        self.__x = kwargs["x"] - kwargs["width"] / 2
+        self.__y = kwargs["y"] - kwargs["height"] / 2
         self.__width = kwargs["width"]
         self.__height = kwargs["height"]
 
