@@ -215,11 +215,11 @@ class Planet(Object):
                "position",
                "velocity",
                "inclination",
-               "excentrity"]
+               "eccentricity"]
     
     """Classe filla d'Objecte. Crea els Planetes.
     """
-    def __init__(self, app, shader, texture, info, size, position, velocity, inclination, excentrity):
+    def __init__(self, app, shader, texture, info, size, position, velocity, inclination, eccentricity):
         """Inicialització de la classe Planet. Tindrà els atributs de Object i els següents
 
         Args:
@@ -227,14 +227,14 @@ class Planet(Object):
             position (glm.vec3): Posició del planeta
             velocity (float): Velocitat del planeta
             inclination (float): Inclinació de rotació
-            excentrity (float): Excentritat de l'el·lipse
+            eccentricity (float): Excentritat de l'el·lipse
         """
         # Característiques de l'esfera
         self.size = size
         self.position = position
         self.velocity = velocity
         self.inclination = inclination
-        self.excentrity = excentrity
+        self.eccentricity = eccentricity
         super().__init__(app, shader, texture, info)
         
     def get_model_matrix(self):
@@ -279,7 +279,7 @@ class Planet(Object):
 
         # Semieje mayor y menor basados en la distancia inicial del planeta al Sol
         a = glm.length(glm.vec2(self.position.x, self.position.z))  # La magnitud en XZ como semieje mayor
-        b = a * (1 - self.excentrity ** 2) ** 0.5 # Semieje menor (ajústalo según el grado de excentricidad que desees)
+        b = a * (1 - self.eccentricity ** 2) ** 0.5 # Semieje menor (ajústalo según el grado de excentricidad que desees)
 
         # Calcular el ángulo en función del tiempo
         theta = self.app.time * self.velocity   # Ajusta la velocidad de la órbita
@@ -288,6 +288,7 @@ class Planet(Object):
         x = a * glm.cos(theta)
         z = b * glm.sin(theta)
         y = self.position.y  # Mantener la altura constante o ajustarla si deseas órbitas inclinadas
+
 
         # Trasladar el planeta a la nueva posición calculada (órbita elíptica respecto al Sol en (0, 0, 0))
         new_position = glm.vec3(x, y, z)
@@ -299,11 +300,11 @@ class Planet(Object):
         self.m_model = m_model    
 
 class Satellite(Object):
-    __slots__=["size", "position", "distance_to_planet", "velocity_planet", "velocity_satellite", "inclination", "excentrity"]
+    __slots__=["size", "position", "distance_to_planet", "velocity_planet", "velocity_satellite", "inclination", "eccentricity"]
     
     """Classe filla d'Objecte. Crea els Satèl·lits naturals.
     """
-    def __init__(self, app, shader, texture, info, size, position, distance_to_planet, velocity_planet, velocity_satellite, inclination, excentrity):
+    def __init__(self, app, shader, texture, info, size, position, distance_to_planet, velocity_planet, velocity_satellite, inclination, eccentricity):
         """Inicialització de la classe Planet. Tindrà els atributs de Object i els següents
 
         Args:
@@ -318,7 +319,7 @@ class Satellite(Object):
         self.velocity_planet = velocity_planet
         self.velocity_satellite = velocity_satellite
         self.inclination = inclination
-        self.excentrity = excentrity
+        self.eccentricity = eccentricity
         super().__init__(app, shader, texture, info)
         
     def get_model_matrix(self):
@@ -360,7 +361,7 @@ class Satellite(Object):
         """Rotació del satèl·lit sobre el planeta.
         """
         a = glm.length(glm.vec2(self.distance_to_planet, self.distance_to_planet))
-        b = a * (1 - self.excentrity ** 2) ** 0.5  # Excentricidad de la órbita del satélite
+        b = a * (1 - self.eccentricity ** 2) ** 0.5  # Excentricidad de la órbita del satélite
         theta = self.app.time * self.velocity_satellite
 
         # Calcular la posición en la órbita alrededor del planeta (eje XZ)
@@ -379,7 +380,7 @@ class Satellite(Object):
         """Rotació del satèl·lit sobre el sol (igual que els planetes).
         """
         a = glm.length(glm.vec2(self.position.x, self.position.z))
-        b = a * (1 - self.excentrity ** 2) ** 0.5
+        b = a * (1 - self.eccentricity ** 2) ** 0.5
         theta = self.app.time * self.velocity_planet
 
         # Calcular la posición en la órbita elíptica (eje XZ) respecto al Sol
@@ -393,19 +394,19 @@ class Satellite(Object):
         return planet_position  # Devolver la posición del planeta
 
 class Orbit(Object):
-    __slots__=["position", "excentrity"]
+    __slots__=["position", "eccentricity"]
 
     """Classe filla d'Objecte. Crea les òrbites dels planetes (traça el·lipses del seu moviment).
     """
-    def __init__(self, app, shader, texture, info, position, excentrity):
+    def __init__(self, app, shader, texture, info, position, eccentricity):
         """Inicialització de la classe Orbit
 
         Args:
             position (glm.vec3): Posició del planeta
-            excentrity (float): Excentritat de l'el·lipse
+            eccentricity (float): Excentritat de l'el·lipse
         """
         self.position = position
-        self.excentrity = excentrity
+        self.eccentricity = eccentricity
         super().__init__(app, shader, texture, info)
 
     def on_init(self):
@@ -451,7 +452,7 @@ class Orbit(Object):
         """
         # Paràmetres de la òrbita
         a = glm.length(glm.vec2(self.position.x, self.position.z))  # Semieix major
-        b = a * (1 - self.excentrity ** 2) ** 0.5  # Semieix menor
+        b = a * (1 - self.eccentricity ** 2) ** 0.5  # Semieix menor
 
         orbit_points = []
 
