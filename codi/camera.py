@@ -105,6 +105,12 @@ class Camera:
             self.strafe(-self.speed)
         if keys[pg.K_d]:
             self.strafe(self.speed)
+
+        # Move upward (Spacebar) or downward (Control key)    
+        if keys[pg.K_SPACE]:
+            self.move_upward(self.speed)
+        if keys[pg.K_LCTRL] or keys[pg.K_RCTRL]:  # Left or Right Control
+            self.move_upward(-self.speed)
     
     def move_forward(self, speed):
         # Calculate the forward direction based on yaw and pitch
@@ -119,8 +125,38 @@ class Camera:
         self.m_view = self.get_view_matrix()
         for object in self.app.objects:
             object.shader['m_view'].write(self.m_view)
-        self.app.stars.shader['m_view'].write(self.m_view)  
-    
+        self.app.stars.shader['m_view'].write(self.m_view)
+
+    def move_upward(self, speed):
+        # Calculate the forward direction based on yaw and pitch
+        forward = glm.vec3(
+            math.cos(glm.radians(self.yaw)) * math.cos(glm.radians(self.pitch)),
+            math.sin(glm.radians(self.pitch)),
+            math.sin(glm.radians(self.yaw)) * math.cos(glm.radians(self.pitch))
+        )
+        forward = glm.normalize(forward)
+
+        # Calculate the right direction (strafe direction)
+        right = glm.vec3(
+            math.cos(glm.radians(self.yaw + 90)),
+            0,
+            math.sin(glm.radians(self.yaw + 90))
+        )
+        right = glm.normalize(right)
+
+        # Calculate the upward direction relative to the camera
+        upward = glm.cross(right, forward)
+        upward = glm.normalize(upward)
+
+        # Move the camera in the upward direction
+        self.position += upward * speed
+        self.m_view = self.get_view_matrix()
+
+        # Update the view matrix for all objects and stars
+        for object in self.app.objects:
+            object.shader['m_view'].write(self.m_view)
+        self.app.stars.shader['m_view'].write(self.m_view)
+
     def strafe(self, speed):
         # Strafe movement is based on the yaw only (moving perpendicular to the direction we're facing)
         right = glm.vec3()
@@ -199,7 +235,7 @@ class PlanetaryCamera():
 
     def process_keyboard(self):
         pass
-    
+
 class FollowCamera(Camera):
     def __init__(self, app, distance):
         """
