@@ -27,7 +27,7 @@ class Camera:
         """
         self.app = app
         self.aspec_ratio = app.WIN_SIZE[0]/app.WIN_SIZE[1]
-        self.position = glm.vec3( 66.8807,      66.8807,      66.8807)
+        self.position = glm.vec3( 66.8807,      66.8807,      66.8807) # ---------Per què aquesta posició?
         self.up = glm.vec3(0,1,0)
 
         # Moviment de la càmera
@@ -63,6 +63,12 @@ class Camera:
         """
         return glm.perspective(glm.radians(45), self.aspec_ratio, 0.1, 2000)
     
+    def get_type(self):
+        return "Camera"
+
+    def follow_target(self):
+        pass
+
     def calculate_initial_orientation(self, position, target):
         # Calculate the direction vector from the camera to the target
         direction = target - position
@@ -238,21 +244,62 @@ class PlanetaryCamera():
         pass
 
 class FollowCamera(Camera):
-    def __init__(self, app, distance):
+    __slots__ = ["target", 
+                 "elevation",
+                 "azimuth",
+                 "distance",
+                 "lock_target"]
+    """Classe que estableix la càmara planetària
+    """ 
+    def __init__(self, app, distance, lock_target = True):
         """
         Initializes the FollowCamera.
 
         Args:
             distance (float): The distance from the camera to the planet.
         """
-        super().__init__(app)
         self.target = None
         self.elevation = 0
         self.azimuth = 0
         self.distance = distance
+        self.lock_target = lock_target
+        super().__init__(app)
     
     def get_type(self):
         return "FollowCamera"
+                 
+    def get_view_matrix(self):
+        """
+        Sobrecarreguem aquesta funció per gestionar si volem que la càmera es fixi en el planeta o no
+        Returns:
+            glm.vec4: Matriu view 
+        """
+
+        if self.lock_target and self.target is not None: # Condició temporal, un cop el canvi de target estigui implementat s'haurà de canviar
+            forward = glm.normalize(self.target.actual_pos - self.position)
+        
+            # Dynamically adjust the reference vector to avoid gimbal lock near poles
+            if abs(forward.y) > 0.99:  # Near the poles, choose a different reference vector
+                reference_up = glm.vec3(0, 0, 0)  # Use a horizontal vector instead of world up
+            else:
+                reference_up = glm.vec3(0, 1, 0)  # Standard world up for most cases
+            
+            # Calculate the right vector (perpendicular to forward and reference up)
+            right = glm.normalize(glm.cross(reference_up, forward))
+            
+            # Recalculate the true up vector (perpendicular to forward and right)
+            new_up = glm.normalize(glm.cross(forward, right))
+
+            return glm.lookAt(self.position, self.target.actual_pos, new_up)
+        
+        # Calculate direction from yaw and pitch
+        direction = glm.vec3()
+        direction.x = math.cos(glm.radians(self.yaw)) * math.cos(glm.radians(self.pitch))
+        direction.y = math.sin(glm.radians(self.pitch))
+        direction.z = math.sin(glm.radians(self.yaw)) * math.cos(glm.radians(self.pitch))
+        direction = glm.normalize(direction)
+
+        return glm.lookAt(self.position, self.position + direction, self.up)
     
     def select_target(self, target):
         """ ----RECORDATORI----
@@ -261,7 +308,7 @@ class FollowCamera(Camera):
         """
         self.target = target
         # TODO: calculate the speed so that it takes the same time to wrap around any planet
-        if self.radius < 1:
+        if self.target.radius < 1:
             self.speed /= target.radius
         else:
             self.speed *= target.radius  

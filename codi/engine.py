@@ -4,7 +4,7 @@ import moderngl as mgl
 import glm
 import sys
 #from axis import Axis
-from camera import Camera
+from camera import Camera, FollowCamera
 from light import Light
 from objects import *
 import shaders as sh
@@ -70,7 +70,9 @@ class GraphicsEngine:
 
         # camera
         self.camera = Camera(self)
-
+        # Distància arbitrària, de moment. 
+        # TODO: que la classe calculi una distància entre la superfície del planeta i el seu satèl·lit més proper
+        #self.camera = FollowCamera(self, 0.5) 
         # light
         self.light = Light()
         
@@ -98,6 +100,8 @@ class GraphicsEngine:
         # axis
         # self.objects.append(Axis(self))
 
+        # Establim un target a la càmera. Això hauria d'estar al check_events
+        #self.camera.select_target(self.objects[3]) # Aquesta línia saltarà error si la càmera inicialitzada no és del tipus "FollowCamera"
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
         self.ellipse = True
@@ -307,7 +311,6 @@ class GraphicsEngine:
             constellations_shaders = [sh.vertex_shader_CONSTELLATION, sh.fragment_shader_CONSTELLATION]
         ) 
 
-
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.
         """
@@ -430,5 +433,6 @@ class GraphicsEngine:
             self.check_events()
             self.camera.process_keyboard()
             self.move()
+            self.camera.follow_target()
             self.render()
             self.clock.tick(60)
