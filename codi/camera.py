@@ -75,7 +75,16 @@ class Camera:
         pitch = math.degrees(math.atan2(direction.y, horizontal_dist))  # Pitch angle based on Y
 
         return yaw, pitch
-    
+    def update_shaders_m_view(self):
+        # New m_view
+        self.m_view = self.get_view_matrix()
+        # Update all shaders
+        for object in self.app.objects:
+            object.shader['m_view'].write(self.m_view)
+        for orbit in self.app.orbits:
+            orbit.shader['m_view'].write(self.m_view)
+        self.app.stars.shader['m_view'].write(self.m_view)
+
     def process_mouse_movement(self, mouse_dx, mouse_dy):
         # Apply sensitivity and update yaw and pitch
         self.yaw += mouse_dx * self.sensitivity
@@ -85,10 +94,7 @@ class Camera:
         self.pitch = max(-89.0, min(89.0, self.pitch))
 
         # Update the view matrix with new yaw and pitch
-        self.m_view = self.get_view_matrix()
-        for object in self.app.objects:
-            object.shader['m_view'].write(self.m_view)
-        self.app.stars.shader['m_view'].write(self.m_view)  
+        self.update_shaders_m_view()
     
     def process_keyboard(self):
         # Get the current key state
@@ -122,10 +128,7 @@ class Camera:
 
         # Update the camera position by moving along the forward direction
         self.position += direction * speed
-        self.m_view = self.get_view_matrix()
-        for object in self.app.objects:
-            object.shader['m_view'].write(self.m_view)
-        self.app.stars.shader['m_view'].write(self.m_view)
+        self.update_shaders_m_view()
 
     def move_upward(self, speed):
         # Calculate the forward direction based on yaw and pitch
@@ -150,12 +153,9 @@ class Camera:
 
         # Move the camera in the upward direction
         self.position += upward * speed
-        self.m_view = self.get_view_matrix()
 
         # Update the view matrix for all objects and stars
-        for object in self.app.objects:
-            object.shader['m_view'].write(self.m_view)
-        self.app.stars.shader['m_view'].write(self.m_view)
+        self.update_shaders_m_view()
 
     def strafe(self, speed):
         # Strafe movement is based on the yaw only (moving perpendicular to the direction we're facing)
@@ -166,10 +166,9 @@ class Camera:
 
         # Update the camera position by strafing
         self.position += right * speed
-        self.m_view = self.get_view_matrix()
-        for object in self.app.objects:
-            object.shader['m_view'].write(self.m_view)
-        self.app.stars.shader['m_view'].write(self.m_view)  
+
+        # Update the view matrix for all objects and stars
+        self.update_shaders_m_view()
 
 class Planets(Enum):
     SUN     = 0
@@ -259,7 +258,11 @@ class FollowCamera(Camera):
             DESPRÉS DE CREAR-LOS
         """
         self.target = target
-        self.speed = self.speed * (target.radius)**(-5) # valor arbitrari.
+        # TODO: calculate the speed so that it takes the same time to wrap around any planet
+        if self.radius < 1:
+            self.speed /= target.radius
+        else:
+            self.speed *= target.radius  
     
     def process_keyboard(self):
         # Get the current key state

@@ -33,13 +33,9 @@ class Orbit(Object):
         """
         return self.ctx.vertex_array(self.shader, [(self.vbo, '3f', 'in_position')])
     
-    def update(self):
-        self.shader['m_view'].write(self.app.camera.m_view)
-
     def render(self):
         """Renderització del VAO
         """
-        self.update()
         self.vao.render(mgl.LINE_LOOP) 
 
 

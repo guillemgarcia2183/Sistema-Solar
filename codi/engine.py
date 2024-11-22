@@ -6,12 +6,7 @@ import sys
 #from axis import Axis
 from camera import Camera
 from light import Light
-from objects.asteroid import AsteroidBatch
-from objects.orbit import Orbit
-from objects.planet import Planet
-from objects.satellite import Satellite
-from objects.star import StarBatch
-from objects.sun import Sun 
+from objects import *
 import shaders as sh
 from reader import Reader
 from gui import ButtonManager
