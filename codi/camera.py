@@ -75,6 +75,7 @@ class Camera:
         pitch = math.degrees(math.atan2(direction.y, horizontal_dist))  # Pitch angle based on Y
 
         return yaw, pitch
+    
     def update_shaders_m_view(self):
         # New m_view
         self.m_view = self.get_view_matrix()
@@ -84,6 +85,7 @@ class Camera:
         for orbit in self.app.orbits:
             orbit.shader['m_view'].write(self.m_view)
         self.app.stars.shader['m_view'].write(self.m_view)
+        self.app.stars.constellations_shader['m_view'].write(self.m_view)
 
     def process_mouse_movement(self, mouse_dx, mouse_dy):
         # Apply sensitivity and update yaw and pitch

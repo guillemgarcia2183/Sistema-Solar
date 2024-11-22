@@ -395,6 +395,10 @@ class GraphicsEngine:
         """
         self.time = pg.time.get_ticks() * 0.001
 
+    def move(self):
+        for objecte in self.objects:
+            objecte.move()
+        
     def render(self):
         """Renderització dels objectes 
         """
@@ -425,5 +429,6 @@ class GraphicsEngine:
             self.get_time()
             self.check_events()
             self.camera.process_keyboard()
+            self.move()
             self.render()
             self.clock.tick(60)

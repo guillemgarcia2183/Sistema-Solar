@@ -90,21 +90,14 @@ class StarBatch(Object):
 
         # in-world placement of the star
         rads = glm.radians(23.44)
-        m_model = glm.translate(-self.app.objects[1].position)
+        m_model = glm.translate(-self.app.objects[1].original_pos)
         m_model *= glm.rotate(glm.mat4(), rads, glm.vec3(0, 0, 1))
 
         return m_model
     
-    def update(self):
-        """Actualització de la càmera al moure-la
-        """
-        self.shader['m_view'].write(self.app.camera.m_view)
-        self.constellations_shader['m_view'].write(self.app.camera.m_view)
-
     def render(self):
         """Renderització de l'estrella
         """
-        self.update()
         self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
         self.ctx.point_size = 3
         self.vao.render(mgl.POINTS)

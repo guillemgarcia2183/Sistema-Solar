@@ -38,13 +38,15 @@ class Satellite(Object):
     def get_data(self):
         return self.create_sphere(False)
     
+    def move(self):
+        planet_position = self.rotate_sun()
+        self.rotate_planet(planet_position)
+        self.rotate_self()
+
     def render(self):
         """Renderització del VAO i rotació dels planetes
         """
         self.texture.use()
-        planet_position = self.rotate_sun()
-        self.rotate_planet(planet_position)
-        self.rotate_self()
         self.vao.render()    
 
     def rotate_self(self):

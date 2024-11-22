@@ -147,12 +147,14 @@ class AsteroidBatch(Object):
 
         # Update the instance buffer with the new matrices
         self.instance_buffer.write(np.array(updated_matrices, dtype='f4').tobytes())
+        
+    def move(self):
+        self.update_orbit()
 
     def render(self):
         """Renderització del VAO
         """
         self.texture.use()
-        self.update_orbit()
         self.vao.render(instances=self.num_asteroids)
 
     def get_data(self):

@@ -38,7 +38,6 @@ class Orbit(Object):
         """
         self.vao.render(mgl.LINE_LOOP) 
 
-
     def get_data(self, num_points = 200):
         """Genera els punts de la òrbita del planeta al voltant del sol.
     

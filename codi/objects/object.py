@@ -195,3 +195,5 @@ class Object:
         m_model = glm.rotate(glm.mat4(), glm.radians(0), glm.vec3(0, 1, 0))
         return m_model 
     
+    def move(self):
+        pass

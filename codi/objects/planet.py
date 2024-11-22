@@ -4,7 +4,8 @@ from objects.object import Object
 
 class Planet(Object):
     __slots__=["size",
-               "position",
+               "original_pos",
+               "actual_pos",
                "velocity",
                "inclination",
                "eccentricity"]
@@ -23,7 +24,7 @@ class Planet(Object):
         """
         # Característiques de l'esfera
         self.size = size
-        self.position = position
+        self.original_pos = position
         self.velocity = velocity
         self.inclination = inclination
         self.eccentricity = eccentricity
@@ -36,18 +37,20 @@ class Planet(Object):
         """
         m_model = glm.rotate(glm.mat4(), glm.radians(0), glm.vec3(0, 1, 0))
         m_model = glm.scale(m_model, self.size)  
-        m_model = glm.translate(m_model, self.position)   
+        m_model = glm.translate(m_model, self.original_pos)   
         return m_model
             
     def get_data(self):
         return self.create_sphere(False)
     
+    def move(self):
+        self.rotate_sun()
+        self.rotate_self()
+        
     def render(self):
         """Renderització del VAO i rotació dels planetes
         """
         self.texture.use()
-        self.rotate_sun()
-        self.rotate_self()
         self.vao.render()    
 
     def rotate_self(self):
@@ -70,7 +73,7 @@ class Planet(Object):
         m_model = glm.mat4()
 
         # Semieje mayor y menor basados en la distancia inicial del planeta al Sol
-        a = glm.length(glm.vec2(self.position.x, self.position.z))  # La magnitud en XZ como semieje mayor
+        a = glm.length(glm.vec2(self.original_pos.x, self.original_pos.z))  # La magnitud en XZ como semieje mayor
         b = a * (1 - self.eccentricity ** 2) ** 0.5 # Semieje menor (ajústalo según el grado de excentricidad que desees)
 
         # Calcular el ángulo en función del tiempo
@@ -79,12 +82,12 @@ class Planet(Object):
         # Posición del planeta en la órbita elíptica (plano XZ)
         x = a * glm.cos(theta)
         z = b * glm.sin(theta)
-        y = self.position.y  # Mantener la altura constante o ajustarla si deseas órbitas inclinadas
+        y = self.original_pos.y  # Mantener la altura constante o ajustarla si deseas órbitas inclinadas
 
 
         # Trasladar el planeta a la nueva posición calculada (órbita elíptica respecto al Sol en (0, 0, 0))
         new_position = glm.vec3(x, y, z)
-
+        self.actual_pos = new_position
         m_model = glm.translate(m_model, new_position)
         m_model = glm.scale(m_model, self.size)
         
