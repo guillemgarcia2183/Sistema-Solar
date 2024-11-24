@@ -300,7 +300,8 @@ vertex_shader_RING = '''
     layout (location = 0) in vec3 in_position;
     layout (location = 1) in vec2 in_texcoord;
     layout (location = 2) in float instance_radius;
-    layout (location = 3) in float instance_id;  // Recibir el identificador de instancia
+    layout (location = 3) in float instance_id;
+    layout (location = 4) in mat4 model_matrix;  // Nueva entrada para la matriz de modelo por instancia
 
     out vec2 v_texcoord;
 
@@ -309,14 +310,11 @@ vertex_shader_RING = '''
     uniform mat4 m_model;
 
     void main() {
-        vec3 scaled_position = in_position * instance_radius;  // Escalar por el radio de instancia
-        gl_Position = m_proj * m_view * m_model * vec4(scaled_position, 1.0);
+        vec3 scaled_position = in_position * instance_radius;
+        gl_Position = m_proj * m_view * m_model * model_matrix * vec4(scaled_position, 1.0);
 
-        // Calcular las coordenadas de textura para cada anillo usando el identificador de instancia
-        float tex_u_start = instance_id / 500.0;  // Ajusta el valor según el número total de instancias
+        float tex_u_start = instance_id / 500.0;
         float tex_u_end = (instance_id + 1.0) / 500.0;
-
-        // Asignar la coordenada de textura
         v_texcoord = vec2(tex_u_start + (tex_u_end - tex_u_start) * in_texcoord.x, in_texcoord.y);
     }
 '''

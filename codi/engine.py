@@ -128,13 +128,18 @@ class GraphicsEngine:
         for planet in self.planets_list:
             # Almacenar radios y distancias en UA sin normalizar
             raw_radii[planet] = (self.planets_data[planet].data["Diameter (km)"] / 2) / UA_CONVERSION
+            # Distancia del planeta al Sol
             raw_distances[planet] = (self.planets_data[planet].data["Distance from Sun (10^6 km)"] * 1e6) / UA_CONVERSION
 
         # Satélites
         satellites_reader = Reader.read_satellites("data/satellites.csv") 
         for index, row in satellites_reader.data.iterrows():
             name = row['name']
+            planet = row['planet']
+            # Radi del satèl·lit en UA
             raw_radii[name] = row['radius'] / UA_CONVERSION
+            # Distancia del satèl·lit al Sol
+            raw_distances[name] = raw_distances[planet] + (row['Distance_to_planet (10^6km)']*1e6 / UA_CONVERSION)
 
         # Encontrar los valores mínimo y máximo para normalización
         min_radius, max_radius = min(raw_radii.values()), max(raw_radii.values())
@@ -143,6 +148,8 @@ class GraphicsEngine:
         # Normalizar a los rangos deseados
         normalized_radii = {name: self.normalize(radius, min_radius, max_radius, 0.0001, 20) for name, radius in raw_radii.items()}
         normalized_distances = {name: self.normalize(distance, min_distance, max_distance, 21, 500) for name, distance in raw_distances.items()}
+
+        #print(f"normalized_distances: {normalized_distances}")
 
         normalized_radii_real = {name: radius*100 for name, radius in raw_radii.items()}
         normalized_distances_real = {name: distance*100 for name, distance in raw_distances.items()}
@@ -237,8 +244,6 @@ class GraphicsEngine:
         for index, row in satellites_reader.data.iterrows():
             name = row['name']
             planet = row['planet']
-            planet_distance = distance_objects[planet]
-            distance = row['Distance (10^6km)'] 
             velocity = row['Velocity (km/s)']
             texture = self.satellites_textures[planet]
 
@@ -248,18 +253,16 @@ class GraphicsEngine:
                 texture,
                 [radius_objects[name], 15, 15],
                 glm.vec3(1, 1, 1),
-                glm.vec3(planet_distance, 0, planet_distance),
-                (distance/UA_CONVERSION) +  radius_objects[planet],
-                self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
-                velocity*1e5,
-                self.planets_data[planet].data["Orbital Inclination (degrees)"],
-                self.planets_data[planet].data["Orbital Eccentricity"],
+                position_planet = glm.vec3(distance_objects[planet], 0, distance_objects[planet]),
+                position_satellite = glm.vec3(distance_objects[name]+radius_objects[planet], 0, distance_objects[name]+radius_objects[planet]),
+                velocity_planet = self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
+                velocity_satellite = velocity,
+                inclination = self.planets_data[planet].data["Orbital Inclination (degrees)"],
+                eccentricity = self.planets_data[planet].data["Orbital Eccentricity"],
             ))
         
         #Add asteroids
         speed_asteroids = (self.planets_data["Mars"].data["Orbital Velocity (km/s)"] + self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"])/200
-        
-
         # Main asteroid Belt
         self.objects.append(AsteroidBatch(
             self,
@@ -273,7 +276,6 @@ class GraphicsEngine:
             eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"],
             type = "Belt"
             ))
-        
         # Trojan Asteroids 
         self.objects.append(AsteroidBatch(
             self,
@@ -287,7 +289,6 @@ class GraphicsEngine:
             eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
             type = "Trojan Right"
             ))
-        
         self.objects.append(AsteroidBatch(
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],

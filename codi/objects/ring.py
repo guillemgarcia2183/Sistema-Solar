@@ -17,7 +17,8 @@ class RingBatch(Object):
         "instance_ids",
         "instance_buffer",
         "instance_id_buffer",
-        "velocity_rings"
+        "velocity_rings",
+        "model_matrix_buffer"
         )
     def __init__(self, app, shader, texture, info, planet_distance, ring_inner_radius, ring_outer_radius, velocity, eccentricity, num_segments=500, num_instances=500):
         self.planet_distance = planet_distance
@@ -63,6 +64,7 @@ class RingBatch(Object):
         self.velocity_rings = np.linspace(self.velocity_planet, self.velocity_planet/100, self.num_instances).astype('f4')
         self.instance_ids = np.arange(self.num_instances, dtype='f4')
         # Crear un buffer para instancias
+        self.model_matrix_buffer = self.ctx.buffer(reserve=self.num_instances * 64)
         self.instance_buffer = self.ctx.buffer(self.radii.tobytes())
         self.instance_id_buffer = self.ctx.buffer(self.instance_ids.tobytes())  # Buffer para identificadores de instancia
 
@@ -70,7 +72,8 @@ class RingBatch(Object):
         return self.ctx.vertex_array(self.shader,
             [(self.vbo, '3f 2f', 'in_position', 'in_texcoord'),
              (self.instance_buffer, '1f/i', 'instance_radius'),
-             (self.instance_id_buffer, '1f/i', 'instance_id')],
+             (self.instance_id_buffer, '1f/i', 'instance_id'),
+             (self.model_matrix_buffer, '16f/i', 'model_matrix')]
         )
 
     def load_texture(self, filepath):
@@ -84,6 +87,7 @@ class RingBatch(Object):
     
     def move(self):
         self.rotate_sun()
+        self.rotate_ring()
         
     def render(self):
         self.texture.use()
@@ -108,4 +112,19 @@ class RingBatch(Object):
         m_model = glm.rotate(m_model, glm.radians(27), glm.vec3(0, 0, 1))
         self.m_model = m_model
         self.shader['m_model'].write(self.m_model)
-    
+
+    def rotate_ring(self):
+        # Crear un array para almacenar las matrices de modelo de cada anillo
+        model_matrices = np.zeros((self.num_instances, 16), dtype='f4')
+
+        for i in range(self.num_instances):
+            # Calcular el ángulo de rotación basado en el tiempo y la velocidad del anillo
+            angle = self.app.time * self.velocity_rings[i]
+
+            # Crear una matriz de rotación para este anillo
+            rotation_matrix = glm.rotate(glm.mat4(), angle, glm.vec3(0, 1, 0))
+
+            # Convertir la matriz glm a un array numpy y almacenarla
+            model_matrices[i] = np.array(rotation_matrix).flatten()
+
+        self.model_matrix_buffer.write(model_matrices.tobytes())
