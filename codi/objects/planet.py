@@ -77,7 +77,7 @@ class Planet(Object):
         b = a * (1 - self.eccentricity ** 2) ** 0.5 # Semieje menor (ajústalo según el grado de excentricidad que desees)
 
         # Calcular el ángulo en función del tiempo
-        theta = self.app.time * self.velocity   # Ajusta la velocidad de la órbita
+        theta = self.app.time * self.velocity  # Ajusta la velocidad de la órbita
 
         # Posición del planeta en la órbita elíptica (plano XZ)
         x = a * glm.cos(theta)

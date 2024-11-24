@@ -4,3 +4,4 @@ from .planet import Planet
 from .satellite import Satellite
 from .star import StarBatch
 from .sun import Sun
+from .ring import RingBatch

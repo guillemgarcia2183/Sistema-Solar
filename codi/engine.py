@@ -258,6 +258,8 @@ class GraphicsEngine:
         
         #Add asteroids
         speed_asteroids = (self.planets_data["Mars"].data["Orbital Velocity (km/s)"] + self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"])/200
+        
+
         # Main asteroid Belt
         self.objects.append(AsteroidBatch(
             self,
@@ -298,6 +300,19 @@ class GraphicsEngine:
             eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
             type = "Trojan Left"
             ))
+        
+        # Saturn rings
+        self.objects.append(RingBatch(
+            self,
+            [sh.vertex_shader_RING, sh.fragment_shader_RING],
+            "textures/saturn_rings.png",
+            [0,0,0],
+            planet_distance=distance_objects["Saturn"],
+            ring_inner_radius=radius_objects["Saturn"] - 5,
+            ring_outer_radius=radius_objects["Saturn"] - 10,
+            velocity=self.planets_data["Saturn"].data["Orbital Velocity (km/s)"]/100,
+            eccentricity=self.planets_data["Saturn"].data["Orbital Eccentricity"]
+        ))
 
         # Implement stars
         star_reader = Reader.read_stars("data/stars.csv")
@@ -309,7 +324,7 @@ class GraphicsEngine:
             [0, 0, 0],
             constellations = True,
             constellations_shaders = [sh.vertex_shader_CONSTELLATION, sh.fragment_shader_CONSTELLATION]
-        ) 
+        )
 
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.

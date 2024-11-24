@@ -169,6 +169,7 @@ fragment_shader_STAR = '''
         }
     }
 '''
+
 vertex_shader_CONSTELLATION = '''
     #version 330
 
@@ -292,3 +293,43 @@ fragment_shader_ASTEROID = '''
             }
 
             '''
+
+vertex_shader_RING = '''
+    #version 330
+
+    layout (location = 0) in vec3 in_position;
+    layout (location = 1) in vec2 in_texcoord;
+    layout (location = 2) in float instance_radius;
+    layout (location = 3) in float instance_id;  // Recibir el identificador de instancia
+
+    out vec2 v_texcoord;
+
+    uniform mat4 m_proj;
+    uniform mat4 m_view;
+    uniform mat4 m_model;
+
+    void main() {
+        vec3 scaled_position = in_position * instance_radius;  // Escalar por el radio de instancia
+        gl_Position = m_proj * m_view * m_model * vec4(scaled_position, 1.0);
+
+        // Calcular las coordenadas de textura para cada anillo usando el identificador de instancia
+        float tex_u_start = instance_id / 500.0;  // Ajusta el valor según el número total de instancias
+        float tex_u_end = (instance_id + 1.0) / 500.0;
+
+        // Asignar la coordenada de textura
+        v_texcoord = vec2(tex_u_start + (tex_u_end - tex_u_start) * in_texcoord.x, in_texcoord.y);
+    }
+'''
+fragment_shader_RING = '''
+    #version 330
+
+    in vec2 v_texcoord;
+
+    out vec4 f_color;
+
+    uniform sampler2D u_texture;
+
+    void main() {
+        f_color = texture(u_texture, v_texcoord);
+    }
+'''
