@@ -122,7 +122,7 @@ class AsteroidBatch(Object):
         """Update the orbit of each asteroid based on velocity and time."""
         updated_matrices = []
         for i in range(self.num_asteroids):
-            # Retrieve current asteroid distance and velocity
+            # Retrieve current asteroid distance 
             distance = self.distances[i]
 
             # Calculate semi-major and semi-minor axes
@@ -149,6 +149,8 @@ class AsteroidBatch(Object):
         self.instance_buffer.write(np.array(updated_matrices, dtype='f4').tobytes())
         
     def move(self):
+        #collisions = self.check_collisions()
+        #self.apply_collision(collisions)
         self.update_orbit()
 
     def render(self):
@@ -160,3 +162,15 @@ class AsteroidBatch(Object):
     def get_data(self):
         """Genera esfera (asteroides)"""
         return self.create_sphere(False)
+
+    def check_collisions(self):
+        collisions = []
+        for i in range(self.num_asteroids):
+            # Per cada asteroide, hem de veure si col·lisiona amb un altre del cinturó
+            for j in range(i+1, self.num_asteroids):
+                # Obtenim les posicions del asteroide i & j
+                position_i = self.instance_matrices[i][3][:3]
+                position_j = self.instance_matrices[j][3][:3]
+        "....."
+        # Retornem les col·lisions
+        return collisions
