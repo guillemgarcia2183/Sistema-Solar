@@ -2,6 +2,7 @@ import random
 import numpy as np
 import glm
 from objects.object import Object
+from scipy.spatial import KDTree
 
 class AsteroidBatch(Object):
     """Class to create an asteroid belt using instancing."""
@@ -17,7 +18,9 @@ class AsteroidBatch(Object):
                "y_asteroids",
                "instance_matrices",
                "instance_buffer",
-               "type")
+               "type",
+               "positions",
+               "kd_tree")
     def __init__(self, app, shader, texture, info, num_asteroids, distance1, distance2, velocity, eccentricity, type):
         """
         Initialize the Asteroid class.
@@ -149,7 +152,7 @@ class AsteroidBatch(Object):
         self.instance_buffer.write(np.array(updated_matrices, dtype='f4').tobytes())
         
     def move(self):
-        #collisions = self.check_collisions()
+        collisions = self.check_collisions()
         #self.apply_collision(collisions)
         self.update_orbit()
 
@@ -162,15 +165,29 @@ class AsteroidBatch(Object):
     def get_data(self):
         """Genera esfera (asteroides)"""
         return self.create_sphere(False)
-
+    
+    def get_asteroid_positions(self):
+        return [self.instance_matrices[i][3][:3] for i in range(self.num_asteroids)]
+    
+    def construct_kd_tree(self):
+        self.kd_tree = KDTree(self.positions)
+        
+    def find_neighbors(self, asteroid):
+        # Comprovar si està construït el kd_tree
+        if not hasattr(self, 'kd_tree'):
+            self.construct_kd_tree()
+        #Consultar els k veïns més propers del asteroides 
+        distances, indices = self.kd_tree.query(asteroid, k=4)
+        #Retorna els índexs de self.positions que té més propers (ignorant ell mateix)
+        return indices[:, 1:]
+    
     def check_collisions(self):
         collisions = []
-        for i in range(self.num_asteroids):
-            # Per cada asteroide, hem de veure si col·lisiona amb un altre del cinturó
-            for j in range(i+1, self.num_asteroids):
-                # Obtenim les posicions del asteroide i & j
-                position_i = self.instance_matrices[i][3][:3]
-                position_j = self.instance_matrices[j][3][:3]
-        "....."
-        # Retornem les col·lisions
+        self.positions = self.get_asteroid_positions()
+        for asteroid in self.positions:
+            neighbors = self.find_neighbors(asteroid)
+
+        # print(f"Comprovació amb {self.positions[:1]}")
+        # print(self.find_neighbors(self.positions[:1]))
+        # print("============================================")
         return collisions
