@@ -20,7 +20,7 @@ class AsteroidBatch(Object):
                "instance_buffer",
                "type",
                "positions",
-               "kd_tree")
+               "mass")
     def __init__(self, app, shader, texture, info, num_asteroids, distance1, distance2, velocity, eccentricity, type):
         """
         Initialize the Asteroid class.
@@ -39,6 +39,7 @@ class AsteroidBatch(Object):
         self.velocity = velocity
         self.eccentricity = eccentricity
         self.type = type
+        self.mass = 1.0        
         super().__init__(app, shader, texture, info) 
 
         # Generate instance-specific transformation matrices
@@ -53,7 +54,9 @@ class AsteroidBatch(Object):
                 (self.instance_buffer, '16f/i', 'instance_model'),
             ],
         )
- 
+
+        self.positions = self.initial_positions()
+
     def on_init(self):
         """Pos-inicialització de la classe Object. Establiment dels paràmetres del shader 
         """
@@ -124,6 +127,7 @@ class AsteroidBatch(Object):
     def update_orbit(self):
         """Update the orbit of each asteroid based on velocity and time."""
         updated_matrices = []
+        new_positions = []
         for i in range(self.num_asteroids):
             # Retrieve current asteroid distance 
             distance = self.distances[i]
@@ -131,14 +135,16 @@ class AsteroidBatch(Object):
             # Calculate semi-major and semi-minor axes
             a = distance  # Semi-major axis
             b = a * (1 - self.eccentricity ** 2) ** 0.5  # Semi-minor axis
-            angle = self.angles[i]
+            angle = float(self.angles[i])
             # Increment the angle based on velocity and time
             angle += self.velocity_asteroids[i] * self.app.time  # Use velocity and time for orbit speed
-            angle %= 2*np.pi 
+            #angle %= 2*np.pi 
             # Update position based on the new angle
-            x = a * np.cos(angle)
-            z = b * np.sin(angle)
-            y = self.y_asteroids[i]  # You can adjust this if needed
+            x = float(a * np.cos(angle))
+            z = float(b * np.sin(angle))
+            y = float(self.y_asteroids[i])  # You can adjust this if needed
+
+            new_positions.append([x, y, z])  # Store the new position
 
             # Create the new transformation matrix
             model = glm.mat4(1.0)
@@ -150,10 +156,15 @@ class AsteroidBatch(Object):
 
         # Update the instance buffer with the new matrices
         self.instance_buffer.write(np.array(updated_matrices, dtype='f4').tobytes())
+        # Update the positions array with the new positions
+        self.positions = new_positions
         
     def move(self):
-        collisions = self.check_collisions()
-        #self.apply_collision(collisions)
+        if (self.type == "Belt"):
+            collisions = self.check_collisions()
+            if collisions:
+                print(f"Collisions detected: {collisions}, number of collisions:{len(collisions)}")
+                self.apply_collision(collisions)
         self.update_orbit()
 
     def render(self):
@@ -166,28 +177,71 @@ class AsteroidBatch(Object):
         """Genera esfera (asteroides)"""
         return self.create_sphere(False)
     
-    def get_asteroid_positions(self):
+    def initial_positions(self):
         return [self.instance_matrices[i][3][:3] for i in range(self.num_asteroids)]
     
-    def construct_kd_tree(self):
-        self.kd_tree = KDTree(self.positions)
-        
     def find_neighbors(self, asteroid):
         # Comprovar si està construït el kd_tree
-        if not hasattr(self, 'kd_tree'):
-            self.construct_kd_tree()
+        kd_tree = KDTree(self.positions)
         #Consultar els k veïns més propers del asteroides 
-        distances, indices = self.kd_tree.query(asteroid, k=4)
+        distances, indices = kd_tree.query(asteroid, k=4)
         #Retorna els índexs de self.positions que té més propers (ignorant ell mateix)
-        return indices[:, 1:]
+        return indices[1:], distances[1:]
     
     def check_collisions(self):
         collisions = []
-        self.positions = self.get_asteroid_positions()
-        for asteroid in self.positions:
-            neighbors = self.find_neighbors(asteroid)
-
-        # print(f"Comprovació amb {self.positions[:1]}")
-        # print(self.find_neighbors(self.positions[:1]))
-        # print("============================================")
+        checked_pairs = set() 
+        # Iterem tots els asteroides
+        for index, asteroid in enumerate(self.positions):
+            # Trobem els més propers
+            neighbors, distances = self.find_neighbors(asteroid)
+            radius_asteroid = self.scales[index]*self.radius
+            for i,n in enumerate(neighbors):
+                # Evita repetir la comprovació de la parella (index, n)
+                if (index, n) in checked_pairs or (n, index) in checked_pairs:
+                    continue
+                # Marcar la parella com comprovada
+                checked_pairs.add((index, n))
+                # Paràmetres del veï (distance, radius)
+                radius_neighbor = self.scales[n]*self.radius
+                distance = distances[i]
+                # Comprova si hi ha col·lisió
+                if distance <= (radius_asteroid + radius_neighbor):
+                    collisions.append((index, n))  # Guardem els índexs dels asteroides que col·lisionen
         return collisions
+    
+    def apply_collision(self, collisions):
+        for (i1, i2) in collisions:
+            # Convertimos posiciones y velocidades en arrays para los cálculos
+            pos1 = np.array(self.positions[i1], dtype=float)
+            pos2 = np.array(self.positions[i2], dtype=float)
+            
+            vel1 = float(self.velocity_asteroids[i1])  # Nos aseguramos de que sea float
+            vel2 = float(self.velocity_asteroids[i2])
+            
+            # Vector de colisión normalizado
+            collision_vector = pos2 - pos1
+            collision_vector /= np.linalg.norm(collision_vector)
+            
+            # Componentes de las velocidades proyectadas en la dirección del choque
+            vel1_proj = np.dot(vel1 * collision_vector, collision_vector)
+            vel2_proj = np.dot(vel2 * collision_vector, collision_vector)
+
+            vel1_perp = vel1 - vel1_proj
+            vel2_perp = vel2 - vel2_proj
+
+            mass1 = self.mass * self.scales[i1]
+            mass2 = self.mass * self.scales[i2]
+
+            # Cálculo de nuevas velocidades según colisión elástica
+            new_vel1_proj = ((vel1_proj * (mass1 - mass2) + 2 * mass2 * vel2_proj) / (mass1 + mass2))
+            new_vel2_proj = ((vel2_proj * (mass2 - mass1) + 2 * mass1 * vel1_proj) / (mass1 + mass2))
+
+            new_vel1 = new_vel1_proj + vel1_perp
+            new_vel2 = new_vel2_proj + vel2_perp
+
+            # Convertimos a float antes de asignar
+            self.velocity_asteroids[i1] = float(new_vel1)
+            self.velocity_asteroids[i2] = float(new_vel2)
+
+

@@ -41,6 +41,7 @@ Alguns sistemes de visualització del sistema solar ja existents son els següen
 
 * Banerjee, Sourav (2024): "Planet Dataset." Disponible a https://www.kaggle.com/datasets/iamsouravbanerjee/planet-dataset. Darrer accés: 16 de Octubre de 2024.
 
+
 ## Participants - Grup 2
 Guillem Garcia (NIU: 1636279)
 

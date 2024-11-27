@@ -267,9 +267,9 @@ class GraphicsEngine:
         self.objects.append(AsteroidBatch(
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
-            "textures/asteroids.jpg",  # You'll need an asteroid texture
-            [0.2, 5, 5],  # Adjust these parameters as needed
-            num_asteroids=2500,  # Or however many you want
+            "textures/asteroids.jpg",  
+            [7, 5, 5],  
+            num_asteroids=10,  # Or however many you want
             distance1=distance_objects["Mars"]+25,
             distance2=distance_objects["Jupiter"],
             velocity=speed_asteroids,
