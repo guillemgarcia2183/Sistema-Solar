@@ -199,53 +199,22 @@ class TextLabel:
         # Set text texture
         self.__set_text_texture()
 
-        gl_x = (
-            2 * (
-                (
-                    self.__x - (self.__width / 2) -
-                    (self.__app.WIN_SIZE[0] / 2)
-                ) / (
-                    self.__app.WIN_SIZE[0]
-                )
-            ),
-            2 * (
-                (
-                    self.__x + (self.__width / 2) -
-                    (self.__app.WIN_SIZE[0] / 2)
-                ) / (
-                    self.__app.WIN_SIZE[0]
-                )
-            )
-        )
+        ndc_x_center = (self.__x / self.__app.WIN_SIZE[0]) * 2 - 1
+        ndc_y_center = (self.__y / self.__app.WIN_SIZE[1]) * 2 - 1
 
-        gl_y = (
-            -2 * (
-                (
-                    self.__y - (self.__height / 2) -
-                    (self.__app.WIN_SIZE[1] / 2)
-                ) / (
-                    self.__app.WIN_SIZE[1]
-                )
-            ),
-            -2 * (
-                (
-                    self.__y + (self.__height / 2) -
-                    (self.__app.WIN_SIZE[1] / 2)
-                ) / (
-                    self.__app.WIN_SIZE[1]
-                )
-            )
-        )
+        # Half-width and half-height in NDC
+        ndc_half_w = self.__width / self.__app.WIN_SIZE[0]
+        ndc_half_h = self.__height / self.__app.WIN_SIZE[1]
 
-        self.__vertexes = np.array(
-            [
-                gl_x[0], gl_y[0], 0.0, 1.0,
-                gl_x[1], gl_y[0], 1.0, 1.0,
-                gl_x[0], gl_y[1], 0.0, 0.0,
-                gl_x[1], gl_y[1], 1.0, 0.0,
-            ],
-            dtype='f4'
-        )
+        # Define quad vertices centered at (ndc_x_center, ndc_y_center)
+        self.__vertexes = np.array([
+            # Position                  # Texcoords
+            ndc_x_center - ndc_half_w, ndc_y_center - ndc_half_h,  0.0, 1.0,  # Bottom-left
+            ndc_x_center + ndc_half_w, ndc_y_center -
+            ndc_half_h,  1.0, 1.0,  # Bottom-right
+            ndc_x_center - ndc_half_w, ndc_y_center + ndc_half_h,  0.0, 0.0,  # Top-left
+            ndc_x_center + ndc_half_w, ndc_y_center + ndc_half_h,  1.0, 0.0,  # Top-right
+        ], dtype='f4')
 
     def destroy(self):
         """

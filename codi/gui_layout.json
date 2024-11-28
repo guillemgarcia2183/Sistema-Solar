@@ -113,7 +113,7 @@
                 0.5
             ],
             "locked_color": null,
-            "hidden": false,
+            "hidden": true,
             "locked": false,
             "text": {
                 "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",

@@ -7,6 +7,7 @@ Created on Tue Oct 22 15:55:23 2024
 import sys
 
 from .button_manager import ButtonManager
+from .text_label import TextLabel
 
 if sys.version_info[0] < 3:
     raise RuntimeError("Python version lower than 3.")
