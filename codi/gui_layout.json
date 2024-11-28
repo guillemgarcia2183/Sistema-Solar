@@ -18,7 +18,16 @@
             ],
             "locked_color": null,
             "hidden": false,
-            "locked": false
+            "locked": false,
+            "text": {
+                "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 200
+            }
         }
     },
     "zoom_in": {
@@ -104,8 +113,17 @@
                 0.5
             ],
             "locked_color": null,
-            "hidden": true,
-            "locked": false
+            "hidden": false,
+            "locked": false,
+            "text": {
+                "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 200
+            }
 
         }
 

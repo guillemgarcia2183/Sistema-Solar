@@ -1,13 +1,16 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- noqa
 """
 Created on Thu Oct 17 12:06:14 2024
 
 @author: Joel Tapia Salvador
 """
-import numpy as np
 import moderngl as mgl
+import numpy as np
 
 from typing import Tuple
+
+from empty import Empty
+from text_label import TextLabel
 
 
 class RectangularButton:
@@ -22,6 +25,7 @@ class RectangularButton:
         "__is_locked",
         "__locked_color",
         "__shader_programs",
+        "__text",
         "__uuid",
         "__vao",
         "__vbo",
@@ -42,6 +46,7 @@ class RectangularButton:
             "locked_color": None,
             "hidden": False,
             "locked": False,
+            "text": None,
         }
 
         kwargs = default_kwargs | kwargs  # NOTE: Works for python 3.9+
@@ -53,8 +58,8 @@ class RectangularButton:
         self.__uuid = uuid
 
         # Position information
-        self.__x = kwargs["x"] - kwargs["width"] / 2
-        self.__y = kwargs["y"] - kwargs["height"] / 2
+        self.__x = kwargs["x"]
+        self.__y = kwargs["y"]
         self.__width = kwargs["width"]
         self.__height = kwargs["height"]
 
@@ -76,17 +81,29 @@ class RectangularButton:
         self.__is_hovered = False
         self.__is_locked = kwargs["locked"]
 
+        # Text on the button
+        if kwargs['text'] is None:
+            self.__text = Empty()
+        else:
+            kwargs['text'] = kwargs['text'] | {"x": self.__x, "y": self.__y}
+            print(kwargs['text'])
+            self.__text = TextLabel(
+                self.__app,
+                self.__uuid + "_text",
+                **kwargs['text'],
+            )
+
         # Write the shader
-        self.__shader_programs = self.__get_shader_programs()
+        self.__set_shader_programs()
 
         # Create all ModernGL objects
         self.__set_vao()
 
     def __containing(self, pos_x, pos_y):
         return (
-            self.__x <= pos_x <= self.__x + self.__width
+            self.__x - self.__width / 2 <= pos_x <= self.__x + self.__width / 2
         ) and (
-            self.__y <= pos_y <= self.__y + self.__height
+            self.__y - self.__height / 2 <= pos_y <= self.__y + self.__height / 2
         )
 
     @property
@@ -97,17 +114,17 @@ class RectangularButton:
     def __color(self, new_color):
         self.__shader_programs['in_colour'].value = new_color
 
-    def __get_shader_programs(self):
-        program = self.__app.ctx.program(
+    def __set_shader_programs(self):
+        self.__shader_programs = self.__app.ctx.program(
             vertex_shader='''
             #version 330
-            
+
             layout (location = 0) in vec3 in_vert;
 
             uniform vec3 in_colour;
 
             out vec3 frag_color;
-            
+
             void main() {
                 frag_color = in_colour;
                 gl_Position = vec4(in_vert, 1.0);
@@ -115,18 +132,16 @@ class RectangularButton:
             ''',
             fragment_shader='''
             #version 330
-            
+
             in vec3 frag_color;
-            
+
             out vec4 f_color;
-            
+
             void main() {
                 f_color = vec4(frag_color, 1.0);
             }
             '''
         )
-
-        return program
 
     def __set_vao(self):
 
@@ -147,14 +162,16 @@ class RectangularButton:
         gl_x = (
             2 * (
                 (
-                    self.__x - (self.__app.WIN_SIZE[0] / 2)
+                    self.__x - (self.__width / 2) -
+                    (self.__app.WIN_SIZE[0] / 2)
                 ) / (
                     self.__app.WIN_SIZE[0]
                 )
             ),
             2 * (
                 (
-                    self.__x + self.__width - (self.__app.WIN_SIZE[0] / 2)
+                    self.__x + (self.__width / 2) -
+                    (self.__app.WIN_SIZE[0] / 2)
                 ) / (
                     self.__app.WIN_SIZE[0]
                 )
@@ -164,14 +181,16 @@ class RectangularButton:
         gl_y = (
             -2 * (
                 (
-                    self.__y - (self.__app.WIN_SIZE[1] / 2)
+                    self.__y - (self.__height / 2) -
+                    (self.__app.WIN_SIZE[1] / 2)
                 ) / (
                     self.__app.WIN_SIZE[1]
                 )
             ),
             -2 * (
                 (
-                    self.__y + self.__height - (self.__app.WIN_SIZE[1] / 2)
+                    self.__y + (self.__height / 2) -
+                    (self.__app.WIN_SIZE[1] / 2)
                 ) / (
                     self.__app.WIN_SIZE[1]
                 )
@@ -276,6 +295,9 @@ class RectangularButton:
 
         # Render button (draw quad as two triangles)
         self.__vao.render(mgl.TRIANGLE_STRIP)
+
+        # Render possible text on button
+        self.__text.render()
 
     def unhide(self):
         self.__is_hidden = False

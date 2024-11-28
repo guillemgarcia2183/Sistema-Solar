@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- noqa
 """
 Created on Thu Oct 17 12:06:14 2024
 
@@ -9,6 +9,9 @@ import moderngl as mgl
 
 from math import acos, ceil, cos, pi, sin
 from typing import Tuple
+
+from empty import Empty
+from text_label import TextLabel
 
 
 class CircularButton:
@@ -23,6 +26,7 @@ class CircularButton:
         "__locked_color",
         "__radius",
         "__shader_programs",
+        "__text",
         "__uuid",
         "__vao",
         "__vbo",
@@ -41,6 +45,7 @@ class CircularButton:
             "locked_color": None,
             "hidden": False,
             "locked": False,
+            "text": None,
         }
 
         kwargs = default_kwargs | kwargs  # NOTE: Works for python 3.9+
@@ -74,8 +79,14 @@ class CircularButton:
         self.__is_hovered = False
         self.__is_locked = kwargs["locked"]
 
+        # Text on the button
+        if kwargs['text'] is None:
+            self.__text = Empty()
+        else:
+            self.__text = TextLabel(self.__app, uuid, kwargs)
+
         # Write the shader
-        self.__shader_programs = self.__get_shader_programs()
+        self.__set_shader_programs()
 
         # Create all ModernGL objects
         self.__set_vao()
@@ -93,8 +104,8 @@ class CircularButton:
     def __color(self, new_color):
         self.__shader_programs['in_colour'].value = new_color
 
-    def __get_shader_programs(self):
-        program = self.__app.ctx.program(
+    def __set_shader_programs(self):
+        self.__shader_programs = self.__app.ctx.program(
             vertex_shader='''
             #version 330
             
@@ -121,8 +132,6 @@ class CircularButton:
             }
             '''
         )
-
-        return program
 
     def __set_vao(self):
 
@@ -310,6 +319,9 @@ class CircularButton:
 
         # Render button (draw quad as two triangles)
         self.__vao.render(mgl.TRIANGLE_STRIP)
+
+        # Render possible text on button
+        self.__text.render()
 
     def unhide(self):
         self.__is_hidden = False
