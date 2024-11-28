@@ -9,8 +9,8 @@ import numpy as np
 
 from typing import Tuple
 
-from empty import Empty
-from text_label import TextLabel
+from .empty import Empty
+from .text_label import TextLabel
 
 
 class RectangularButton:

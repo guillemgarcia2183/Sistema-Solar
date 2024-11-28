@@ -20,8 +20,10 @@ class AsteroidBatch(Object):
                "instance_buffer",
                "type",
                "positions",
-               "mass")
-    def __init__(self, app, shader, texture, info, num_asteroids, distance1, distance2, velocity, eccentricity, type):
+               "mass",
+               "collision_adjustments",
+               "enabled")
+    def __init__(self, app, shader, texture, info, num_asteroids, distance1, distance2, velocity, eccentricity, type, enable_collision=False):
         """
         Initialize the Asteroid class.
 
@@ -56,6 +58,8 @@ class AsteroidBatch(Object):
         )
 
         self.positions = self.initial_positions()
+        self.collision_adjustments = {}
+        self.enabled = enable_collision
 
     def on_init(self):
         """Pos-inicialització de la classe Object. Establiment dels paràmetres del shader 
@@ -160,11 +164,14 @@ class AsteroidBatch(Object):
         self.positions = new_positions
         
     def move(self):
-        if (self.type == "Belt"):
-            collisions = self.check_collisions()
-            if collisions:
-                print(f"Collisions detected: {collisions}, number of collisions:{len(collisions)}")
-                self.apply_collision(collisions)
+        if self.enabled:
+            if (self.type == "Belt"):
+                collisions = self.check_collisions()
+                if collisions:
+                    #print(f"Collisions detected: {collisions}, number of collisions:{len(collisions)}")
+                    self.apply_collision(collisions)
+
+            self.smooth_angle_adjustments()
         self.update_orbit()
 
     def render(self):
@@ -184,7 +191,7 @@ class AsteroidBatch(Object):
         # Comprovar si està construït el kd_tree
         kd_tree = KDTree(self.positions)
         #Consultar els k veïns més propers del asteroides 
-        distances, indices = kd_tree.query(asteroid, k=4)
+        distances, indices = kd_tree.query(asteroid, k=2)
         #Retorna els índexs de self.positions que té més propers (ignorant ell mateix)
         return indices[1:], distances[1:]
     
@@ -210,38 +217,39 @@ class AsteroidBatch(Object):
                     collisions.append((index, n))  # Guardem els índexs dels asteroides que col·lisionen
         return collisions
     
-    def apply_collision(self, collisions):
+    def apply_collision(self, collisions, adjustment_amount=0.1):
         for (i1, i2) in collisions:
-            # Convertimos posiciones y velocidades en arrays para los cálculos
-            pos1 = np.array(self.positions[i1], dtype=float)
-            pos2 = np.array(self.positions[i2], dtype=float)
+            velocity1 = self.velocity_asteroids[i1]
+            velocity2 = self.velocity_asteroids[i2]
+
+            if i1 not in self.collision_adjustments:
+                self.collision_adjustments[i1] = 0.0
+            if i2 not in self.collision_adjustments:
+                self.collision_adjustments[i2] = 0.0
             
-            vel1 = float(self.velocity_asteroids[i1])  # Nos aseguramos de que sea float
-            vel2 = float(self.velocity_asteroids[i2])
-            
-            # Vector de colisión normalizado
-            collision_vector = pos2 - pos1
-            collision_vector /= np.linalg.norm(collision_vector)
-            
-            # Componentes de las velocidades proyectadas en la dirección del choque
-            vel1_proj = np.dot(vel1 * collision_vector, collision_vector)
-            vel2_proj = np.dot(vel2 * collision_vector, collision_vector)
+            if velocity1 > velocity2:
+                self.collision_adjustments[i1] -= adjustment_amount
+                self.collision_adjustments[i2] += adjustment_amount
+            else:
+                self.collision_adjustments[i1] += adjustment_amount
+                self.collision_adjustments[i2] -= adjustment_amount
 
-            vel1_perp = vel1 - vel1_proj
-            vel2_perp = vel2 - vel2_proj
+    def smooth_angle_adjustments(self):
+        smoothing_factor = 0.001
+        for key, a in self.collision_adjustments.items():
+            if a != 0:
+                adjustment = smoothing_factor * np.sign(a)
 
-            mass1 = self.mass * self.scales[i1]
-            mass2 = self.mass * self.scales[i2]
+                if abs(adjustment) > abs(a):
+                   adjustment = a 
+                
+                self.angles[key] += adjustment
 
-            # Cálculo de nuevas velocidades según colisión elástica
-            new_vel1_proj = ((vel1_proj * (mass1 - mass2) + 2 * mass2 * vel2_proj) / (mass1 + mass2))
-            new_vel2_proj = ((vel2_proj * (mass2 - mass1) + 2 * mass1 * vel1_proj) / (mass1 + mass2))
+                self.collision_adjustments[key] -= adjustment
 
-            new_vel1 = new_vel1_proj + vel1_perp
-            new_vel2 = new_vel2_proj + vel2_perp
-
-            # Convertimos a float antes de asignar
-            self.velocity_asteroids[i1] = float(new_vel1)
-            self.velocity_asteroids[i2] = float(new_vel2)
-
-
+                # # if (self.collision_adjustments[key]) == 0:
+                # #     if adjustment < 0:
+                # #         self.velocity_asteroids[key] *= 0.9
+                # #     elif adjustment > 0:
+                # #         self.velocity_asteroids[key] *= 1.1
+                    

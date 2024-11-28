@@ -45,8 +45,7 @@ class ButtonManager():
         try:
             self.__buttons_buffer[new_button.uuid]
 
-            raise ValueError(f'A button with uuid: {
-                             new_button.uuid} already exists.')
+            raise ValueError(f'A button with uuid: {new_button.uuid} already exists.')
 
         except KeyError:
             self.__buttons_buffer[new_button.uuid] = new_button
@@ -82,8 +81,7 @@ class ButtonManager():
         try:
             self.__types_buttons[button_type]
         except KeyError as error:
-            raise ValueError(f'Type of button: {
-                             button_type} does not exist.') from error
+            raise ValueError(f'Type of button: {button_type} does not exist.') from error
 
         new_button = self.__types_buttons[button_type](
             self.__app,
@@ -179,8 +177,7 @@ class ButtonManager():
         try:
             self.__buttons_buffer[uuid]
         except KeyError as error:
-            raise ValueError(f'Button with uuid: {
-                             uuid} ' + ' does not exist.') from error
+            raise ValueError(f'Button with uuid: {uuid} ' + ' does not exist.') from error
 
         self.__buttons_buffer[uuid].destroy()
         del self.__buttons_buffer[uuid]

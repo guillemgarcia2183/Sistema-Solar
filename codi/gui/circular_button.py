@@ -10,8 +10,8 @@ import moderngl as mgl
 from math import acos, ceil, cos, pi, sin
 from typing import Tuple
 
-from empty import Empty
-from text_label import TextLabel
+from .empty import Empty
+from .text_label import TextLabel
 
 
 class CircularButton:
