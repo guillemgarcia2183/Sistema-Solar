@@ -103,7 +103,10 @@ class StarBatch(Object):
         self.vao.render(mgl.POINTS)
 
         if self.constellations:
+            default_line_width = self.ctx.line_width
+            self.ctx.line_width = 2.0
             self.constellations_vao.render(mgl.LINES)
+            self.ctx.line_width = default_line_width 
 
     def get_constellations_vao(self):
         """ This function creates an index buffer object that points to the stars
@@ -115,34 +118,30 @@ class StarBatch(Object):
             Markab -- Scheat
 
         """
-        
         if (not self.constellations):
             return None
 
         star_indices = dict()
         index = 0
         for _, _, _, _, con, proper in self.positions:
-            if (con == "Peg"):
-                if isinstance(proper, str):
-                    star_indices[proper] = index
-            if (isinstance(proper, str) and proper== "Alpheratz"):
-                    star_indices[proper] = index
+            if isinstance(proper, str):
+                star_indices[proper] = index
             index += 1
-            
-        constellation_indices = [
-            star_indices["Enif"],   star_indices["Biham"],
-            star_indices["Biham"],  star_indices["Homam"],
-            star_indices["Homam"],  star_indices["Markab"],
-            star_indices["Markab"], star_indices["Algenib"],
-            star_indices["Markab"], star_indices["Scheat"],
-            star_indices["Scheat"], star_indices["Alpheratz"],
-            star_indices["Algenib"], star_indices["Alpheratz"]
-        ]
+
+        consts = self.parse_constellations()
+        constellation_indices = list()
+
+        print(consts)
+
+        for v in consts.values():
+            for pair in v:
+                constellation_indices.append(star_indices[pair[0]]) 
+                constellation_indices.append(star_indices[pair[1]])
+
 
         ibo = self.ctx.buffer(np.array(constellation_indices, dtype='i4').tobytes())
-        # perform an offset of self.ibo of 3*sizeof(float)
-        # and a stride of 24 = 6*sizeof(float) according to the format -> color vec3f and pos vec3f
 
+        # TODO: We don't need color here but it doesn't work without it 
         return self.ctx.vertex_array(
             self.constellations_shader,
             [(self.vbo, '3f 3f', 'in_color', 'in_position')], 
@@ -162,3 +161,24 @@ class StarBatch(Object):
                          x, y, z))
         data = np.array(data, dtype='f4')
         return data
+
+    def parse_constellations(self, constellations_path: str = r"./data/constellations.txt"):
+        
+        constellations = dict()
+        with open(constellations_path, 'r') as fCo:
+            current_const = None
+            for line in fCo:
+                if (not line):
+                    continue
+
+                if ('{' in line):
+                    current_const = line.split()[0]
+                    constellations[current_const] = list()
+                elif (line.find('};') > 0):
+                    current_const = None
+                elif (line.find('};') < 0):
+                    constellations[current_const].append(
+                        tuple(line.replace(' ', '').strip('\n').split('--'))
+                    )
+
+        return constellations
