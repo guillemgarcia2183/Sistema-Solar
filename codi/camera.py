@@ -248,7 +248,10 @@ class FollowCamera(Camera):
                  "elevation",
                  "azimuth",
                  "distance",
-                 "lock_target"]
+                 "lock_target",
+                 "relative_position",
+                 "right",
+                 "keep_up"]
     """Classe que estableix la càmara planetària
     """ 
     def __init__(self, app, distance, lock_target = True):
@@ -263,6 +266,9 @@ class FollowCamera(Camera):
         self.azimuth = 0
         self.distance = distance
         self.lock_target = lock_target
+        self.relative_position = glm.vec3(1,0,0)
+        self.right = glm.vec3(0,0,1)
+        self.keep_up = True
         super().__init__(app)
     
     def get_type(self):
@@ -276,31 +282,52 @@ class FollowCamera(Camera):
         """
 
         if self.lock_target and self.target is not None: # Condició temporal, un cop el canvi de target estigui implementat s'haurà de canviar
-            forward = glm.normalize(self.target.actual_pos - self.position)
-        
-            # Dynamically adjust the reference vector to avoid gimbal lock near poles
-            if abs(forward.y) > 0.99:  # Near the poles, choose a different reference vector
-                reference_up = glm.vec3(0, 0, 0)  # Use a horizontal vector instead of world up
-            else:
-                reference_up = glm.vec3(0, 1, 0)  # Standard world up for most cases
+            """
+            direction = glm.normalize(self.target.actual_pos - self.position)
             
-            # Calculate the right vector (perpendicular to forward and reference up)
-            right = glm.normalize(glm.cross(reference_up, forward))
+            preliminary_up = glm.cross(preliminary_up, forward)
+
+            # Ensure up is perpendicular to forward
+            #right = glm.normalize(glm.cross(preliminary_up, forward))
+            self.up = glm.normalize(preliminary_up)
+                    
+            return glm.lookAt(self.position, self.target.actual_pos, self.up)
             
-            # Recalculate the true up vector (perpendicular to forward and right)
-            new_up = glm.normalize(glm.cross(forward, right))
+            direction = glm.normalize(self.target.actual_pos - self.position)
+            
+            # Create quaternion for azimuth and elevation rotation
+            azimuth_quat = glm.angleAxis(glm.radians(self.azimuth), glm.vec3(0, 1, 0))  # Y-axis rotation
+            elevation_quat = glm.angleAxis(glm.radians(self.elevation), glm.vec3(1, 0, 0))  # X-axis rotation
 
-            return glm.lookAt(self.position, self.target.actual_pos, new_up)
-        
-        # Calculate direction from yaw and pitch
-        direction = glm.vec3()
-        direction.x = math.cos(glm.radians(self.yaw)) * math.cos(glm.radians(self.pitch))
-        direction.y = math.sin(glm.radians(self.pitch))
-        direction.z = math.sin(glm.radians(self.yaw)) * math.cos(glm.radians(self.pitch))
-        direction = glm.normalize(direction)
+            # Combine rotations
+            rotation_quat = azimuth_quat * elevation_quat
 
-        return glm.lookAt(self.position, self.position + direction, self.up)
-    
+            # Rotate world up vector (0, 1, 0) to calculate the camera's up vector. We use self.up since it is already defined as we want
+            new_up = glm.normalize(rotation_quat * self.up * (1/rotation_quat))
+
+            # Ensure self.up is perpendicular to direction
+            right = glm.normalize(glm.cross(new_up, direction))
+            self.up = glm.normalize(glm.cross(direction, right))
+
+            # Return the view matrix
+            return glm.lookAt(self.position, self.target.actual_pos, self.up)
+        """
+            direction = glm.normalize(self.target.actual_pos - self.position)
+            if self.keep_up: # Moviments AD, mantenim el vector 'up' per generar el vector 'right' en el pla desitjat
+                self.right = glm.normalize(glm.cross(direction, self.up))
+                # Recalculem 'up' per a que tenir la nova base
+                self.up = glm.normalize(glm.cross(self.right, direction))
+
+            else: # Moviments WS, mantenim el vector 'right' per generar el vector 'up' en el pla desitjat
+                self.up = glm.normalize(glm.cross(self.right, direction))
+                # Recalculem 'right' per a que tenir la nova base
+                self.right = glm.normalize(glm.cross(direction, self.up))
+                
+            #print(f"right:{self.right}\nup:{self.up}")
+            return glm.lookAt(self.position, self.position + direction, self.up)
+        else:
+            return super().get_view_matrix()
+
     def select_target(self, target):
         """ ----RECORDATORI----
             SELECCIONAR TARGET 
@@ -311,33 +338,74 @@ class FollowCamera(Camera):
         if self.target.radius < 1:
             self.speed /= target.radius
         else:
-            self.speed *= target.radius  
+            self.speed *= target.radius 
     
     def process_keyboard(self):
         # Get the current key state
         keys = pg.key.get_pressed()
 
         # Change the elevation relative to the object 
+        """
         if keys[pg.K_w]:
-            self.elevation = (self.elevation + self.speed) % 360
+            #self.elevation = (self.elevation + self.speed) % 360
+            self.keep_up = False
+            self.relative_position.x = self.relative_position.x + glm.normalize(self.speed * (self.right.x + self.up.x))
+            self.relative_position.y = self.relative_position.y + glm.normalize(self.speed * (self.right.y + self.up.y))
+            self.relative_position.z = self.relative_position.z + glm.normalize(self.speed * (self.right.z + self.up.z))
         if keys[pg.K_s]:
-            self.elevation = (self.elevation - self.speed) % 360
+            #self.elevation = (self.elevation - self.speed) % 360
+            self.keep_up = False
+            self.relative_position.x = self.relative_position.x - glm.normalize(self.speed * (self.right.x + self.up.x))
+            self.relative_position.y = self.relative_position.y - glm.normalize(self.speed * (self.right.y + self.up.y))
+            self.relative_position.z = self.relative_position.z - glm.normalize(self.speed * (self.right.z + self.up.z))
 
         # Change the azimuth relative to the object
         if keys[pg.K_a]:
-            self.azimuth = (self.azimuth + self.speed) % 360
+            #self.azimuth = (self.azimuth + self.speed) % 360
+            self.keep_up = True
+            self.relative_position.x = self.relative_position.x + glm.normalize(self.speed * (self.right.x + self.up.x))
+            self.relative_position.y = self.relative_position.y + glm.normalize(self.speed * (self.right.y + self.up.y))
+            self.relative_position.z = self.relative_position.z + glm.normalize(self.speed * (self.right.z + self.up.z))
         if keys[pg.K_d]:
-            self.azimuth = (self.azimuth - self.speed) % 360
+            #self.azimuth = (self.azimuth - self.speed) % 360
+            self.keep_up = True
+            self.relative_position.x = self.relative_position.x - glm.normalize(self.speed * (self.right.x + self.up.x))
+            self.relative_position.y = self.relative_position.y - glm.normalize(self.speed * (self.right.y + self.up.y))
+            self.relative_position.z = self.relative_position.z - glm.normalize(self.speed * (self.right.z + self.up.z))
+        """
+        increment = glm.vec3(0, 0, 0)
+        if keys[pg.K_w]:
+            self.keep_up = False
+            increment += self.up * 0.1##self.speed
+        if keys[pg.K_s]:
+            self.keep_up = False
+            increment -= self.up * 0.1#self.speed
+        if keys[pg.K_a]:
+            self.keep_up = True
+            increment -= self.right * 0.1#self.speed 
+        if keys[pg.K_d]:
+            self.keep_up = True
+            increment += self.right * 0.1#self.speed
 
+        # Update the relative position
+        self.relative_position += increment
+
+        # Normalize the relative position to stay on the sphere
+        self.relative_position = glm.normalize(self.relative_position) 
+        
     def follow_target(self):
         """Update the camera's position based on the planet's position and the set distance and angles."""
-        # Calculate Cartesian coordinates from spherical
-
+        """# Calculate Cartesian coordinates from spherical
         x = self.target.actual_pos.x + self.distance * glm.cos(glm.radians(self.elevation)) * glm.cos(glm.radians(self.azimuth))
         y = self.distance * glm.sin(glm.radians(self.elevation)) # self.target.actual_pos.y serà sempre 0
         z = self.target.actual_pos.z + self.distance * glm.cos(glm.radians(self.elevation)) * glm.sin(glm.radians(self.azimuth))
         
         # Update camera position and direction
         self.position = glm.vec3(x, y, z)
+        """
         
+        self.position = self.target.actual_pos + self.relative_position * self.distance
+        print(f"Target actual pos:{self.target.actual_pos}")
+        print(f"Camera relative pos:{self.relative_position}")
+        print(f"Camera pos:{self.position}")
         self.update_shaders_m_view()
