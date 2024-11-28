@@ -1,0 +1,15 @@
+Peg {
+    Enif -- Biham
+    Biham -- Homam
+    Homam -- Markab
+    Markab -- Algenib
+    Markab -- Scheat
+    Scheat -- Alpheratz
+    Algenib -- Alpheratz
+};
+Cas {
+    Caph -- Schedar
+    Schedar -- Cih
+    Cih -- Ruchbah
+    Ruchbah -- Segin
+};
