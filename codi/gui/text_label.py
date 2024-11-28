@@ -152,9 +152,7 @@ class TextLabel:
 
             void main() {
                 vec4 tex_color = texture(text_texture, v_texcoord);
-                if (tex_color.a < 0.1) {
-                    discard; // Discard transparent pixels
-                }
+                
                 frag_color = tex_color;
             }
             '''
@@ -225,9 +223,13 @@ class TextLabel:
         None.
 
         """
-        self.__vbo.destroy()
+        self.__texture.release()
 
-        self.__vao.destroy()
+        self.__vbo.release()
+
+        self.__vao.release()
+
+        self.__shader_programs.release()
 
     def render(self):
         """

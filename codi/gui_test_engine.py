@@ -101,6 +101,7 @@ class TestEngine:
         """
 
         # self.button_manager.destroy()
+        self.label.destroy()
 
         pg.quit()
         sys.exit()
@@ -118,6 +119,7 @@ class TestEngine:
 
         # render gui
         # self.button_manager.render()
+        self.label.render()
 
         # Swap buffers + display caption
         pg.display.set_caption(self.info)

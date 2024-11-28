@@ -238,8 +238,11 @@ class RectangularButton:
         self.__default_color = new_default_color
 
     def destroy(self) -> None:
-        self.__vao.release()
         self.__vbo.release()
+
+        self.__vao.release()
+
+        self.__shader_programs.release()
 
     @property
     def height(self) -> int:

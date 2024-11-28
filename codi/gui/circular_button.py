@@ -262,8 +262,11 @@ class CircularButton:
         self.__default_color = new_default_color
 
     def destroy(self):
-        self.__vao.release()
         self.__vbo.release()
+
+        self.__vao.release()
+
+        self.__shader_programs.release()
 
     def hide(self):
         self.__is_hidden = True
