@@ -38,7 +38,8 @@ class GraphicsEngine:
         "satellites_textures",
         "planets_data",
         "aux_objects",
-        "aux_orbits"
+        "aux_orbits",
+        "second_cam"
     )
 
     def __init__(self, fs = True, win_size=(1200, 800)):
@@ -72,7 +73,8 @@ class GraphicsEngine:
         self.camera = Camera(self)
         # Distància arbitrària, de moment. 
         # TODO: que la classe calculi una distància entre la superfície del planeta i el seu satèl·lit més proper
-        #self.camera = FollowCamera(self, 0.5) 
+        # Per a la presentació, habilitar les diferents càmeres
+        self.second_cam = FollowCamera(self, 0.5) 
         # light
         self.light = Light()
         
@@ -101,7 +103,7 @@ class GraphicsEngine:
         # self.objects.append(Axis(self))
 
         # Establim un target a la càmera. Això hauria d'estar al check_events
-        #self.camera.select_target(self.objects[3]) # Aquesta línia saltarà error si la càmera inicialitzada no és del tipus "FollowCamera"
+        self.second_cam.select_target(self.objects[3]) # Aquesta línia saltarà error si la càmera inicialitzada no és del tipus "FollowCamera"
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
         self.ellipse = True
@@ -342,6 +344,9 @@ class GraphicsEngine:
             if event.type == pg.KEYDOWN and event.key == pg.K_p:
                 self.ellipse = not self.ellipse
             
+            if event.type == pg.KEYDOWN and event.key == pg.K_k:
+                self.camera, self.second_cam = self.second_cam, self.camera
+
             if event.type == pg.KEYDOWN and event.key == pg.K_m:
                 self.objects, self.aux_objects = self.aux_objects, self.objects
                 self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
@@ -376,7 +381,7 @@ class GraphicsEngine:
 
             elif event.type == pg.MOUSEMOTION and self.camera.left_button_held:
                 current_mouse_pos = pg.mouse.get_pos()
-                if self.camera.last_mouse_pos is not None:
+                if self.camera.last_mouse_pos is not None and not (self.camera.get_type == "FollowCamera" and self.camera.lock_target):
                     # Calculate difference in mouse movement
                     dx = current_mouse_pos[0] - self.camera.last_mouse_pos[0]
                     dy = current_mouse_pos[1] - self.camera.last_mouse_pos[1]
