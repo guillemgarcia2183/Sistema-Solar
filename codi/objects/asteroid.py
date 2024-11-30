@@ -92,7 +92,7 @@ class AsteroidBatch(Object):
             else:
                 velocity = self.velocity
 
-            y_asteroid = random.uniform(-5,5)
+            y_asteroid = random.uniform(-3,3)
             self.distances.append(distance)  # Store the distance
             self.velocity_asteroids.append(velocity)
             self.y_asteroids.append(y_asteroid)
