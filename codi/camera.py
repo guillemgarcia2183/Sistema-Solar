@@ -5,6 +5,8 @@ import pygame as pg
 from enum import Enum
 
 class Camera:
+    """Classe que estableix la càmara en escena
+    """
     __slots__ = ["app", 
                  "aspec_ratio",
                  "position",
@@ -17,8 +19,7 @@ class Camera:
                  "left_button_held",
                  "m_view",
                  "m_proj"]
-    """Classe que estableix la càmara en escena
-    """
+
     def __init__(self, app):
         """Inicialització de la classe Camera
 
@@ -67,9 +68,13 @@ class Camera:
         return "Camera"
 
     def follow_target(self):
+        """Funció per seguir al objectiu
+        """
         self.update_shaders_m_view()
 
     def calculate_initial_orientation(self, position, target):
+        """Càlcul de l'orientació inicial de la càmera
+        """
         # Calculate the direction vector from the camera to the target
         direction = target - position
 
@@ -83,6 +88,8 @@ class Camera:
         return yaw, pitch
     
     def update_shaders_m_view(self):
+        """Actualització de la matriu view dels objectes
+        """
         # New m_view
         self.m_view = self.get_view_matrix()
         # Update all shaders
@@ -94,6 +101,8 @@ class Camera:
         self.app.stars.constellations_shader['m_view'].write(self.m_view)
 
     def process_mouse_movement(self, mouse_dx, mouse_dy):
+        """Processar el moviment del ratolí
+        """
         # Apply sensitivity and update yaw and pitch
         self.yaw += mouse_dx * self.sensitivity
         self.pitch -= mouse_dy * self.sensitivity
@@ -105,6 +114,8 @@ class Camera:
         self.update_shaders_m_view()
     
     def process_keyboard(self):
+        """Actualitzar la càmera segons els events de l'aplicació (WASD, Space i Ctrl)
+        """
         # Get the current key state
         keys = pg.key.get_pressed()
 
@@ -127,6 +138,11 @@ class Camera:
             self.move_upward(-self.speed)
     
     def move_forward(self, speed):
+        """Moure endevant la càmera
+
+        Args:
+            speed (float): Velocitat 
+        """
         # Calculate the forward direction based on yaw and pitch
         direction = glm.vec3()
         direction.x = math.cos(glm.radians(self.yaw)) * math.cos(glm.radians(self.pitch))
@@ -139,6 +155,11 @@ class Camera:
         self.update_shaders_m_view()
 
     def move_upward(self, speed):
+        """Moure la càmera amunt
+
+        Args:
+            speed (float): Velocitat
+        """
         # Calculate the forward direction based on yaw and pitch
         forward = glm.vec3(
             math.cos(glm.radians(self.yaw)) * math.cos(glm.radians(self.pitch)),
@@ -166,6 +187,11 @@ class Camera:
         self.update_shaders_m_view()
 
     def strafe(self, speed):
+        """Moviment lateral
+
+        Args:
+            speed (float): Velocitat
+        """
         # Strafe movement is based on the yaw only (moving perpendicular to the direction we're facing)
         right = glm.vec3()
         right.x = math.cos(glm.radians(self.yaw + 90))  # Perpendicular direction on the XZ plane
@@ -244,16 +270,17 @@ class PlanetaryCamera():
         pass
 
 class FollowCamera(Camera):
-    __slots__ = ["target", 
+    """Classe que estableix la càmara planetària
+    """ 
+    __slots__ = ("target", 
                  "elevation",
                  "azimuth",
                  "distance",
                  "lock_target",
                  "relative_position",
                  "right",
-                 "keep_up"]
-    """Classe que estableix la càmara planetària
-    """ 
+                 "keep_up")
+    
     def __init__(self, app, distance, lock_target = True):
         """
         Initializes the FollowCamera.

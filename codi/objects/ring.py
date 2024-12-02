@@ -5,6 +5,8 @@ import glm
 from PIL import Image
 
 class RingBatch(Object):
+    """Classe que crea els anells de Saturn, heretat de la classe Objecte
+    """
     __slots__ = (
         "planet_distance",
         "ring_inner_radius",
@@ -21,6 +23,17 @@ class RingBatch(Object):
         "model_matrix_buffer"
         )
     def __init__(self, app, shader, texture, info, planet_distance, ring_inner_radius, ring_outer_radius, velocity, eccentricity, num_segments=500, num_instances=500):
+        """Inicialització de la classe RingBatch
+
+        Args:
+            planet_distance (float): _description_
+            ring_inner_radius (float): _description_
+            ring_outer_radius (float): _description_
+            velocity (float): _description_
+            eccentricity (float): _description_
+            num_segments (int, optional): _description_. Defaults to 500.
+            num_instances (int, optional): _description_. Defaults to 500.
+        """
         self.planet_distance = planet_distance
         self.ring_inner_radius = ring_inner_radius
         self.ring_outer_radius = ring_outer_radius
@@ -32,11 +45,18 @@ class RingBatch(Object):
         # Generate instance-specific transformation matrices
 
     def on_init(self):
+        """Post-inicialització de la classe
+        """
         self.shader['m_model'].write(self.m_model)
         self.shader['m_view'].write(self.app.camera.m_view)
         self.shader['m_proj'].write(self.app.camera.m_proj)
 
     def get_data(self):
+        """Obtenció de les dades dels anells 
+
+        Returns:
+            np.darray: Posicions dels vèrtex i coordenades textura
+        """
         vertices = []
         for i in range(self.num_segments):
             angle = 2 * np.pi * i / self.num_segments
@@ -59,6 +79,8 @@ class RingBatch(Object):
         return np.array(vertices, dtype='f4')
         
     def get_vao(self):
+        """Obtenció del VAO
+        """
         # Cálculo de los radios interpolados entre el radio interno y externo
         self.radii = np.linspace(self.ring_inner_radius, self.ring_outer_radius, self.num_instances).astype('f4')
         self.velocity_rings = np.linspace(self.velocity_planet, self.velocity_planet/100, self.num_instances).astype('f4')
@@ -77,6 +99,14 @@ class RingBatch(Object):
         )
 
     def load_texture(self, filepath):
+        """Carregar la textura d'entrada 
+
+        Args:
+            filepath (str): Path on està la imatge a texturitzar l'objecte
+
+        Returns:
+            mgl.texture: Textura
+        """
         image = Image.open(filepath).transpose(Image.FLIP_TOP_BOTTOM)
         texture = self.ctx.texture(image.size, 4, image.tobytes())
         texture.filter = (mgl.LINEAR_MIPMAP_LINEAR, mgl.LINEAR)
@@ -86,14 +116,20 @@ class RingBatch(Object):
         return texture
     
     def move(self):
+        """Actualitzar l'òrbita dels anells
+        """
         self.rotate_sun()
         self.rotate_ring()
         
     def render(self):
+        """Renderització del VAO
+        """
         self.texture.use()
         self.vao.render(mgl.LINES, instances = self.num_instances)
 
     def rotate_sun(self):
+        """Rotació dels anells respecte el Sol
+        """
         m_model = glm.mat4()
         
         # Semieje mayor y menor basados en la distancia inicial del planeta al Sol
@@ -114,6 +150,8 @@ class RingBatch(Object):
         self.shader['m_model'].write(self.m_model)
 
     def rotate_ring(self):
+        """Rotació dels anells sobre ells mateixos
+        """
         # Crear un array para almacenar las matrices de modelo de cada anillo
         model_matrices = np.zeros((self.num_instances, 16), dtype='f4')
 

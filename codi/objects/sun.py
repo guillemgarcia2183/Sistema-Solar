@@ -10,4 +10,9 @@ class Sun(Object):
         self.vao.render()
 
     def get_data(self):
+        """Obtenció de les dades que generen el sol 
+
+        Returns:
+            np.darray: Posicions dels vèrtexs i coordenades textures
+        """
         return self.create_sphere(True)

@@ -5,7 +5,7 @@ from objects.object import Object
 from scipy.spatial import KDTree
 
 class AsteroidBatch(Object):
-    """Class to create an asteroid belt using instancing."""
+    """Crea el cinturó d'asteroides mitjançant instancing. Classe heretada de Object"""
     __slots__=("distance1",
                "distance2",
                "num_asteroids",
@@ -23,17 +23,18 @@ class AsteroidBatch(Object):
                "mass",
                "collision_adjustments",
                "enabled")
+    
     def __init__(self, app, shader, texture, info, num_asteroids, distance1, distance2, velocity, eccentricity, type, enable_collision=False):
         """
-        Initialize the Asteroid class.
+        Inicialització de la classe AsteroidBatch
 
         Args:
-            num_asteroids (int): Number of asteroids in the belt.
-            distance1 (float): Minimum distance for the asteroid.
-            distance2 (float): Maximum distance for the asteroid.
-            velocity (float): Maximum velocity of the asteroids 
-            eccentricity (float): Eccentricity of the asteroid belt
-            type (str): Type of asteroids (Belt or Trojan)
+            num_asteroids (int): Nombre d'asteroides en el cinturó
+            distance1 (float): Mínima distància del asteroide 
+            distance2 (float): Màxima distància del asteroide
+            velocity (float): Màxima velocitat dels asteroides
+            eccentricity (float): Excentricitat de l'òrbita 
+            type (str): Tipus d'asteroide (Trojan o Belt)
         """
         self.distance1 = distance1
         self.distance2 = distance2
@@ -76,7 +77,11 @@ class AsteroidBatch(Object):
         self.shader['m_view'].write(self.app.camera.m_view)      
 
     def generate_instance_matrices(self):
-        """Generate transformation matrices for all asteroid instances."""
+        """Gemeració de la matriu que farà instancing
+
+        Returns:
+            np.darray: Array de matrius de models, cadascuna representant un asteroide
+        """
         matrices = []
         self.distances = []
         self.scales = []
@@ -129,7 +134,8 @@ class AsteroidBatch(Object):
         return np.array(matrices, dtype='f4')
         
     def update_orbit(self):
-        """Update the orbit of each asteroid based on velocity and time."""
+        """Actualitzar l'òrbita dels asteroides
+        """
         updated_matrices = []
         new_positions = []
         for i in range(self.num_asteroids):
@@ -164,6 +170,8 @@ class AsteroidBatch(Object):
         self.positions = new_positions
         
     def move(self):
+        """Actualitzar l'orbitació dels asteroides, comprovant si succeeix una col·lisió
+        """
         if self.enabled:
             if (self.type == "Belt"):
                 collisions = self.check_collisions()
@@ -185,9 +193,22 @@ class AsteroidBatch(Object):
         return self.create_sphere(False)
     
     def initial_positions(self):
+        """Posició inicial dels asteroides
+
+        Returns:
+            list: Posicions de cada asteroide al inici de l'aplicació
+        """
         return [self.instance_matrices[i][3][:3] for i in range(self.num_asteroids)]
     
     def find_neighbors(self, asteroid):
+        """Trobar els k veïns més propers del asteroide
+
+        Args:
+            asteroid (glm.vec3): Asteroide a comprovar els veïns
+
+        Returns:
+            (list, list): Llista dels índexos i distàncies dels veïns més propers
+        """
         # Comprovar si està construït el kd_tree
         kd_tree = KDTree(self.positions)
         #Consultar els k veïns més propers del asteroides 
@@ -196,6 +217,11 @@ class AsteroidBatch(Object):
         return indices[1:], distances[1:]
     
     def check_collisions(self):
+        """Comprovar si es produeix una col·lisió amb tots els asteroides
+
+        Returns:
+            list[Tuple]: Índexos dels asteroides que han col·lisionat
+        """
         collisions = []
         checked_pairs = set() 
         # Iterem tots els asteroides
@@ -218,6 +244,12 @@ class AsteroidBatch(Object):
         return collisions
     
     def apply_collision(self, collisions, adjustment_amount=0.1):
+        """Aplicar la col·lisió als asteroides en qüestió
+
+        Args:
+            collisions (list[Tuple]): Llista dels asteroides que han col·lisionat
+            adjustment_amount (float, optional): Angle a adjustar dels asteroides. Defaults to 0.1.
+        """
         for (i1, i2) in collisions:
             velocity1 = self.velocity_asteroids[i1]
             velocity2 = self.velocity_asteroids[i2]
@@ -235,6 +267,8 @@ class AsteroidBatch(Object):
                 self.collision_adjustments[i2] -= adjustment_amount
 
     def smooth_angle_adjustments(self):
+        """Aplicar el adjustament del angle dels asteroides mitjançant diversos frames 
+        """
         smoothing_factor = 0.001
         for key, a in self.collision_adjustments.items():
             if a != 0:

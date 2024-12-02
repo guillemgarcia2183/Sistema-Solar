@@ -7,20 +7,16 @@ import sys
 from camera import Camera, FollowCamera
 from light import Light
 from objects import *
-import shaders as sh
 from reader import Reader
 from gui import ButtonManager
+import shaders as sh
 
-
-# Conversión a unidades astronómicas (UA)
+### VARIABLES GLOBALS ###
 UA_CONVERSION = 149_600_000  # 1 UA en kilómetros
 
-
 class GraphicsEngine:
-
     """Classe que farà corre l'aplicació controlant instàcies de les altres classes 
     """
-
     __slots__ = (
         "WIN_SIZE",
         "ctx",
@@ -47,6 +43,7 @@ class GraphicsEngine:
         """Inicialització de la classe GraphicsEngine
 
         Args:
+            fs (bool, optional): Si es True, s'executa en full screen. Defaults to True
             win_size (tuple, optional): Tamany de finestra de l'aplicació. Defaults to (900,800).
         """
         # init pygame modules
@@ -111,6 +108,11 @@ class GraphicsEngine:
         self.ellipse = True
 
     def obtain_data_planets(self):
+        """Obtenció de les dades dels planetes cridant al seu dataset
+
+        Returns:
+            dict: Retornar les dades dels planetes en format diccionari
+        """
         planets_data = dict()
 
         for planet in self.planets_list:
@@ -121,10 +123,27 @@ class GraphicsEngine:
 
     @staticmethod
     def normalize(value, min_value, max_value, new_min, new_max):
+        """Normalització min-max, utilitzat per controlar radis i distàncies dels objectes
+
+        Args:
+            value (float): Distància o radi del objecte
+            min_value (float): Valor mínim de la distància o radi
+            max_value (float): Valor màxim de la distància o radi
+            new_min (float): Nou valor que serà la mínima distància o radi
+            new_max (float): Nou valor que serà la màxima distància o radi
+
+        Returns:
+            float: Nou valor normalitzat
+        """
         # Normalización min-max
         return ((value - min_value) / (max_value - min_value)) * (new_max - new_min) + new_min
 
     def radius_distance_objects(self):
+        """Càlcul de les distàncies i radis dels objectes
+
+        Returns:
+            (dict, dict, dict, dict): Dos diccionaris amb les distàncies i radis normalitzats, i dos diccionaris amb les distàncies i radis reals
+        """
         # Radios y distancias sin escalar (en UA) para calcular valores min y max
         raw_radii = {"Sun": 696000 / UA_CONVERSION}
         raw_distances = {}
@@ -170,6 +189,8 @@ class GraphicsEngine:
         return normalized_radii, normalized_distances, normalized_radii_real, normalized_distances_real
 
     def create_objects(self):
+        """Creació dels objectes que formaràn part de l'escena
+        """
         self.planets_list = ["Mercury", "Venus", "Earth",
                              "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
         self.planets_textures = ["textures/mercury.jpg",
@@ -431,11 +452,6 @@ class GraphicsEngine:
     def end(self):
         """
         Destruir tots els objectes i finalitzar la simulació.
-
-        Returns
-        -------
-        None.
-
         """
 
         self.button_manager.destroy()
@@ -457,6 +473,8 @@ class GraphicsEngine:
         self.time = pg.time.get_ticks() * 0.001
 
     def move(self):
+        """Funció per fer moure els objectes que es troben en orbitació
+        """
         for objecte in self.objects:
             objecte.move()
 

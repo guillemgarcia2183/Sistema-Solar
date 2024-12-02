@@ -4,21 +4,22 @@ import numpy as np
 from objects.object import Object
 
 class StarBatch(Object):
+    """Classe filla d'Objecte. Crea les estrelles que envoltarà tot el Sistema Solar.
+    """
     __slots__ = (
         "positions",
         "constellations",
         "constellations_shader",
         "constellations_vao"
     )
-    
-    """Classe filla d'Objecte. Crea les estrelles que envoltarà tot el Sistema Solar.
-    """
     def __init__(self, app, shader, texture, info, positions, constellations=True, **kwargs):
 
         """Inicialització de la classe StarBatch
 
         Args:
-            positions (glm.vec3): Posició en l'espai de l'estrella 
+            positions (glm.vec3): Posició en l'espai de l'estrella
+            constellations (bool): Indica si es vol mostrar les constellacions
+            kwargs (dict): Paràmetres per inicialitzar la classe StarBatch 
         """
         self.positions = positions
         self.constellations = constellations
@@ -68,10 +69,13 @@ class StarBatch(Object):
         self.constellations_shader['m_model'].write(self.m_model)
     
     def get_color_from_mag(self, mag):
-        """
-        Mapea la magnitud de la estrella a un color.
-        Las estrellas más brillantes (magnitudes bajas) serán de color blanco,
-        y las más tenues (magnitudes altas) se acercarán a colores más oscuros.
+        """Calcular el color que s'ha de pintar una estrella
+
+        Args:
+            mag (float): Magnitut de l'estrella
+
+        Returns:
+            glm.vec3: Color de l'estrella
         """
         # Definimos un rango de magnitudes y un rango de colores
         min_mag = -1.44  # Máxima luminosidad
@@ -109,14 +113,8 @@ class StarBatch(Object):
             self.ctx.line_width = default_line_width 
 
     def get_constellations_vao(self):
-        """ This function creates an index buffer object that points to the stars
-            that have a common constellation.
-            Enif -- Biham
-            Biham -- Homam
-            Homam -- Markab
-            Markab -- Algenib
-            Markab -- Scheat
-
+        """ 
+        Crea un index buffer que apunta a les estrelles que tenen una constel·lació en comú.
         """
         if (not self.constellations):
             return None
@@ -163,7 +161,14 @@ class StarBatch(Object):
         return data
 
     def parse_constellations(self, constellations_path: str = r"./data/constellations.txt"):
-        
+        """Crea les constel·lacions 
+
+        Args:
+            constellations_path (str, optional): Path del fitxer que conté les connexió de constel·lacions. Defaults to r"./data/constellations.txt".
+
+        Returns:
+            dict: Diccionari amb les constel·lacions
+        """
         constellations = dict()
         with open(constellations_path, 'r') as fCo:
             current_const = None

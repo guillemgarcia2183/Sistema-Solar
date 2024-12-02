@@ -3,15 +3,14 @@ import math
 from objects.object import Object
 
 class Planet(Object):
-    __slots__=["size",
+    """Classe filla d'Objecte. Crea els Planetes.
+    """
+    __slots__=("size",
                "original_pos",
                "actual_pos",
                "velocity",
                "inclination",
-               "eccentricity"]
-    
-    """Classe filla d'Objecte. Crea els Planetes.
-    """
+               "eccentricity")
     def __init__(self, app, shader, texture, info, size, position, velocity, inclination, eccentricity):
         """Inicialització de la classe Planet. Tindrà els atributs de Object i els següents
 
@@ -41,9 +40,16 @@ class Planet(Object):
         return m_model
             
     def get_data(self):
+        """Obtenció de les dades per crear l'esfera
+
+        Returns:
+            np.darray: Posicions dels vèrtex i coordenades textura de l'esfera
+        """
         return self.create_sphere(False)
     
     def move(self):
+        """Actualitzar l'òrbita dels planetes
+        """
         self.rotate_sun()
         self.rotate_self()
         

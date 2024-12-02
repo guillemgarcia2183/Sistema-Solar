@@ -4,6 +4,8 @@ import moderngl as mgl
 from PIL import Image
 
 class Object:
+    """Classe per crear un objecte dintre del Sistema Solar (classe pare)
+    """
     __slots__ = (
         "app",
         "ctx",
@@ -19,8 +21,6 @@ class Object:
         "radius",
     )
     
-    """Classe per crear un objecte dintre del Sistema Solar (classe pare)
-    """
     def __init__(self, app, shader, texture, info):
         """Inicialització de la classe Object
 

@@ -13,10 +13,14 @@ import glm
 
 class TestCamera(unittest.TestCase):
     def setUp(self):
+        """Crea una instància de Camera
+        """
         # Initialize a Camera object before each test
         self.camera = Camera(GraphicsEngine())
 
     def test_initialization(self):
+        """Test d'inicialització de la classe
+        """
         # Test if the camera is initialized with no problems
         self.assertIsInstance(self.camera, Camera)
         self.assertIsInstance(self.camera.app, GraphicsEngine)
@@ -26,6 +30,8 @@ class TestCamera(unittest.TestCase):
         self.assertEqual(self.camera.up, glm.vec3(0,1,0))
 
     def test_process_mouse_movement(self):
+        """Test del moviment del ratolí amb la càmera
+        """
         # Test camera movement
         self.camera.yaw = -135.0
         self.camera.pitch = -35.264389682754654

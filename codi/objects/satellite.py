@@ -3,10 +3,10 @@ import math
 from objects.object import Object
 
 class Satellite(Object):
-    __slots__=["size", "position_planet", "position_satellite", "velocity_planet", "velocity_satellite", "inclination", "eccentricity"]
-    
     """Classe filla d'Objecte. Crea els Satèl·lits naturals.
     """
+    __slots__=["size", "position_planet", "position_satellite", "velocity_planet", "velocity_satellite", "inclination", "eccentricity"]
+    
     def __init__(self, app, shader, texture, info, size, position_planet, position_satellite, velocity_planet, velocity_satellite, inclination, eccentricity):
         """Inicialització de la classe Planet. Tindrà els atributs de Object i els següents
 
@@ -40,9 +40,15 @@ class Satellite(Object):
         return m_model
             
     def get_data(self):
+        """Obtenció de les dades per crear l'esfera
+        Returns:
+            np.darray: Posicions i coordenades textura de l'esfera
+        """
         return self.create_sphere(False)
     
     def move(self):
+        """Actualitzar la posició del satèl·lit 
+        """
         planet_position = self.rotate_sun()
         self.rotate_planet(planet_position)
         self.rotate_self()
@@ -88,6 +94,9 @@ class Satellite(Object):
 
     def rotate_sun(self):
         """Rotació del satèl·lit sobre el sol (igual que els planetes).
+
+        Returns: 
+            glm.vec3: Posició del satèl·lit en coordenades 3D, després de rotar respecte el Sol
         """
         a = glm.length(glm.vec2(self.position_planet.x, self.position_planet.z))
         b = a * (1 - self.eccentricity ** 2) ** 0.5
