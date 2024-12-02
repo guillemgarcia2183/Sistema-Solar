@@ -17,7 +17,7 @@
                 0.5
             ],
             "locked_color": null,
-            "hidden": false,
+            "hidden": true,
             "locked": false,
             "text": {
                 "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -48,7 +48,7 @@
                 0.5
             ],
             "locked_color": null,
-            "hidden": false,
+            "hidden": true,
             "locked": false
         }
     },
@@ -70,7 +70,7 @@
                 0.5
             ],
             "locked_color": null,
-            "hidden": false,
+            "hidden": true,
             "locked": false
         }
     },
@@ -91,7 +91,7 @@
                 0.5
             ],
             "locked_color": null,
-            "hidden": false,
+            "hidden": true,
             "locked": false
         }
     },
@@ -127,5 +127,70 @@
 
         }
 
+    },
+    "elipses" : {
+        "class": "circular",
+        "kwargs": {
+            "x": 0.95,
+            "y": 0.9,
+            "radius": 0.015,
+            "default_color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false
+        }
+    },
+    "canvi_camera": {
+        "class": "rectangular",
+        "kwargs": {
+            "x": 0.05,
+            "y": 0.9,
+            "width": 0.03,
+            "height": 0.03,
+            "default_color": [
+                0.0,
+                1.0,
+                0.0
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false
+        }
+    },
+    "escala": {
+        "class": "rectangular",
+        "kwargs": {
+            "x": 0.1,
+            "y": 0.9,
+            "width": 0.03,
+            "height": 0.03,
+            "default_color": [
+                1.0,
+                0.0,
+                0.0
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false
+        }
     }
 }
