@@ -209,7 +209,7 @@ class RectangularButton:
 
     def check_click(self, mouse_pos: Tuple[int, int]) -> bool:
         # Cannot be clicked if is locked
-        if self.__is_locked:
+        if self.__is_locked or self.__is_hidden:
             return False
 
         # Get mouse coordinates
@@ -220,7 +220,7 @@ class RectangularButton:
 
     def check_hover(self, mouse_pos: Tuple[int, int]) -> None:
         # Cannot be hovered if is locked
-        if self.__is_locked:
+        if self.__is_locked or self.__is_hidden:
             return None
 
         # Get mouse coordinates
