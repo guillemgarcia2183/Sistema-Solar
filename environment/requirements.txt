@@ -1,0 +1,19 @@
+glcontext @ file:///D:/bld/glcontext_1725374261299/work
+moderngl @ file:///D:/bld/moderngl_1727269758643/work
+numpy @ file:///D:/bld/numpy_1730588047498/work/dist/numpy-2.1.3-cp312-cp312-win_amd64.whl#sha256=205de337debcb67f9fe4f529615b40fcacb46170e7f95fb9d7873c8f7c62b57e
+opencv-python==4.10.0.84
+pandas @ file:///D:/bld/pandas_1726878552024/work
+pillow @ file:///D:/bld/pillow_1729065774911/work
+pygame==2.6.1
+PyGLM @ file:///D:/bld/pyglm_1732610421977/work
+python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/python-dateutil_1733215673016/work
+pytz @ file:///home/conda/feedstock_root/build_artifacts/pytz_1706886791323/work
+scipy @ file:///C:/bld/scipy-split_1729480791675/work/dist/scipy-1.14.1-cp312-cp312-win_amd64.whl#sha256=5dfa73fd01bbcf2c4a9bb708e300fdf4e4770c7a9e6b0f1dd0a893a03b07ded2
+setuptools==75.6.0
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1733216807016/work
+torch==2.4.1
+torchvision==0.19.1
+tzdata @ file:///home/conda/feedstock_root/build_artifacts/python-tzdata_1733235305708/work
+ultralytics==8.3.0
+ultralytics-thop==2.0.8
+wheel==0.45.1
