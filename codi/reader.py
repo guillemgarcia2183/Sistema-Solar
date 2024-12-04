@@ -1,5 +1,7 @@
 import pandas as pd
+import os
 
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 class Reader():
     """Classe que llegeix les dades dels datasets."""

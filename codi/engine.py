@@ -10,6 +10,8 @@ from objects import *
 from reader import Reader
 from gui import ButtonManager
 import shaders as sh
+import os
+
 
 ### VARIABLES GLOBALS ###
 UA_CONVERSION = 149_600_000  # 1 UA en kilómetros
@@ -39,13 +41,17 @@ class GraphicsEngine:
         "second_cam"
     )
 
-    def __init__(self, fs=True, win_size=(1200, 800)):
+    def __init__(self, testing = False, fs=True, win_size=(1200, 800)):
         """Inicialització de la classe GraphicsEngine
 
         Args:
             fs (bool, optional): Si es True, s'executa en full screen. Defaults to True
             win_size (tuple, optional): Tamany de finestra de l'aplicació. Defaults to (900,800).
         """
+        if testing:
+            # En cas de fer unittesting, es necessita actualitzar el directori
+            os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
         # init pygame modules
         pg.init()
         # window size
@@ -66,6 +72,7 @@ class GraphicsEngine:
         pg.display.set_mode(self.WIN_SIZE, flags=pg.OPENGL | pg.DOUBLEBUF)
         self.ctx = mgl.create_context()
         self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.BLEND)
+        
 
         # camera
         self.camera = Camera(self)
@@ -90,7 +97,6 @@ class GraphicsEngine:
 
         # with open(r"./codi/gui_layout.json", "r") as file:
         #     gui_layout = json.load(file)
-
         with open("gui_layout.json", "r") as file:
             gui_layout = json.load(file)
 

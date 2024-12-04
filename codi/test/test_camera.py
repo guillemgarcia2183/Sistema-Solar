@@ -1,25 +1,26 @@
 import unittest
 import sys
 import os
+import glm
 
-# Add the parent directory to the Python path#+
+# Add the parent directory to the Python path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
 from engine import GraphicsEngine
 from camera import Camera
-import glm
 
 class TestCamera(unittest.TestCase):
+    __slots__ = ('camera')
     def setUp(self):
         """Crea una instància de Camera
         """
         # Initialize a Camera object before each test
-        self.camera = Camera(GraphicsEngine())
+        self.camera = Camera(GraphicsEngine(testing=True))
 
     def test_initialization(self):
-        """Test d'inicialització de la classe
+        """1. Test d'inicialització de la classe
         """
         # Test if the camera is initialized with no problems
         self.assertIsInstance(self.camera, Camera)
@@ -30,7 +31,7 @@ class TestCamera(unittest.TestCase):
         self.assertEqual(self.camera.up, glm.vec3(0,1,0))
 
     def test_process_mouse_movement(self):
-        """Test del moviment del ratolí amb la càmera
+        """2. Test del moviment del ratolí amb la càmera
         """
         # Test camera movement
         self.camera.yaw = -135.0
