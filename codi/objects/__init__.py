@@ -5,3 +5,4 @@ from .satellite import Satellite
 from .star import StarBatch
 from .sun import Sun
 from .ring import RingBatch
+from .object import Object

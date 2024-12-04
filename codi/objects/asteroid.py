@@ -20,7 +20,6 @@ class AsteroidBatch(Object):
                "instance_buffer",
                "type",
                "positions",
-               "mass",
                "collision_adjustments",
                "enabled")
     
@@ -42,7 +41,6 @@ class AsteroidBatch(Object):
         self.velocity = velocity
         self.eccentricity = eccentricity
         self.type = type
-        self.mass = 1.0        
         super().__init__(app, shader, texture, info) 
 
         # Generate instance-specific transformation matrices

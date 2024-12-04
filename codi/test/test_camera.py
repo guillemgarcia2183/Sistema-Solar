@@ -28,6 +28,8 @@ class TestCamera(unittest.TestCase):
         self.assertIsInstance(self.camera.aspec_ratio, float)
         self.assertIsInstance(self.camera.sensitivity, float)
         self.assertIsInstance(self.camera.speed, float)
+        self.assertIsInstance(self.camera.yaw, float)
+        self.assertIsInstance(self.camera.pitch, float)
         self.assertEqual(self.camera.up, glm.vec3(0,1,0))
 
     def test_process_mouse_movement(self):
@@ -39,6 +41,45 @@ class TestCamera(unittest.TestCase):
         self.camera.process_mouse_movement(30, 30)
         self.assertAlmostEqual(self.camera.yaw, -132.0, 0.1)
         self.assertAlmostEqual(self.camera.pitch, -38.264389682754654, 0.1)
+
+    def test_move(self):
+        """3. Test del moviment de la càmera
+        """
+        previous_position = glm.vec3(10,10,10)
+        self.camera.position = glm.vec3(10,10,10)
+        self.camera.move_forward(speed = 0.25)
+        self.assertLess(self.camera.position.x, previous_position.x)
+        self.assertLess(self.camera.position.y, previous_position.y)
+        self.assertLess(self.camera.position.z, previous_position.z)
+
+        previous_position = glm.vec3(10,10,10)
+        self.camera.position = glm.vec3(10,10,10)
+        self.camera.move_forward(speed = -0.25)
+        self.assertGreater(self.camera.position.x, previous_position.x)
+        self.assertGreater(self.camera.position.y, previous_position.y)
+        self.assertGreater(self.camera.position.z, previous_position.z)
+
+        previous_position = glm.vec3(10,10,10)
+        self.camera.position = glm.vec3(10,10,10)
+        self.camera.move_upward(speed = 0.25)
+        self.assertGreater(self.camera.position.y, previous_position.y)
+
+        previous_position = glm.vec3(10,10,10)
+        self.camera.position = glm.vec3(10,10,10)
+        self.camera.move_upward(speed = -0.25)
+        self.assertLess(self.camera.position.y, previous_position.y)
+
+        previous_position = glm.vec3(10,10,10)
+        self.camera.position = glm.vec3(10,10,10)
+        self.camera.strafe(speed = 0.25)
+        self.assertGreater(self.camera.position.x, previous_position.x)
+        self.assertLess(self.camera.position.z, previous_position.z)
+
+        previous_position = glm.vec3(10,10,10)
+        self.camera.position = glm.vec3(10,10,10)
+        self.camera.strafe(speed = -0.25)
+        self.assertGreater(self.camera.position.z, previous_position.z)
+        self.assertLess(self.camera.position.x, previous_position.x)
 
 if __name__ == '__main__':
     unittest.main()

@@ -90,7 +90,6 @@ class Planet(Object):
         z = b * glm.sin(theta)
         y = self.original_pos.y  # Mantener la altura constante o ajustarla si deseas órbitas inclinadas
 
-
         # Trasladar el planeta a la nueva posición calculada (órbita elíptica respecto al Sol en (0, 0, 0))
         new_position = glm.vec3(x, y, z)
         self.actual_pos = new_position

@@ -53,6 +53,7 @@ class StarBatch(Object):
         vao = self.ctx.vertex_array(self.shader,[(self.vbo, '3f 3f', 'in_color', 'in_position')])
 
         return vao
+    
     def on_init(self):
         """Post-inicialització de la classe StarBatch
         """
