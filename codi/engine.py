@@ -391,21 +391,25 @@ class GraphicsEngine:
             ):
                 self.end()
 
-            if event.type == pg.KEYDOWN and event.key == pg.K_p:
-                self.ellipse = not self.ellipse
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_p:
+                    self.ellipse = not self.ellipse
 
-            if event.type == pg.KEYDOWN and event.key == pg.K_k:
-                self.camera, self.second_cam = self.second_cam, self.camera
+                elif event.key == pg.K_k:
+                    self.camera, self.second_cam = self.second_cam, self.camera
 
-            if event.type == pg.KEYDOWN and event.key == pg.K_m:
-                self.objects, self.aux_objects = self.aux_objects, self.objects
-                self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
+                elif event.key == pg.K_m:
+                    self.objects, self.aux_objects = self.aux_objects, self.objects
+                    self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
 
-                # Update the view matrix
-                m_view = self.camera.get_view_matrix()
-                for object in self.objects:
-                    object.shader['m_view'].write(m_view)
-                self.stars.shader['m_view'].write(m_view)
+                    # Update the view matrix
+                    m_view = self.camera.get_view_matrix()
+                    for object in self.objects:
+                        object.shader['m_view'].write(m_view)
+                    self.stars.shader['m_view'].write(m_view)
+
+                elif event.key == pg.K_l:
+                    self.camera.change_lock()
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
@@ -444,13 +448,12 @@ class GraphicsEngine:
 
             elif event.type == pg.MOUSEMOTION and self.camera.left_button_held:
                 current_mouse_pos = pg.mouse.get_pos()
-                if self.camera.last_mouse_pos is not None and not (self.camera.get_type == "FollowCamera" and self.camera.lock_target):
-                    # Calculate difference in mouse movement
-                    dx = current_mouse_pos[0] - self.camera.last_mouse_pos[0]
-                    dy = current_mouse_pos[1] - self.camera.last_mouse_pos[1]
+                # Calculate difference in mouse movement
+                dx = current_mouse_pos[0] - self.camera.last_mouse_pos[0]
+                dy = current_mouse_pos[1] - self.camera.last_mouse_pos[1]
 
-                    # Process the mouse movement to update camera rotation
-                    self.camera.process_mouse_movement(dx, dy)
+                # Process the mouse movement to update camera rotation
+                self.camera.process_mouse_movement(dx, dy)
 
                 # Update last mouse position
                 self.camera.last_mouse_pos = current_mouse_pos
