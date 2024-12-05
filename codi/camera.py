@@ -237,7 +237,7 @@ class FollowCamera(Camera):
         self.keep_up = True
         self.direction = glm.vec3(0,0,0)
         super().__init__(app)
-        self.sensitivity *= 0.01
+        #self.sensitivity *= 0.01
     
     def get_type(self):
         return "FollowCamera"
@@ -333,6 +333,11 @@ class FollowCamera(Camera):
             else:
                 self.azimuth = (self.azimuth - self.speed) % 360
                 # Update the relative position
+        if keys[pg.K_q]:  # Roll counterclockwise
+            self.roll(-self.speed)
+        if keys[pg.K_e]:  # Roll clockwise
+            self.roll(self.speed)
+
         self.relative_position += increment
 
         # Normalize the relative position to stay on the sphere
@@ -342,18 +347,31 @@ class FollowCamera(Camera):
         """Processar el moviment del ratolí quan no hi ha lock_target
         """
         if not self.lock_target:
-            # Apply sensitivity and update horizontal changes
-            self.direction = glm.normalize(self.direction + mouse_dx * self.sensitivity * self.right)
-            self.up = glm.normalize(glm.cross(self.right, self.direction))
+            # Calculate rotation around the vertical axis (yaw) for horizontal movement
+            yaw_rotation = glm.rotate(glm.mat4(1.0), glm.radians(-mouse_dx * self.sensitivity), self.up)
+            self.direction = glm.normalize(glm.vec3(yaw_rotation * glm.vec4(self.direction, 0.0)))
             self.right = glm.normalize(glm.cross(self.direction, self.up))
 
-            # Apply sensitivity and update vertical changes
-            self.direction = glm.normalize(self.direction - mouse_dy * self.sensitivity * self.up)
-            self.right = glm.normalize(glm.cross(self.direction, self.up))
-            self.up = glm.normalize(glm.cross(self.right, self.direction))
-            # Update the view matrix with new direction, right and up
+            # Calculate rotation around the horizontal axis (pitch) for vertical movement
+            pitch_rotation = glm.rotate(glm.mat4(1.0), glm.radians(-mouse_dy * self.sensitivity), self.right)
+            new_direction = glm.normalize(glm.vec3(pitch_rotation * glm.vec4(self.direction, 0.0)))
+            
+            # Prevent flipping by clamping the pitch
+            if abs(glm.dot(new_direction, self.up)) < 0.99:  # Limit pitch to near-horizontal
+                self.direction = new_direction
+                self.up = glm.normalize(glm.cross(self.right, self.direction))
+
+            # Update the view matrix with the new direction, right, and up
             self.update_shaders_m_view()
+    def roll(self, angle):
+        rotation_matrix = glm.rotate(glm.mat4(1.0), glm.radians(angle), self.direction)
 
+        # Apply the rotation to 'up' and 'right' vectors
+        self.up = glm.normalize(glm.vec3(rotation_matrix * glm.vec4(self.up, 0.0)))
+        self.right = glm.normalize(glm.vec3(rotation_matrix * glm.vec4(self.right, 0.0)))
+
+        # Update the view matrix with the new 'up' and 'right' vectors
+        self.update_shaders_m_view()
     def follow_target(self):
         """Update the camera's position based on the planet's position and the set distance and angles."""
         if not self.lock_target:
