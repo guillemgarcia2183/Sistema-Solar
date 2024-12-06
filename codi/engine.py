@@ -316,10 +316,10 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",
-            [0.35, 3, 3],
-            num_asteroids=225,  # Or however many you want
+            [0.35, 5, 5],
+            num_asteroids=500,  # Or however many you want
             distance1=distance_objects["Mars"]+25,
-            distance2=distance_objects["Jupiter"]-25,
+            distance2=distance_objects["Jupiter"]-20,
             velocity=speed_asteroids,
             eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"],
             type="Belt",
@@ -331,7 +331,7 @@ class GraphicsEngine:
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
             [0.2, 5, 5],  # Adjust these parameters as needed
-            num_asteroids=100,  # Or however many you want
+            num_asteroids=250,  # Or however many you want
             distance1=distance_objects["Jupiter"]+35,
             distance2=distance_objects["Jupiter"]+45,
             velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"] /
@@ -344,7 +344,7 @@ class GraphicsEngine:
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
             [0.2, 5, 5],  # Adjust these parameters as needed
-            num_asteroids=100,  # Or however many you want
+            num_asteroids=250,  # Or however many you want
             distance1=distance_objects["Jupiter"]+35,
             distance2=distance_objects["Jupiter"]+45,
             velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"] /

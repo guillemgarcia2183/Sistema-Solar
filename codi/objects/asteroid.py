@@ -3,6 +3,7 @@ import numpy as np
 import glm
 from objects.object import Object
 from scipy.spatial import KDTree
+import math
 
 class AsteroidBatch(Object):
     """Crea el cinturó d'asteroides mitjançant instancing. Classe heretada de Object"""
@@ -172,8 +173,8 @@ class AsteroidBatch(Object):
         """
         if self.enabled:
             if (self.type == "Belt"):
-                collisions = self.check_collisions()
-                if collisions:
+                collisions = self.check_collisions_optimized()
+                if len(collisions) > 0:
                     #print(f"Collisions detected: {collisions}, number of collisions:{len(collisions)}")
                     self.apply_collision(collisions)
 
@@ -237,10 +238,39 @@ class AsteroidBatch(Object):
                 radius_neighbor = self.scales[n]*self.radius
                 distance = distances[i]
                 # Comprova si hi ha col·lisió
-                if distance <= (radius_asteroid + radius_neighbor):
-                    collisions.append((index, n))  # Guardem els índexs dels asteroides que col·lisionen
+                if (distance**2) <= ((radius_asteroid + radius_neighbor)**2):
+                    collisions.append([index, n])  # Guardem els índexs dels asteroides que col·lisionen
         return collisions
     
+    def check_collisions_optimized(self):
+        positions = np.array(self.positions)
+        radius = np.array(self.scales)*self.radius
+
+        # Coordenadas separades per calcular distàncies
+        p1 = positions[:,0].reshape(-1,1)
+        p2 = positions[:,1].reshape(-1,1)
+        p3 = positions[:,2].reshape(-1,1)
+
+        # Calculem sumatori de distàncies  
+        distance = (p1 - p1.transpose())**2
+        distance += (p2 - p2.transpose())**2
+        distance += (p3 - p3.transpose())**2
+        np.fill_diagonal(distance, math.inf)
+
+        # Calcular las distancias de colisión permitidas
+        collision_distance = (radius + radius.reshape(-1, 1)) ** 2
+
+        # Identificar colisiones: matriz booleana
+        collisions_mask = distance <= collision_distance
+
+        # Extraer los pares de índices donde ocurre colisión
+        collisions_indices = np.argwhere(collisions_mask)
+        
+        # Evitar duplicats
+        collisions_indices = collisions_indices[collisions_indices[:, 0] < collisions_indices[:, 1]]
+
+        return collisions_indices
+
     def apply_collision(self, collisions, adjustment_amount=0.1):
         """Aplicar la col·lisió als asteroides en qüestió
 
