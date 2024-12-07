@@ -130,7 +130,7 @@ class StarBatch(Object):
         consts = self.parse_constellations()
         constellation_indices = list()
 
-        print(consts)
+        #print(consts)
 
         for v in consts.values():
             for pair in v:

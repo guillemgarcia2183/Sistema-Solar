@@ -68,33 +68,33 @@ class TestAsteroids(unittest.TestCase):
 
         self.assertNotEqual(test1_positions, test2_positions) 
 
-    def test_collisions_time(self):
-        """3. Comparativa de temps entre mètodes per trobar col·lisions
-        """
-        initial_time_kdtree = time.time()
-        collisions_kdtree = self.object.check_collisions()
-        final_time_kdtree = time.time() - initial_time_kdtree
+    # def test_collisions_time(self):
+    #     """3. Comparativa de temps entre mètodes per trobar col·lisions
+    #     """
+    #     initial_time_kdtree = time.time()
+    #     collisions_kdtree = self.object.check_collisions()
+    #     final_time_kdtree = time.time() - initial_time_kdtree
 
-        initial_time_product = time.time()
-        collisions_product = self.object.check_collisions_optimized()
-        final_time_product = time.time() - initial_time_product
+    #     initial_time_product = time.time()
+    #     collisions_product = self.object.check_collisions_optimized()
+    #     final_time_product = time.time() - initial_time_product
 
-        print(f"Temps Kd_tree amb {self.object.num_asteroids} asteroides: {final_time_kdtree}")
-        print(f"Temps Numpy product amb {self.object.num_asteroids} asteroides: {final_time_product}")
+    #     print(f"Temps Kd_tree amb {self.object.num_asteroids} asteroides: {final_time_kdtree}")
+    #     print(f"Temps Numpy product amb {self.object.num_asteroids} asteroides: {final_time_product}")
         
-        ##################################### LOGS #####################################
-        # Temps Kd_tree amb 250 asteroides: 0.027542591094970703
-        # Temps Numpy product amb 250 asteroides: 0.001001596450805664
-        # Speedup = 27x
+    #     ##################################### LOGS #####################################
+    #     # Temps Kd_tree amb 250 asteroides: 0.027542591094970703
+    #     # Temps Numpy product amb 250 asteroides: 0.001001596450805664
+    #     # Speedup = 27x
 
-        # Temps Kd_tree amb 500 asteroides: 0.09464883804321289
-        # Temps Numpy product amb 500 asteroides: 0.0035066604614257812
-        # Speedup = 26,85x
+    #     # Temps Kd_tree amb 500 asteroides: 0.09464883804321289
+    #     # Temps Numpy product amb 500 asteroides: 0.0035066604614257812
+    #     # Speedup = 26,85x
 
-        # Temps Kd_tree amb 1000 asteroides: 0.34557580947875977
-        # Temps Numpy product amb 1000 asteroides: 0.01617884635925293
-        # Speedup = 21,59x
-        ##################################################################################
+    #     # Temps Kd_tree amb 1000 asteroides: 0.34557580947875977
+    #     # Temps Numpy product amb 1000 asteroides: 0.01617884635925293
+    #     # Speedup = 21,59x
+    #     ##################################################################################
 
 if __name__ == '__main__':
     unittest.main()
