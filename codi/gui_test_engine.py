@@ -13,6 +13,7 @@ from gui import ButtonManager, TextLabel
 
 
 class TestEngine:
+    """GUI Test Engine."""
 
     def __init__(self, debug=False, fs=True, win_size=(1200, 800)):
         """Inicialització de la classe TestEngine
@@ -76,9 +77,152 @@ class TestEngine:
                     0.0
                 ],
                 "font_size": 64,
-                "x": 100,
-                "y": 000,
-            })
+                "x": 600,
+                "y": 400,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 570,
+                "y": 400,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 0,
+                "y": 400,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 1200,
+                "y": 400,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 630,
+                "y": 400,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 600,
+                "y": 0,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 600,
+                "y": 325,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 0,
+                "y": 0,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 1200,
+                "y": 800,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 600,
+                "y": 800,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 600,
+                "y": 475,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 0,
+                "y": 800,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 1200,
+                "y": 800,
+            }),
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 1200,
+                "y": 0,
+            }),
         ]
 
     def check_events(self):
@@ -90,7 +234,7 @@ class TestEngine:
             if event.type == pg.QUIT or (
                     event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE
             ):
-                self.end()
+                raise KeyboardInterrupt("Exit game via click.")
 
                 # button_event = self.button_manager.check_click(
                 #     pg.mouse.get_pos())
@@ -112,6 +256,8 @@ class TestEngine:
         None.
 
         """
+        if self.DEBUG:
+            print("Ending...")
 
         # self.button_manager.destroy()
         for label in self.labels:
@@ -151,7 +297,7 @@ class TestEngine:
 
 
 if __name__ == "__main__":
-    app = TestEngine(fs=False)
+    app = TestEngine(debug=True, fs=False)
     try:
         app.run()
     except:  # noqa

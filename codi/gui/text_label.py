@@ -231,7 +231,7 @@ class TextLabel:
         self.__set_text_texture()
 
         ndc_x_center = (self.__x / self.__app.WIN_SIZE[0]) * 2 - 1
-        ndc_y_center = (self.__y / self.__app.WIN_SIZE[1]) * 2 - 1
+        ndc_y_center = -((self.__y / self.__app.WIN_SIZE[1]) * 2 - 1)
 
         # Half-width and half-height in NDC
         ndc_half_w = self.__width / self.__app.WIN_SIZE[0]

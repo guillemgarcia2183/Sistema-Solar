@@ -392,7 +392,7 @@ class GraphicsEngine:
             if event.type == pg.QUIT or (
                     event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE
             ):
-                self.end()
+                raise KeyboardInterrupt("Exit game via click.")
 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_p:
@@ -474,6 +474,8 @@ class GraphicsEngine:
         """
         Destruir tots els objectes i finalitzar la simulació.
         """
+        if self.DEBUG:
+            print("Ending...")
 
         self.button_manager.destroy()
 
