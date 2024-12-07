@@ -14,12 +14,13 @@ from gui import ButtonManager, TextLabel
 
 class TestEngine:
 
-    def __init__(self, fs=True, win_size=(1200, 800)):
+    def __init__(self, debug=False, fs=True, win_size=(1200, 800)):
         """Inicialització de la classe TestEngine
 
         Args:
             win_size (tuple, optional): Tamany de finestra de l'aplicació. Defaults to (900,800).
         """
+        self.DEBUG = debug
         # init pygame modules
         pg.init()
         pg.font.init()
@@ -36,11 +37,21 @@ class TestEngine:
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)
         pg.display.gl_set_attribute(
             pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)
+        pg.display.gl_set_attribute(
+            pg.GL_CONTEXT_FORWARD_COMPATIBLE_FLAG, True)
 
         # create opengl context
         pg.display.set_mode(self.WIN_SIZE, flags=pg.OPENGL | pg.DOUBLEBUF)
         self.ctx = mgl.create_context()
         self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.BLEND)
+
+        if self.DEBUG:
+            print(f"ModernGL Version: {self.ctx.version_code}")
+            print(f"OpenGL Vendor: {self.ctx.info['GL_VENDOR']}")
+            print(f"OpenGL Renderer: {self.ctx.info['GL_RENDERER']}")
+            print(f"OpenGL Version: {self.ctx.info['GL_VERSION']}")
+            # print(f"Shader Version: {
+            #       self.ctx.info['GL_SHADING_LANGUAGE_VERSION']}")
 
         self.info = "Test GUI"
         pg.display.set_caption(self.info)
@@ -56,17 +67,19 @@ class TestEngine:
 
         # self.button_manager.batch_add_buttons(gui_layout)
 
-        self.label = TextLabel(self, "a", **{
-            "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "color": [
-                1.0,
-                0.0,
-                0.0
-            ],
-            "font_size": 200,
-            "x": 500,
-            "y": 500,
-        })
+        self.labels = [
+            TextLabel(self, "a", **{
+                "text": "a",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "font_size": 64,
+                "x": 100,
+                "y": 000,
+            })
+        ]
 
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.
@@ -101,7 +114,8 @@ class TestEngine:
         """
 
         # self.button_manager.destroy()
-        self.label.destroy()
+        for label in self.labels:
+            label.destroy()
 
         pg.quit()
         sys.exit()
@@ -119,7 +133,8 @@ class TestEngine:
 
         # render gui
         # self.button_manager.render()
-        self.label.render()
+        for label in self.labels:
+            label.render()
 
         # Swap buffers + display caption
         pg.display.set_caption(self.info)
@@ -136,5 +151,8 @@ class TestEngine:
 
 
 if __name__ == "__main__":
-    app = TestEngine()
-    app.run()
+    app = TestEngine(fs=False)
+    try:
+        app.run()
+    except:  # noqa
+        app.end()
