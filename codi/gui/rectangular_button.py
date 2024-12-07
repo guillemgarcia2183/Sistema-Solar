@@ -86,7 +86,8 @@ class RectangularButton:
             self.__text = Empty()
         else:
             kwargs['text'] = kwargs['text'] | {"x": self.__x, "y": self.__y}
-            print(kwargs['text'])
+            if self.__app.DEBUG:
+                print(kwargs['text'])
             self.__text = TextLabel(
                 self.__app,
                 self.__uuid + "_text",

@@ -16,10 +16,12 @@ import os
 ### VARIABLES GLOBALS ###
 UA_CONVERSION = 149_600_000  # 1 UA en kilómetros
 
+
 class GraphicsEngine:
     """Classe que farà corre l'aplicació controlant instàcies de les altres classes 
     """
     __slots__ = (
+        "DEBUG",
         "WIN_SIZE",
         "ctx",
         "camera",
@@ -41,13 +43,15 @@ class GraphicsEngine:
         "second_cam"
     )
 
-    def __init__(self, testing = False, fs=True, win_size=(1200, 800)):
+    def __init__(self, testing=False, debug=False, fs=True, win_size=(1200, 800)):
         """Inicialització de la classe GraphicsEngine
 
         Args:
             fs (bool, optional): Si es True, s'executa en full screen. Defaults to True
             win_size (tuple, optional): Tamany de finestra de l'aplicació. Defaults to (900,800).
         """
+        self.DEBUG = debug
+
         if testing:
             # En cas de fer unittesting, es necessita actualitzar el directori
             os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -72,7 +76,6 @@ class GraphicsEngine:
         pg.display.set_mode(self.WIN_SIZE, flags=pg.OPENGL | pg.DOUBLEBUF)
         self.ctx = mgl.create_context()
         self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.BLEND)
-        
 
         # camera
         self.camera = Camera(self)
@@ -415,19 +418,28 @@ class GraphicsEngine:
                 button_event = self.button_manager.check_click(
                     pg.mouse.get_pos())
                 if button_event == "day_picker":
-                    print("Day picker pressed.")
+                    if self.DEBUG:
+                        print("Day picker pressed.")
                 elif button_event == "zoom_in":
-                    print("Zoom in pressed.")
+                    if self.DEBUG:
+                        print("Zoom in pressed.")
                 elif button_event == "zoom_out":
-                    print("Zoom out pressed.")
+                    if self.DEBUG:
+                        print("Zoom out pressed.")
                 elif button_event == "constellations_visibility":
-                    print("Constelations visibility pressed.")
+                    if self.DEBUG:
+                        print("Constelations visibility pressed.")
                 elif button_event == "elipses":
                     self.ellipse = not self.ellipse
+                    if self.DEBUG:
+                        print(f'Ellipses: {self.ellipse}')
                 elif button_event == "canvi_camera":
-                    print("c")
+                    if self.DEBUG:
+                        print("Canvi camera")
                     self.camera, self.second_cam = self.second_cam, self.camera
                 elif button_event == "escala":
+                    if self.DEBUG:
+                        print("Canvi escala")
                     self.objects, self.aux_objects = self.aux_objects, self.objects
                     self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
 
