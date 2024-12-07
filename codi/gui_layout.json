@@ -113,7 +113,7 @@
                 0.5
             ],
             "locked_color": null,
-            "hidden": true,
+            "hidden": false,
             "locked": false,
             "text": {
                 "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -122,7 +122,7 @@
                     0.0,
                     0.0
                 ],
-                "font_size": 200
+                "font_size": 12
             }
 
         }
