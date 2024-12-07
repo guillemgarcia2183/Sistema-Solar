@@ -319,10 +319,10 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",
-            [0.35, 3, 3],
-            num_asteroids=225,  # Or however many you want
+            [0.35, 5, 5],
+            num_asteroids=500,  # Or however many you want
             distance1=distance_objects["Mars"]+25,
-            distance2=distance_objects["Jupiter"]-25,
+            distance2=distance_objects["Jupiter"]-20,
             velocity=speed_asteroids,
             eccentricity=self.planets_data["Mars"].data["Orbital Eccentricity"],
             type="Belt",
@@ -334,7 +334,7 @@ class GraphicsEngine:
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
             [0.2, 5, 5],  # Adjust these parameters as needed
-            num_asteroids=100,  # Or however many you want
+            num_asteroids=250,  # Or however many you want
             distance1=distance_objects["Jupiter"]+35,
             distance2=distance_objects["Jupiter"]+45,
             velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"] /
@@ -347,7 +347,7 @@ class GraphicsEngine:
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
             [0.2, 5, 5],  # Adjust these parameters as needed
-            num_asteroids=100,  # Or however many you want
+            num_asteroids=250,  # Or however many you want
             distance1=distance_objects["Jupiter"]+35,
             distance2=distance_objects["Jupiter"]+45,
             velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"] /
@@ -394,21 +394,25 @@ class GraphicsEngine:
             ):
                 self.end()
 
-            if event.type == pg.KEYDOWN and event.key == pg.K_p:
-                self.ellipse = not self.ellipse
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_p:
+                    self.ellipse = not self.ellipse
 
-            if event.type == pg.KEYDOWN and event.key == pg.K_k:
-                self.camera, self.second_cam = self.second_cam, self.camera
+                elif event.key == pg.K_k:
+                    self.camera, self.second_cam = self.second_cam, self.camera
 
-            if event.type == pg.KEYDOWN and event.key == pg.K_m:
-                self.objects, self.aux_objects = self.aux_objects, self.objects
-                self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
+                elif event.key == pg.K_m:
+                    self.objects, self.aux_objects = self.aux_objects, self.objects
+                    self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
 
-                # Update the view matrix
-                m_view = self.camera.get_view_matrix()
-                for object in self.objects:
-                    object.shader['m_view'].write(m_view)
-                self.stars.shader['m_view'].write(m_view)
+                    # Update the view matrix
+                    m_view = self.camera.get_view_matrix()
+                    for object in self.objects:
+                        object.shader['m_view'].write(m_view)
+                    self.stars.shader['m_view'].write(m_view)
+
+                elif event.key == pg.K_l:
+                    self.camera.change_lock()
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
@@ -456,13 +460,12 @@ class GraphicsEngine:
 
             elif event.type == pg.MOUSEMOTION and self.camera.left_button_held:
                 current_mouse_pos = pg.mouse.get_pos()
-                if self.camera.last_mouse_pos is not None and not (self.camera.get_type == "FollowCamera" and self.camera.lock_target):
-                    # Calculate difference in mouse movement
-                    dx = current_mouse_pos[0] - self.camera.last_mouse_pos[0]
-                    dy = current_mouse_pos[1] - self.camera.last_mouse_pos[1]
+                # Calculate difference in mouse movement
+                dx = current_mouse_pos[0] - self.camera.last_mouse_pos[0]
+                dy = current_mouse_pos[1] - self.camera.last_mouse_pos[1]
 
-                    # Process the mouse movement to update camera rotation
-                    self.camera.process_mouse_movement(dx, dy)
+                # Process the mouse movement to update camera rotation
+                self.camera.process_mouse_movement(dx, dy)
 
                 # Update last mouse position
                 self.camera.last_mouse_pos = current_mouse_pos

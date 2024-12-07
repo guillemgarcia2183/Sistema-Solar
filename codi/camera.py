@@ -67,6 +67,9 @@ class Camera:
     def get_type(self):
         return "Camera"
 
+    def change_lock(self):
+        pass
+
     def follow_target(self):
         """Funció per seguir al objectiu
         """
@@ -204,71 +207,6 @@ class Camera:
         # Update the view matrix for all objects and stars
         self.update_shaders_m_view()
 
-class Planets(Enum):
-    SUN     = 0
-    MERCURY = 1 
-    VENUS   = 3
-    EARTH   = 5
-    MART    = 7
-    JUPITER = 9
-    SATURN  = 11
-    URANUS  = 13
-    NEPTUNE = 15
-
-class PlanetaryCamera():
-
-    def __init__(self, app: object, 
-                 planet: int = Planets.JUPITER,
-                 height_of_camera: float = 10.0):
-         
-        self.app = app
-        self.aspect_ratio = app.WIN_SIZE[0]/app.WIN_SIZE[1]
-        self.planet = planet.value
-        self.height = height_of_camera
-        self.position = self.app.objects[self.planet].position \
-                            + glm.vec3(0, self.height, 0)
-        self.up = glm.vec3(0, 1, 0)
-
-        self.m_view = self.get_view_matrix()
-        self.m_proj = self.get_projection_matrix()
-               
-    def get_view_matrix(self) -> glm.mat4x4:
-        # For now let's look at the sun
-        # TODO: Sun has NO position artibute wich makes no sense
-        return glm.lookAt(self.position, glm.vec3(0), self.up)
-    
-    def get_projection_matrix(self) -> glm.mat4x4:
-        return glm.perspective(glm.radians(45), self.aspect_ratio, 0.1, 700)
-
-    def update(self) -> None:
-        """Rotació dela camara sobre el sol.
-        """
-        
-        planet = self.app.objects[self.planet]
-
-        # Semieje mayor y menor basados en la distancia inicial del planeta al Sol
-        a = glm.length(glm.vec2(planet.position.x, planet.position.z))  # La magnitud en XZ como semieje mayor
-        b = a * (1 - planet.excentrity ** 2) ** 0.5 # Semieje menor (ajústalo según el grado de excentricidad que desees)
-
-        # Calcular el ángulo en función del tiempo
-        theta = self.app.time * planet.velocity   # Ajusta la velocidad de la órbita
-
-        # Posición del planeta en la órbita elíptica (plano XZ)
-        x = a * glm.cos(theta)
-        z = b * glm.sin(theta)
-        y = 0
-
-        # Trasladar el planeta a la nueva posición calculada (órbita elíptica respecto al Sol en (0, 0, 0))
-        new_position = glm.vec3(x, y, z)
-        self.position = new_position + glm.vec3(0, self.height, 0)
-        self.m_view = self.get_view_matrix()
-
-        for object in self.app.objects:
-            object.faces_shader['m_view'].write(self.m_view)
-
-    def process_keyboard(self):
-        pass
-
 class FollowCamera(Camera):
     """Classe que estableix la càmara planetària
     """ 
@@ -279,7 +217,8 @@ class FollowCamera(Camera):
                  "lock_target",
                  "relative_position",
                  "right",
-                 "keep_up")
+                 "keep_up",
+                 "direction")
     
     def __init__(self, app, distance, lock_target = True):
         """
@@ -296,11 +235,27 @@ class FollowCamera(Camera):
         self.relative_position = glm.vec3(1,0,0)
         self.right = glm.vec3(0,0,1)
         self.keep_up = True
+        self.direction = glm.vec3(0,0,0)
         super().__init__(app)
+        #self.sensitivity *= 0.01
     
     def get_type(self):
         return "FollowCamera"
-                 
+    
+    def change_lock(self):
+        if self.lock_target:
+            # Calculem la posició que estàvem amb lock_target
+            self.elevation = glm.degrees(glm.asin(self.position.y / self.distance))
+            delta_x = self.position.x - self.target.actual_pos.x
+            delta_z = self.position.z - self.target.actual_pos.z
+            self.azimuth = glm.degrees(glm.atan(delta_z, delta_x))
+            # Canviem el mode
+            self.lock_target = False
+        else:
+            self.relative_position = (self.position - self.target.actual_pos)/self.distance
+            self.lock_target = True
+        
+
     def get_view_matrix(self):
         """
         Sobrecarreguem aquesta funció per gestionar si volem que la càmera es fixi en el planeta o no
@@ -309,21 +264,21 @@ class FollowCamera(Camera):
         """
 
         if self.lock_target and self.target is not None: # Condició temporal, un cop el canvi de target estigui implementat s'haurà de canviar
-            direction = glm.normalize(self.target.actual_pos - self.position)
+            self.direction = glm.normalize(self.target.actual_pos - self.position)
             if self.keep_up: # Moviments AD, mantenim el vector 'up' per generar el vector 'right' en el pla desitjat
-                self.right = glm.normalize(glm.cross(direction, self.up))
+                self.right = glm.normalize(glm.cross(self.direction, self.up))
                 # Recalculem 'up' per a que tenir la nova base
-                self.up = glm.normalize(glm.cross(self.right, direction))
+                self.up = glm.normalize(glm.cross(self.right, self.direction))
 
             else: # Moviments WS, mantenim el vector 'right' per generar el vector 'up' en el pla desitjat
-                self.up = glm.normalize(glm.cross(self.right, direction))
+                self.up = glm.normalize(glm.cross(self.right, self.direction))
                 # Recalculem 'right' per a que tenir la nova base
-                self.right = glm.normalize(glm.cross(direction, self.up))
+                self.right = glm.normalize(glm.cross(self.direction, self.up))
                 
             #print(f"right:{self.right}\nup:{self.up}")
-            return glm.lookAt(self.position, self.position + direction, self.up)
+            return glm.lookAt(self.position, self.position + self.direction, self.up)
         else:
-            return super().get_view_matrix()
+            return glm.lookAt(self.position, self.position + self.direction, self.up)
 
     def select_target(self, target):
         """ ----RECORDATORI----
@@ -339,13 +294,13 @@ class FollowCamera(Camera):
 
     def synchronize_yaw_pitch(self):
         """Synchronize yaw and pitch with the current forward direction."""
-        forward = glm.normalize(self.target.actual_pos - self.position if self.lock_target else -self.relative_position)
+        forward = glm.normalize(self.target.actual_pos - self.position)
 
         # Calculate yaw (atan2 gives us the angle in the XZ plane)
-        self.yaw = glm.degrees(glm.atan(forward.z, forward.x))
+        self.yaw = glm.degrees(glm.atan(forward.z, forward.x)) % 360
 
-        # Calculate pitch (asin gives us the vertical angle)
-        self.pitch = glm.degrees(glm.asin(forward.y))
+        # Pitch is the vertical angle of the forward vector
+        self.pitch = glm.degrees(glm.asin(forward.y / glm.length(forward)))
         
     def process_keyboard(self):
         # Get the current key state
@@ -377,27 +332,48 @@ class FollowCamera(Camera):
                 increment += self.right * 0.1#self.speed
             else:
                 self.azimuth = (self.azimuth - self.speed) % 360
-        # Decidim seguir el planeta o no
-        if keys[pg.K_l]:
-            self.lock_target = not self.lock_target
-            self.synchronize_yaw_pitch()
-            
-        # Update the relative position
+                # Update the relative position
+        if keys[pg.K_q]:  # Roll counterclockwise
+            self.roll(-self.speed)
+        if keys[pg.K_e]:  # Roll clockwise
+            self.roll(self.speed)
+
         self.relative_position += increment
 
         # Normalize the relative position to stay on the sphere
         self.relative_position = glm.normalize(self.relative_position) 
-        
+
+    def process_mouse_movement(self, mouse_dx, mouse_dy):
+        """Processar el moviment del ratolí quan no hi ha lock_target
+        """
+        if not self.lock_target:
+            # Calculate rotation around the vertical axis (yaw) for horizontal movement
+            yaw_rotation = glm.rotate(glm.mat4(1.0), glm.radians(-mouse_dx * self.sensitivity), self.up)
+            self.direction = glm.normalize(glm.vec3(yaw_rotation * glm.vec4(self.direction, 0.0)))
+            self.right = glm.normalize(glm.cross(self.direction, self.up))
+
+            # Calculate rotation around the horizontal axis (pitch) for vertical movement
+            pitch_rotation = glm.rotate(glm.mat4(1.0), glm.radians(-mouse_dy * self.sensitivity), self.right)
+            new_direction = glm.normalize(glm.vec3(pitch_rotation * glm.vec4(self.direction, 0.0)))
+            
+            # Prevent flipping by clamping the pitch
+            if abs(glm.dot(new_direction, self.up)) < 0.99:  # Limit pitch to near-horizontal
+                self.direction = new_direction
+                self.up = glm.normalize(glm.cross(self.right, self.direction))
+
+            # Update the view matrix with the new direction, right, and up
+            self.update_shaders_m_view()
+    def roll(self, angle):
+        rotation_matrix = glm.rotate(glm.mat4(1.0), glm.radians(angle), self.direction)
+
+        # Apply the rotation to 'up' and 'right' vectors
+        self.up = glm.normalize(glm.vec3(rotation_matrix * glm.vec4(self.up, 0.0)))
+        self.right = glm.normalize(glm.vec3(rotation_matrix * glm.vec4(self.right, 0.0)))
+
+        # Update the view matrix with the new 'up' and 'right' vectors
+        self.update_shaders_m_view()
     def follow_target(self):
         """Update the camera's position based on the planet's position and the set distance and angles."""
-        """# Calculate Cartesian coordinates from spherical
-        x = self.target.actual_pos.x + self.distance * glm.cos(glm.radians(self.elevation)) * glm.cos(glm.radians(self.azimuth))
-        y = self.distance * glm.sin(glm.radians(self.elevation)) # self.target.actual_pos.y serà sempre 0
-        z = self.target.actual_pos.z + self.distance * glm.cos(glm.radians(self.elevation)) * glm.sin(glm.radians(self.azimuth))
-        
-        # Update camera position and direction
-        self.position = glm.vec3(x, y, z)
-        """
         if not self.lock_target:
             x = self.target.actual_pos.x + self.distance * glm.cos(glm.radians(self.elevation)) * glm.cos(glm.radians(self.azimuth))
             y = self.distance * glm.sin(glm.radians(self.elevation)) # self.target.actual_pos.y serà sempre 0

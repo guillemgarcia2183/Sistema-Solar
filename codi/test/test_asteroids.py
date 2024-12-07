@@ -1,7 +1,8 @@
 import unittest
 import sys
 import os
-import glm
+import time
+import numpy as np
 
 # Add the parent directory to the Python path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -21,9 +22,9 @@ class TestAsteroids(unittest.TestCase):
                     [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
                     "textures/asteroids.jpg",  # You'll need an asteroid texture
                     [0.5, 5, 5],  # Adjust these parameters as needed
-                    num_asteroids=1000,  # Or however many you want
+                    num_asteroids= 1000,  # Or however many you want
                     distance1=15.5,
-                    distance2=40.5,
+                    distance2=30.5,
                     velocity=10.0,
                     eccentricity=0.05,
                     type="Trojan Left"
@@ -58,7 +59,6 @@ class TestAsteroids(unittest.TestCase):
 
         self.object.update_orbit()
         test1_positions = self.object.positions
-        #print(f"Test1 Positions: {test1_positions}")
 
         self.object.positions = original_positions
         self.object.apply_collision(collisions)
@@ -67,7 +67,34 @@ class TestAsteroids(unittest.TestCase):
         test2_positions = self.object.positions
 
         self.assertNotEqual(test1_positions, test2_positions) 
-        #print(f"Test2 Positions: {test2_positions}")
+
+    def test_collisions_time(self):
+        """3. Comparativa de temps entre mètodes per trobar col·lisions
+        """
+        initial_time_kdtree = time.time()
+        collisions_kdtree = self.object.check_collisions()
+        final_time_kdtree = time.time() - initial_time_kdtree
+
+        initial_time_product = time.time()
+        collisions_product = self.object.check_collisions_optimized()
+        final_time_product = time.time() - initial_time_product
+
+        print(f"Temps Kd_tree amb {self.object.num_asteroids} asteroides: {final_time_kdtree}")
+        print(f"Temps Numpy product amb {self.object.num_asteroids} asteroides: {final_time_product}")
+        
+        ##################################### LOGS #####################################
+        # Temps Kd_tree amb 250 asteroides: 0.027542591094970703
+        # Temps Numpy product amb 250 asteroides: 0.001001596450805664
+        # Speedup = 27x
+
+        # Temps Kd_tree amb 500 asteroides: 0.09464883804321289
+        # Temps Numpy product amb 500 asteroides: 0.0035066604614257812
+        # Speedup = 26,85x
+
+        # Temps Kd_tree amb 1000 asteroides: 0.34557580947875977
+        # Temps Numpy product amb 1000 asteroides: 0.01617884635925293
+        # Speedup = 21,59x
+        ##################################################################################
 
 if __name__ == '__main__':
     unittest.main()
