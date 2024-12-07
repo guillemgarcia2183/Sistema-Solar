@@ -7,5 +7,7 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 if __name__ == '__main__':
     # Executem la nostra aplicació
     app = GraphicsEngine()
-    app.run()
-
+    try:
+        app.run()
+    except:  # noqa
+        app.end()
