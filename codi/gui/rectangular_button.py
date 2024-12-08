@@ -297,11 +297,11 @@ class RectangularButton:
         else:
             self.__color = self.__default_color
 
-        # Render button (draw quad as two triangles)
-        self.__vao.render(mgl.TRIANGLE_STRIP)
-
         # Render possible text on button
         self.__text.render()
+
+        # Render button (draw quad as two triangles)
+        self.__vao.render(mgl.TRIANGLE_STRIP)
 
     def unhide(self):
         self.__is_hidden = False
