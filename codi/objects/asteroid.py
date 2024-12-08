@@ -92,11 +92,11 @@ class AsteroidBatch(Object):
             # Ensure the distance is between Mars and Jupiter
             distance = random.uniform(self.distance1, self.distance2)
             if self.type == "Belt":
-                velocity = random.uniform(self.velocity/4, self.velocity)
+                velocity = random.uniform(self.velocity/10, self.velocity)
             else:
                 velocity = self.velocity
 
-            y_asteroid = random.uniform(-3,3)
+            y_asteroid = random.uniform(-6,6)
             self.distances.append(distance)  # Store the distance
             self.velocity_asteroids.append(velocity)
             self.y_asteroids.append(y_asteroid)
@@ -123,7 +123,7 @@ class AsteroidBatch(Object):
             # Create the transformation matrix
             model = glm.mat4(1.0)
             model = glm.translate(model, glm.vec3(x, y, z))  # Position in orbit
-            scale_factor = random.uniform(0.25, 1)
+            scale_factor = random.uniform(0.1, 1)
             self.scales.append(scale_factor)  # Store the scale factor
 
             model = glm.scale(model, glm.vec3(scale_factor, scale_factor, scale_factor))
@@ -144,10 +144,11 @@ class AsteroidBatch(Object):
             # Calculate semi-major and semi-minor axes
             a = distance  # Semi-major axis
             b = a * (1 - self.eccentricity ** 2) ** 0.5  # Semi-minor axis
-            angle = float(self.angles[i])
+            angle = self.angles[i]
             # Increment the angle based on velocity and time
             angle += self.velocity_asteroids[i] * self.app.time  # Use velocity and time for orbit speed
-            #angle %= 2*np.pi 
+            # angle %= 2*np.pi 
+
             # Update position based on the new angle
             x = float(a * np.cos(angle))
             z = float(b * np.sin(angle))
@@ -297,10 +298,10 @@ class AsteroidBatch(Object):
     def smooth_angle_adjustments(self):
         """Aplicar el adjustament del angle dels asteroides mitjançant diversos frames 
         """
-        smoothing_factor = 0.001
+        smoothing_factor_angle = 0.001
         for key, a in self.collision_adjustments.items():
             if a != 0:
-                adjustment = smoothing_factor * np.sign(a)
+                adjustment = smoothing_factor_angle * np.sign(a)
 
                 if abs(adjustment) > abs(a):
                    adjustment = a 
@@ -309,9 +310,10 @@ class AsteroidBatch(Object):
 
                 self.collision_adjustments[key] -= adjustment
 
-                # # if (self.collision_adjustments[key]) == 0:
-                # #     if adjustment < 0:
-                # #         self.velocity_asteroids[key] *= 0.9
-                # #     elif adjustment > 0:
-                # #         self.velocity_asteroids[key] *= 1.1
-                    
+                if (self.collision_adjustments[key] - adjustment) == 0:
+                    if adjustment < 0:
+                        self.velocity_asteroids[key] *= 0.99
+                    elif adjustment > 0:
+                        self.velocity_asteroids[key] *= 1.01
+    
+

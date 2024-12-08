@@ -319,7 +319,7 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",
-            [0.35, 5, 5],
+            [0.3, 4, 5],
             num_asteroids=500,  # Or however many you want
             distance1=distance_objects["Mars"]+25,
             distance2=distance_objects["Jupiter"]-20,
@@ -333,7 +333,7 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
-            [0.2, 5, 5],  # Adjust these parameters as needed
+            [0.2, 4, 5],  # Adjust these parameters as needed
             num_asteroids=250,  # Or however many you want
             distance1=distance_objects["Jupiter"]+35,
             distance2=distance_objects["Jupiter"]+45,
@@ -346,7 +346,7 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",  # You'll need an asteroid texture
-            [0.2, 5, 5],  # Adjust these parameters as needed
+            [0.2, 4, 5],  # Adjust these parameters as needed
             num_asteroids=250,  # Or however many you want
             distance1=distance_objects["Jupiter"]+35,
             distance2=distance_objects["Jupiter"]+45,
