@@ -141,33 +141,33 @@ class TextLabel:
                 #version 330
 
                 in vec2 in_position;
-                //in vec2 in_texcoord;
+                in vec2 in_texcoord;
 
-                //out vec2 v_texcoord;
+                out vec2 v_texcoord;
 
                 void main() {
-                    //v_texcoord = in_texcoord;
+                    v_texcoord = in_texcoord;
                     gl_Position = vec4(in_position, 0.0, 1.0);
                 }
                 ''',
                 fragment_shader='''
                 #version 330
 
-                //in vec2 v_texcoord;
+                in vec2 v_texcoord;
 
-                //uniform sampler2D text_texture;
+                uniform sampler2D text_texture;
 
                 out vec4 frag_color;
 
                 void main() {
-                    //vec4 tex_color = texture(text_texture, v_texcoord);
-                    //if (tex_color.a < 0.1) {
-                    //   discard; // Discard transparent pixels
-                    //}
+                    vec4 tex_color = texture(text_texture, v_texcoord);
+                    if (tex_color.a < 0.1) {
+                       discard; // Discard transparent pixels
+                    }
 
-                    // frag_color = tex_color;
+                    frag_color = tex_color;
 
-                    frag_color = vec4(0.0, 1.0, 0.0, 1.0); // Render green to confirm shader runs
+                    //frag_color = vec4(0.0, 1.0, 0.0, 1.0); // Render green to confirm shader runs
                 }
                 '''
             )
@@ -200,7 +200,7 @@ class TextLabel:
             self.__shader_programs,
             self.__vbo,
             'in_position',
-            # 'in_texcoord',
+            'in_texcoord',
         )
 
     def __set_vbo(self):
@@ -240,12 +240,14 @@ class TextLabel:
         # Define quad vertices centered at (ndc_x_center, ndc_y_center)
         self.__vertexes = np.array([
             # Position                  # Texcoords
-            ndc_x_center - ndc_half_w, ndc_y_center -
-            ndc_half_h,  # 0.0, 1.0,  # Bottom-left
-            ndc_x_center + ndc_half_w, ndc_y_center -
-            ndc_half_h,  # 1.0, 1.0,  # Bottom-right
-            ndc_x_center - ndc_half_w, ndc_y_center + ndc_half_h,  # 0.0, 0.0,  # Top-left
-            ndc_x_center + ndc_half_w, ndc_y_center + ndc_half_h,  # 1.0, 0.0,  # Top-right
+            ndc_x_center - ndc_half_w, ndc_y_center - ndc_half_h,
+            0.0, 1.0,  # Bottom-left
+            ndc_x_center + ndc_half_w, ndc_y_center - ndc_half_h,
+            1.0, 1.0,  # Bottom-right
+            ndc_x_center - ndc_half_w, ndc_y_center + ndc_half_h,
+            0.0, 0.0,  # Top-left
+            ndc_x_center + ndc_half_w, ndc_y_center + ndc_half_h,
+            1.0, 0.0,  # Top-right
         ], dtype='f4')
 
         # self.__vertexes = np.array([
