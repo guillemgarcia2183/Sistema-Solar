@@ -309,6 +309,24 @@ class GraphicsEngine:
                 eccentricity=self.planets_data[planet].data["Orbital Eccentricity"],
             ))
 
+            self.aux_objects.append(Satellite(
+                self,
+                [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
+                texture,
+                [real_radius[name], 15, 15],
+                glm.vec3(1, 1, 1),
+                position_planet=glm.vec3(
+                    real_distance[planet], 0, real_distance[planet]),
+                position_satellite=glm.vec3(
+                    real_distance[name]+real_radius[planet], 0, real_distance[name]+real_radius[planet]),
+                velocity_planet=self.planets_data[planet].data[
+                    "Orbital Velocity (km/s)"]/100,
+                velocity_satellite=velocity,
+                inclination=self.planets_data[planet].data[
+                    "Orbital Inclination (degrees)"],
+                eccentricity=self.planets_data[planet].data["Orbital Eccentricity"],
+            ))
+
         # Add asteroids
         speed_asteroids = (self.planets_data["Mars"].data["Orbital Velocity (km/s)"] +
                            self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"])/200
@@ -340,6 +358,7 @@ class GraphicsEngine:
             eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
             type="Trojan Right"
         ))
+        
         self.objects.append(AsteroidBatch(
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
@@ -425,6 +444,17 @@ class GraphicsEngine:
 
                 elif event.key == pg.K_l:
                     self.camera.change_lock()
+                
+                elif event.key == pg.K_MINUS:
+                    self.camera.speed *= 0.8
+                    if self.camera.speed < self.camera.minimum_speed:
+                        self.camera.speed = self.camera.minimum_speed
+
+                elif event.key == pg.K_PLUS:
+                    self.camera.speed *= 1.2
+                    if self.camera.speed > self.camera.maximum_speed:
+                        self.camera.speed = self.camera.maximum_speed
+
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
