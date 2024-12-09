@@ -41,6 +41,8 @@ class GraphicsEngine:
         "aux_objects",
         "aux_orbits",
         "second_cam",
+        "ideal_dists",
+        "objects_index",
         "delta",
     )
 
@@ -83,7 +85,7 @@ class GraphicsEngine:
         # Distància arbitrària, de moment.
         # TODO: que la classe calculi una distància entre la superfície del planeta i el seu satèl·lit més proper
         # Per a la presentació, habilitar les diferents càmeres
-        self.second_cam = FollowCamera(self, 0.5)
+        self.second_cam = FollowCamera(self)
         # light
         self.light = Light()
 
@@ -110,7 +112,7 @@ class GraphicsEngine:
 
         # Establim un target a la càmera. Això hauria d'estar al check_events
         # Aquesta línia saltarà error si la càmera inicialitzada no és del tipus "FollowCamera"
-        self.second_cam.select_target(self.objects[3])
+        self.second_cam.select_target("Earth")
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
         self.ellipse = True
@@ -156,6 +158,7 @@ class GraphicsEngine:
         raw_radii = {"Sun": 696000 / UA_CONVERSION}
         raw_distances = {}
 
+        distance_to_planet = {}
         for planet in self.planets_list:
             # Almacenar radios y distancias en UA sin normalizar
             raw_radii[planet] = (
@@ -166,15 +169,23 @@ class GraphicsEngine:
 
         # Satélites
         satellites_reader = Reader.read_satellites("data/satellites.csv")
-        for index, row in satellites_reader.data.iterrows():
+        for _, row in satellites_reader.data.iterrows():
             name = row['name']
             planet = row['planet']
+            try:
+                distance_to_planet[planet]
+            except:
+                distance_to_planet[planet] = {}
+                distance_to_planet[planet][name] = 0
+            else:
+                distance_to_planet[planet][name] = 0
+
             # Radi del satèl·lit en UA
             raw_radii[name] = row['radius'] / UA_CONVERSION
             # Distancia del satèl·lit al Sol
             raw_distances[name] = raw_distances[planet] + \
                 (row['Distance_to_planet (10^6km)']*1e6 / UA_CONVERSION)
-
+        
         # Encontrar los valores mínimo y máximo para normalización
         min_radius, max_radius = min(
             raw_radii.values()), max(raw_radii.values())
@@ -186,19 +197,34 @@ class GraphicsEngine:
             radius, min_radius, max_radius, 0.0001, 20) for name, radius in raw_radii.items()}
         normalized_distances = {name: self.normalize(
             distance, min_distance, max_distance, 21, 500) for name, distance in raw_distances.items()}
+        
+        for planet, value in distance_to_planet.items():
+            for satellite in value:
+                distance_to_planet[planet][satellite] = abs(normalized_distances[satellite] - normalized_distances[planet])
 
+        min_dists = {key: min(sub_dict.values()) for key, sub_dict in distance_to_planet.items()}
+        #print(min_dists)
+        ideal_dists = {}
+        for planet in self.planets_list:
+            try:
+                ideal_dists[planet] = min_dists[planet]/2
+            except:
+                ideal_dists[planet] = normalized_radii[planet]*.25 # Si no té cap satèl·lit, la distància predeterminada serà 1/4 del radi del planeta
+        # print(min_dists)
         # print(f"normalized_distances: {normalized_distances}")
-
+        # print(ideal_dists)
         normalized_radii_real = {name: radius *
                                  100 for name, radius in raw_radii.items()}
         normalized_distances_real = {
             name: distance*100 for name, distance in raw_distances.items()}
-
-        return normalized_radii, normalized_distances, normalized_radii_real, normalized_distances_real
+        
+        return normalized_radii, normalized_distances, normalized_radii_real, normalized_distances_real, ideal_dists
 
     def create_objects(self):
         """Creació dels objectes que formaràn part de l'escena
         """
+        self.objects_index = {}
+        index = 0
         self.planets_list = ["Mercury", "Venus", "Earth",
                              "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
         self.planets_textures = ["textures/mercury.jpg",
@@ -217,7 +243,7 @@ class GraphicsEngine:
                                     "Neptune": "textures/satellites/triton.jpg"}
 
         self.planets_data = self.obtain_data_planets()
-        radius_objects, distance_objects, real_radius, real_distance = self.radius_distance_objects()
+        radius_objects, distance_objects, real_radius, real_distance, self.ideal_dists = self.radius_distance_objects()
 
         #! IMPORTANT ANNOTATION:
         ### MODE 1 - Visualització realista ###
@@ -231,7 +257,8 @@ class GraphicsEngine:
             "textures/sun.jpg",
             [radius_objects["Sun"], 25, 25],
         ))
-
+        self.objects_index["Sun"] = index
+        index +=1
         self.aux_objects.append(Sun(
             self,
             [sh.vertex_shader_SUN, sh.fragment_shader_SUN],
@@ -253,7 +280,8 @@ class GraphicsEngine:
                 self.planets_data[planet].data["Orbital Inclination (degrees)"],
                 self.planets_data[planet].data["Orbital Eccentricity"],
             ))
-
+            self.objects_index[planet] = index
+            index +=1
             self.aux_objects.append(Planet(
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
@@ -286,7 +314,7 @@ class GraphicsEngine:
             ))
 
         satellites_reader = Reader.read_satellites("data/satellites.csv")
-        for index, row in satellites_reader.data.iterrows():
+        for _, row in satellites_reader.data.iterrows():
             name = row['name']
             planet = row['planet']
             velocity = row['Velocity (km/s)']
@@ -302,24 +330,6 @@ class GraphicsEngine:
                     distance_objects[planet], 0, distance_objects[planet]),
                 position_satellite=glm.vec3(
                     distance_objects[name]+radius_objects[planet], 0, distance_objects[name]+radius_objects[planet]),
-                velocity_planet=self.planets_data[planet].data[
-                    "Orbital Velocity (km/s)"]/100,
-                velocity_satellite=velocity,
-                inclination=self.planets_data[planet].data[
-                    "Orbital Inclination (degrees)"],
-                eccentricity=self.planets_data[planet].data["Orbital Eccentricity"],
-            ))
-
-            self.aux_objects.append(Satellite(
-                self,
-                [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
-                texture,
-                [real_radius[name], 15, 15],
-                glm.vec3(1, 1, 1),
-                position_planet=glm.vec3(
-                    real_distance[planet], 0, real_distance[planet]),
-                position_satellite=glm.vec3(
-                    real_distance[name]+real_radius[planet], 0, real_distance[name]+real_radius[planet]),
                 velocity_planet=self.planets_data[planet].data[
                     "Orbital Velocity (km/s)"]/100,
                 velocity_satellite=velocity,
@@ -359,7 +369,6 @@ class GraphicsEngine:
             eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
             type="Trojan Right"
         ))
-        
         self.objects.append(AsteroidBatch(
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],

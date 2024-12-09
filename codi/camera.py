@@ -225,7 +225,7 @@ class FollowCamera(Camera):
                  "keep_up",
                  "direction")
     
-    def __init__(self, app, distance, lock_target = True):
+    def __init__(self, app):
         """
         Initializes the FollowCamera.
 
@@ -235,8 +235,8 @@ class FollowCamera(Camera):
         self.target = None
         self.elevation = 0
         self.azimuth = 0
-        self.distance = distance
-        self.lock_target = lock_target
+        self.distance = 0
+        self.lock_target = True
         self.relative_position = glm.vec3(1,0,0)
         self.right = glm.vec3(0,0,1)
         self.keep_up = True
@@ -290,12 +290,14 @@ class FollowCamera(Camera):
             SELECCIONAR TARGET 
             DESPRÉS DE CREAR-LOS
         """
-        self.target = target
+        self.target = self.app.objects[self.app.objects_index[target]]
+        self.distance = self.app.ideal_dists[target] + self.target.radius
+        #print(f"distance: {self.distance}\n\nradius: {self.target.radius}")
         # TODO: calculate the speed so that it takes the same time to wrap around any planet
         if self.target.radius < 1:
-            self.speed /= target.radius
+            self.speed /= self.target.radius
         else:
-            self.speed *= target.radius
+            self.speed *= self.target.radius
 
     def synchronize_yaw_pitch(self):
         """Synchronize yaw and pitch with the current forward direction."""
@@ -368,6 +370,7 @@ class FollowCamera(Camera):
 
             # Update the view matrix with the new direction, right, and up
             self.update_shaders_m_view()
+
     def roll(self, angle):
         rotation_matrix = glm.rotate(glm.mat4(1.0), glm.radians(angle), self.direction)
 
@@ -377,6 +380,7 @@ class FollowCamera(Camera):
 
         # Update the view matrix with the new 'up' and 'right' vectors
         self.update_shaders_m_view()
+
     def follow_target(self):
         """Update the camera's position based on the planet's position and the set distance and angles."""
         if not self.lock_target:
