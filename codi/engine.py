@@ -310,6 +310,24 @@ class GraphicsEngine:
                 eccentricity=self.planets_data[planet].data["Orbital Eccentricity"],
             ))
 
+            self.aux_objects.append(Satellite(
+                self,
+                [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
+                texture,
+                [real_radius[name], 15, 15],
+                glm.vec3(1, 1, 1),
+                position_planet=glm.vec3(
+                    real_distance[planet], 0, real_distance[planet]),
+                position_satellite=glm.vec3(
+                    real_distance[name]+real_radius[planet], 0, real_distance[name]+real_radius[planet]),
+                velocity_planet=self.planets_data[planet].data[
+                    "Orbital Velocity (km/s)"]/100,
+                velocity_satellite=velocity,
+                inclination=self.planets_data[planet].data[
+                    "Orbital Inclination (degrees)"],
+                eccentricity=self.planets_data[planet].data["Orbital Eccentricity"],
+            ))
+
         # Add asteroids
         speed_asteroids = (self.planets_data["Mars"].data["Orbital Velocity (km/s)"] +
                            self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"])/200
@@ -319,7 +337,7 @@ class GraphicsEngine:
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",
             [0.3, 4, 5],
-            num_asteroids=500,  # Or however many you want
+            num_asteroids=650,  # Or however many you want
             distance1=distance_objects["Mars"]+25,
             distance2=distance_objects["Jupiter"]-20,
             velocity=speed_asteroids,
@@ -341,6 +359,7 @@ class GraphicsEngine:
             eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
             type="Trojan Right"
         ))
+        
         self.objects.append(AsteroidBatch(
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
@@ -367,6 +386,20 @@ class GraphicsEngine:
             velocity=self.planets_data["Saturn"].data["Orbital Velocity (km/s)"] /
             100,
             eccentricity=self.planets_data["Saturn"].data["Orbital Eccentricity"]
+        ))
+
+        # Uranus rings
+        self.objects.append(RingBatch(
+            self,
+            [sh.vertex_shader_RING, sh.fragment_shader_RING],
+            "textures/uranus_rings.png",
+            [0, 0, 0],
+            planet_distance=distance_objects["Uranus"],
+            ring_inner_radius=radius_objects["Uranus"] - 4,
+            ring_outer_radius=radius_objects["Uranus"] - 5,
+            velocity=self.planets_data["Uranus"].data["Orbital Velocity (km/s)"] /
+            100,
+            eccentricity=self.planets_data["Uranus"].data["Orbital Eccentricity"]
         ))
 
         # Implement stars
@@ -412,6 +445,17 @@ class GraphicsEngine:
 
                 elif event.key == pg.K_l:
                     self.camera.change_lock()
+                
+                elif event.key == pg.K_MINUS:
+                    self.camera.speed *= 0.8
+                    if self.camera.speed < self.camera.minimum_speed:
+                        self.camera.speed = self.camera.minimum_speed
+
+                elif event.key == pg.K_PLUS:
+                    self.camera.speed *= 1.2
+                    if self.camera.speed > self.camera.maximum_speed:
+                        self.camera.speed = self.camera.maximum_speed
+
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
@@ -526,7 +570,7 @@ class GraphicsEngine:
         pg.display.flip()
 
     def run(self):
-        """Funció per corre el programa frame a frame.
+        """Funció per fer anar el programa.
         """
         while True:
             self.get_time()
@@ -535,4 +579,5 @@ class GraphicsEngine:
             self.move()
             self.camera.follow_target()
             self.render()
-            self.clock.tick(60)
+            # Frame rate: Màxim podem anar a 120 FPS, és a dir, que podem realitzar el loop 120 cops per segon
+            self.clock.tick(120)

@@ -18,7 +18,9 @@ class Camera:
                  "last_mouse_pos",
                  "left_button_held",
                  "m_view",
-                 "m_proj"]
+                 "m_proj",
+                 "minimum_speed",
+                 "maximum_speed"]
 
     def __init__(self, app):
         """Inicialització de la classe Camera
@@ -36,6 +38,9 @@ class Camera:
         self.sensitivity = 0.1  # Mouse sensitivity for camera movement
         self.speed = 0.7  # Camera movement speed for WASD
         
+        self.minimum_speed = 0.1
+        self.maximum_speed = 20
+
         # Mouse control
         self.last_mouse_pos = None
         self.left_button_held = False
