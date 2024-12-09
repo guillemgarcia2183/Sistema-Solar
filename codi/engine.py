@@ -318,7 +318,7 @@ class GraphicsEngine:
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",
             [0.3, 4, 5],
-            num_asteroids=500,  # Or however many you want
+            num_asteroids=650,  # Or however many you want
             distance1=distance_objects["Mars"]+25,
             distance2=distance_objects["Jupiter"]-20,
             velocity=speed_asteroids,
@@ -366,6 +366,20 @@ class GraphicsEngine:
             velocity=self.planets_data["Saturn"].data["Orbital Velocity (km/s)"] /
             100,
             eccentricity=self.planets_data["Saturn"].data["Orbital Eccentricity"]
+        ))
+
+        # Uranus rings
+        self.objects.append(RingBatch(
+            self,
+            [sh.vertex_shader_RING, sh.fragment_shader_RING],
+            "textures/uranus_rings.png",
+            [0, 0, 0],
+            planet_distance=distance_objects["Uranus"],
+            ring_inner_radius=radius_objects["Uranus"] - 4,
+            ring_outer_radius=radius_objects["Uranus"] - 5,
+            velocity=self.planets_data["Uranus"].data["Orbital Velocity (km/s)"] /
+            100,
+            eccentricity=self.planets_data["Uranus"].data["Orbital Eccentricity"]
         ))
 
         # Implement stars

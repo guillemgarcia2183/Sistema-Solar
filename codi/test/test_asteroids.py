@@ -83,6 +83,9 @@ class TestAsteroids(unittest.TestCase):
     #     print(f"Temps Numpy product amb {self.object.num_asteroids} asteroides: {final_time_product}")
         
     #     ##################################### LOGS #####################################
+    #     # MAX BEFORE: ~ 250 asteroides
+    #     # MAX OPTIMIZED: ~ 900 asteroides
+
     #     # Temps Kd_tree amb 250 asteroides: 0.027542591094970703
     #     # Temps Numpy product amb 250 asteroides: 0.001001596450805664
     #     # Speedup = 27x
