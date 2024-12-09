@@ -4,17 +4,23 @@ Created on Thu Oct 17 12:06:14 2024
 
 @author: Joel Tapia Salvador
 """
+
+if __name__ == "__main__":
+    raise SystemExit(
+        'You are executing a package-module file.' +
+        ' Execute a main instead and import the module.')
+
+
 import numpy as np
 import moderngl as mgl
 
 from math import acos, ceil, cos, pi, sin
-from typing import Tuple
 
 from .empty import Empty
 from .text_label import TextLabel
 
 
-class CircularButton:
+class CircularButton():
 
     __slots__ = (
         "__app",
@@ -55,6 +61,9 @@ class CircularButton:
 
         # Button's unique id
         self.__uuid = uuid
+
+        if self.__app.DEBUG:
+            print(kwargs)
 
         # Position information
         self.__x = kwargs["x"]
@@ -97,24 +106,24 @@ class CircularButton:
         ) <= self.__radius ** 2
 
     @property
-    def __color(self):
+    def __color(self) -> tuple[float, float, float]:
         return self.__shader_programs['in_colour'].value
 
     @__color.setter
-    def __color(self, new_color):
+    def __color(self, new_color: tuple[float, float, float]):
         self.__shader_programs['in_colour'].value = new_color
 
     def __set_shader_programs(self):
         self.__shader_programs = self.__app.ctx.program(
             vertex_shader='''
             #version 330
-            
+
             layout (location = 0) in vec3 in_vert;
 
             uniform vec3 in_colour;
 
             out vec3 frag_color;
-            
+
             void main() {
                 frag_color = in_colour;
                 gl_Position = vec4(in_vert, 1.0);
@@ -122,16 +131,19 @@ class CircularButton:
             ''',
             fragment_shader='''
             #version 330
-            
+
             in vec3 frag_color;
-            
+
             out vec4 f_color;
-            
+
             void main() {
                 f_color = vec4(frag_color, 1.0);
             }
             '''
         )
+
+        if self.__app.DEBUG:
+            print("Shader program compiled and linked successfully.")
 
     def __set_vao(self):
 
@@ -195,7 +207,7 @@ class CircularButton:
             dtype='f4'
         ).flatten('C')
 
-    def check_click(self, mouse_position: Tuple[int, int]) -> bool:
+    def check_click(self, mouse_position: tuple[int, int]) -> bool:
         """
         Check if a click has been on the button,
 
@@ -220,7 +232,7 @@ class CircularButton:
         # Return True if button is clicked
         return self.__containing(mx, my)
 
-    def check_hover(self, mouse_position: Tuple[int, int]):
+    def check_hover(self, mouse_position: tuple[int, int]):
         """
         Check if the mouse is hovering on top of the button.
 
@@ -245,7 +257,7 @@ class CircularButton:
         self.__is_hovered = self.__containing(mx, my)
 
     @property
-    def default_color(self) -> Tuple[float, float, float]:
+    def default_color(self) -> tuple[float, float, float]:
         """
         Property of default color of the button.
 
@@ -258,7 +270,7 @@ class CircularButton:
         return self.__default_color
 
     @default_color.setter
-    def default_color(self, new_default_color: Tuple[float, float, float]):
+    def default_color(self, new_default_color: tuple[float, float, float]):
         self.__default_color = new_default_color
 
     def destroy(self):
@@ -272,11 +284,11 @@ class CircularButton:
         self.__is_hidden = True
 
     @property
-    def hover_color(self) -> Tuple[float, float, float]:
+    def hover_color(self) -> tuple[float, float, float]:
         return self.__hover_color
 
     @hover_color.setter
-    def hover_color(self, new_hover_color: Tuple[float, float, float]):
+    def hover_color(self, new_hover_color: tuple[float, float, float]):
         self.__hover_color = new_hover_color
 
     @property
@@ -291,11 +303,11 @@ class CircularButton:
         self.__is_locked = True
 
     @property
-    def locked_color(self) -> Tuple[float, float, float]:
+    def locked_color(self) -> tuple[float, float, float]:
         return self.__locked_color
 
     @locked_color.setter
-    def locked_color(self, new_locked_color: Tuple[float, float, float]):
+    def locked_color(self, new_locked_color: tuple[float, float, float]):
         self.__locked_color = new_locked_color
 
     @property
@@ -355,9 +367,3 @@ class CircularButton:
         self.__y = new_y
 
         self.__set_vao()
-
-
-if __name__ == "__main__":
-    print(
-        '\33[31m' + 'You are executing a module file, execute main instead.'
-        + '\33[0m')

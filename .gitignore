@@ -168,4 +168,5 @@ cython_debug/
 /codi/data/original_satellites.csv
 /codi/data/parameters_stars.R
 /codi/data/parameters_satellites.R
+-*.py
 

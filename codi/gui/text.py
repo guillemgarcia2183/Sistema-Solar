@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- noqa
 """
-Created on Thu Oct 17 12:06:14 2024
+Created on Sun Dec  8 15:51:26 2024
 
 @author: Joel Tapia Salvador
 """
@@ -18,24 +18,22 @@ from .empty import Empty
 from .text_label import TextLabel
 
 
-class RectangularButton():
+class Text():
 
     __slots__ = (
         "__app",
-        "__default_color",
+        "__background_color"
         "__height",
-        "__hover_color",
         "__is_hidden",
         "__is_hovered",
         "__is_locked",
-        "__locked_color",
         "__shader_programs",
         "__text",
         "__uuid",
         "__vao",
-        "__vbo",
         "__vertexes",
         "__width",
+        "__vbo",
         "__x",
         "__y",
     )
@@ -46,9 +44,7 @@ class RectangularButton():
             "y": 0,
             "width": 1,
             "height": 1,
-            "default_color": (1.0, 1.0, 1.0),
-            "hover_color": None,
-            "locked_color": None,
+            "background_color": (1.0, 1.0, 1.0),
             "hidden": False,
             "locked": False,
             "text": None,
@@ -72,24 +68,14 @@ class RectangularButton():
         self.__height = kwargs["height"]
 
         # Color information
-        self.__default_color = kwargs["default_color"]
-
-        if kwargs["hover_color"] is None:
-            self.__hover_color = kwargs["default_color"]
-        else:
-            self.__hover_color = kwargs["hover_color"]
-
-        if kwargs["locked_color"] is None:
-            self.__locked_color = kwargs["default_color"]
-        else:
-            self.__locked_color = kwargs["locked_color"]
+        self.__background_color = kwargs["background_color"]
 
         # States information
         self.__is_hidden = kwargs["hidden"]
         self.__is_hovered = False
         self.__is_locked = kwargs["locked"]
 
-        # Text on the button
+        # Text
         if kwargs['text'] is None:
             self.__text = Empty()
         else:
@@ -108,19 +94,12 @@ class RectangularButton():
         # Create all ModernGL objects
         self.__set_vao()
 
-    def __containing(self, pos_x, pos_y):
-        return (
-            self.__x - self.__width / 2 <= pos_x <= self.__x + self.__width / 2
-        ) and (
-            self.__y - self.__height / 2 <= pos_y <= self.__y + self.__height / 2
-        )
-
     @property
-    def __color(self) -> tuple[float, float, float]:
+    def __color(self):
         return self.__shader_programs['in_colour'].value
 
     @__color.setter
-    def __color(self, new_color: tuple[float, float, float]):
+    def __color(self, new_color):
         self.__shader_programs['in_colour'].value = new_color
 
     def __set_shader_programs(self):
@@ -216,35 +195,62 @@ class RectangularButton():
             dtype='f4'
         )
 
-    def check_click(self, mouse_pos: tuple[int, int]) -> bool:
+    @property
+    def background_color(self) -> tuple[float, float, float]:
+        return self.__background_color
+
+    @background_color.setter
+    def background_color(self, new_background_color: tuple[float, float, float]):
+        self.__default_color = new_background_color
+
+    def check_click(self, mouse_position: tuple[int, int]) -> bool:
+        """
+        Check if a click has been on the button,
+
+        Parameters
+        ----------
+        mouse_position : Tuple[int, int]
+            Position of the mouse, tuple of integers (pixels) x, y.
+
+        Returns
+        -------
+        bool
+            If the click has been on the button.
+
+        """
         # Cannot be clicked if is locked
         if self.__is_locked or self.__is_hidden:
             return False
 
         # Get mouse coordinates
-        mx, my = mouse_pos
+        mx, my = mouse_position
 
         # Return True if button is clicked
         return self.__containing(mx, my)
 
-    def check_hover(self, mouse_pos: tuple[int, int]) -> None:
+    def check_hover(self, mouse_position: tuple[int, int]):
+        """
+        Check if the mouse is hovering on top of the button.
+
+        Parameters
+        ----------
+        mouse_position : Tuple[int, int]
+            Position of the mouse, tuple of integers (pixels) x, y.
+
+        Returns
+        -------
+        None.
+
+        """
         # Cannot be hovered if is locked
         if self.__is_locked or self.__is_hidden:
             return None
 
         # Get mouse coordinates
-        mx, my = mouse_pos
+        mx, my = mouse_position
 
         # Update hover state
         self.__is_hovered = self.__containing(mx, my)
-
-    @property
-    def default_color(self) -> tuple[float, float, float]:
-        return self.__default_color
-
-    @default_color.setter
-    def default_color(self, new_default_color: tuple[float, float, float]):
-        self.__default_color = new_default_color
 
     def destroy(self) -> None:
         self.__vbo.release()
@@ -267,55 +273,21 @@ class RectangularButton():
         self.__is_hidden = True
 
     @property
-    def hover_color(self) -> tuple[float, float, float]:
-        return self.__hover_color
-
-    @hover_color.setter
-    def hover_color(self, new_hover_color: tuple[float, float, float]):
-        self.__hover_color = new_hover_color
-
-    @property
     def is_hidden(self):
         return self.__is_hidden
-
-    @property
-    def is_locked(self):
-        return self.__is_locked
-
-    def lock(self):
-        self.__is_locked = True
-
-    @property
-    def locked_color(self) -> tuple[float, float, float]:
-        return self.__locked_color
-
-    @locked_color.setter
-    def locked_color(self, new_locked_color: tuple[float, float, float]):
-        self.__locked_color = new_locked_color
 
     def render(self) -> None:
         if self.__is_hidden:
             return None
 
-        # Set color based on state
-        if self.__is_locked:
-            self.__color = self.__locked_color
-        elif self.__is_hovered:
-            self.__color = self.__hover_color
-        else:
-            self.__color = self.__default_color
-
-        # Render possible text on button
+        # Render text
         self.__text.render()
 
-        # Render button (draw quad as two triangles)
+        # Render backgound (draw quad as two triangles)
         self.__vao.render(mgl.TRIANGLE_STRIP)
 
     def unhide(self):
         self.__is_hidden = False
-
-    def unlock(self):
-        self.__is_locked = True
 
     @property
     def uuid(self) -> str:

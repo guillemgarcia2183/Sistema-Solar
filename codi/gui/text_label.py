@@ -4,12 +4,19 @@ Created on Thu Oct 24 13:09:18 2024
 
 @author: Joel Tapia Salvador
 """
+
+if __name__ == "__main__":
+    raise SystemExit(
+        'You are executing a package-module file.' +
+        ' Execute a main instead and import the module.')
+
+
 import moderngl
 import numpy as np
 import pygame as pg
 
 
-class TextLabel:
+class TextLabel():
 
     __slots__ = (
         "__app",
@@ -22,6 +29,7 @@ class TextLabel:
         "__sys_font",
         "__text",
         "__texture",
+        "__uuid",
         "__vao",
         "__vbo",
         "__vertexes",
@@ -35,7 +43,7 @@ class TextLabel:
             'text': "",
             'x': 0,
             'y': 0,
-            'color': (1.0, 1.0, 1.0),
+            'color': (0.0, 0.0, 0.0),
             'sys_font': 'Arial',
             'font_size': 12,
             'scale_factor': 2,
@@ -45,6 +53,9 @@ class TextLabel:
 
         # Engine
         self.__app = app
+
+        # Text Labels's unique id
+        self.__uuid = uuid
 
         if self.__app.DEBUG:
             print(kwargs)
@@ -135,49 +146,45 @@ class TextLabel:
             Shader Program.
 
         """
-        try:
-            self.__shader_programs = self.__app.ctx.program(
-                vertex_shader='''
-                #version 330
 
-                in vec2 in_position;
-                in vec2 in_texcoord;
+        self.__shader_programs = self.__app.ctx.program(
+            vertex_shader='''
+            #version 330
 
-                out vec2 v_texcoord;
+            in vec2 in_position;
+            in vec2 in_texcoord;
 
-                void main() {
-                    v_texcoord = in_texcoord;
-                    gl_Position = vec4(in_position, 0.0, 1.0);
+            out vec2 v_texcoord;
+
+            void main() {
+                v_texcoord = in_texcoord;
+                gl_Position = vec4(in_position, 0.0, 1.0);
+            }
+            ''',
+            fragment_shader='''
+            #version 330
+
+            in vec2 v_texcoord;
+
+            uniform sampler2D text_texture;
+
+            out vec4 frag_color;
+
+            void main() {
+                vec4 tex_color = texture(text_texture, v_texcoord);
+                if (tex_color.a < 0.1) {
+                   discard; // Discard transparent pixels
                 }
-                ''',
-                fragment_shader='''
-                #version 330
 
-                in vec2 v_texcoord;
+                frag_color = tex_color;
 
-                uniform sampler2D text_texture;
+                //frag_color = vec4(0.0, 1.0, 0.0, 1.0); // Render green to confirm shader runs
+            }
+            '''
+        )
 
-                out vec4 frag_color;
-
-                void main() {
-                    vec4 tex_color = texture(text_texture, v_texcoord);
-                    if (tex_color.a < 0.1) {
-                       discard; // Discard transparent pixels
-                    }
-
-                    frag_color = tex_color;
-
-                    //frag_color = vec4(0.0, 1.0, 0.0, 1.0); // Render green to confirm shader runs
-                }
-                '''
-            )
-
-            if self.__app.DEBUG:
-                print("Shader program compiled and linked successfully.")
-
-        except Exception as error:
-            if self.__app.DEBUG:
-                print(f"Shader compilation failed: {error}")
+        if self.__app.DEBUG:
+            print("Shader program compiled and linked successfully.")
 
     def __set_vao(self):
         """

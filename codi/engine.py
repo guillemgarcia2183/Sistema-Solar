@@ -8,7 +8,7 @@ from camera import Camera, FollowCamera
 from light import Light
 from objects import *
 from reader import Reader
-from gui import ButtonManager
+from gui import GUIManager
 import shaders as sh
 import os
 
@@ -30,7 +30,7 @@ class GraphicsEngine:
         "orbits",
         "clock",
         "time",
-        "button_manager",
+        "gui",
         "stars",
         "info",
         "ellipse",
@@ -96,14 +96,12 @@ class GraphicsEngine:
         self.time = 0
 
         # gui
-        self.button_manager = ButtonManager(self)
+        self.gui = GUIManager(self)
 
-        # with open(r"./codi/gui_layout.json", "r") as file:
-        #     gui_layout = json.load(file)
         with open("gui_layout.json", "r") as file:
             gui_layout = json.load(file)
 
-        self.button_manager.batch_add_buttons(gui_layout)
+        self.gui.batch_add_buttons(gui_layout)
 
         self.create_objects()
         # axis
@@ -386,7 +384,7 @@ class GraphicsEngine:
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.
         """
-        self.button_manager.check_hover(pg.mouse.get_pos())
+        self.gui.check_hover(pg.mouse.get_pos())
 
         for event in pg.event.get():
             if event.type == pg.QUIT or (
@@ -419,7 +417,7 @@ class GraphicsEngine:
                     self.camera.left_button_held = True
                     self.camera.last_mouse_pos = pg.mouse.get_pos()
 
-                button_event = self.button_manager.check_click(
+                button_event = self.gui.check_click(
                     pg.mouse.get_pos())
                 if button_event == "day_picker":
                     if self.DEBUG:
@@ -477,7 +475,7 @@ class GraphicsEngine:
         if self.DEBUG:
             print("Ending...")
 
-        self.button_manager.destroy()
+        self.gui.destroy()
 
         for objecte in self.objects:
             objecte.destroy()
@@ -508,7 +506,7 @@ class GraphicsEngine:
         self.ctx.clear(color=(0, 0, 0))
 
         # render gui
-        self.button_manager.render()
+        self.gui.render()
 
         # render scene + axis
         for objecte in self.objects:

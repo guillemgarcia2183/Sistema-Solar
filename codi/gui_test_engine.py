@@ -9,10 +9,10 @@ import pygame as pg
 import moderngl as mgl
 import sys
 
-from gui import ButtonManager, TextLabel
+from gui import GUIManager
 
 
-class TestEngine:
+class TestEngine():
     """GUI Test Engine."""
 
     def __init__(self, debug=False, fs=True, win_size=(1200, 800)):
@@ -60,175 +60,17 @@ class TestEngine:
         self.clock = pg.time.Clock()
         self.time = 0
 
-        # gui
-        # self.button_manager = ButtonManager(self)
+        self.gui = GUIManager(self)
 
-        # with open("gui_layout.json", "r") as file:
-        #     gui_layout = json.load(file)
+        with open("gui_layout.json", "r") as file:
+            gui_layout = json.load(file)
 
-        # self.button_manager.batch_add_buttons(gui_layout)
-
-        self.labels = [
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 600,
-                "y": 400,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 570,
-                "y": 400,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 0,
-                "y": 400,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 1200,
-                "y": 400,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 630,
-                "y": 400,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 600,
-                "y": 0,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 600,
-                "y": 325,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 0,
-                "y": 0,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 1200,
-                "y": 800,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 600,
-                "y": 800,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 600,
-                "y": 475,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 0,
-                "y": 800,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 1200,
-                "y": 800,
-            }),
-            TextLabel(self, "a", **{
-                "text": "a",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 64,
-                "x": 1200,
-                "y": 0,
-            }),
-        ]
+        self.gui.batch_add_buttons(gui_layout)
 
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.
         """
-        # self.button_manager.check_hover(pg.mouse.get_pos())
+        self.gui.check_hover(pg.mouse.get_pos())
 
         for event in pg.event.get():
             if event.type == pg.QUIT or (
@@ -260,8 +102,7 @@ class TestEngine:
             print("Ending...")
 
         # self.button_manager.destroy()
-        for label in self.labels:
-            label.destroy()
+        self.gui.destroy()
 
         pg.quit()
         sys.exit()
@@ -279,8 +120,7 @@ class TestEngine:
 
         # render gui
         # self.button_manager.render()
-        for label in self.labels:
-            label.render()
+        self.gui.render()
 
         # Swap buffers + display caption
         pg.display.set_caption(self.info)
