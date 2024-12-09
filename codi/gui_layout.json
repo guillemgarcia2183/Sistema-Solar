@@ -122,7 +122,9 @@
                     0.0,
                     0.0
                 ],
-                "font_size": 34
+                "sys_font": "TimesNewRoman",
+                "font_size": 34,
+                "scale_factor": 2
             }
         }
     },
@@ -212,7 +214,9 @@
                     1.0,
                     1.0
                 ],
-                "font_size": 34
+                "sys_font": "Arial",
+                "font_size": 34,
+                "scale_factor": 2
             }
         }
     }
