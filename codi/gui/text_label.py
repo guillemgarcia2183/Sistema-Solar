@@ -146,7 +146,6 @@ class TextLabel():
             Shader Program.
 
         """
-
         self.__shader_programs = self.__app.ctx.program(
             vertex_shader='''
             #version 330
@@ -177,8 +176,6 @@ class TextLabel():
                 }
 
                 frag_color = tex_color;
-
-                //frag_color = vec4(0.0, 1.0, 0.0, 1.0); // Render green to confirm shader runs
             }
             '''
         )
