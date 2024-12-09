@@ -537,7 +537,7 @@ class GraphicsEngine:
         pg.display.flip()
 
     def run(self):
-        """Funció per corre el programa frame a frame.
+        """Funció per fer anar el programa.
         """
         while True:
             self.get_time()
@@ -546,4 +546,5 @@ class GraphicsEngine:
             self.move()
             self.camera.follow_target()
             self.render()
-            self.clock.tick(60)
+            # Frame rate: Màxim podem anar a 120 FPS, és a dir, que podem realitzar el loop 120 cops per segon
+            self.clock.tick(120)
