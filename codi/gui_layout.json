@@ -1,6 +1,6 @@
 {
     "day_picker": {
-        "class": "rectangular",
+        "class": "rectangular_button",
         "kwargs": {
             "x": 0.94,
             "y": 0.035,
@@ -31,7 +31,7 @@
         }
     },
     "zoom_in": {
-        "class": "rectangular",
+        "class": "rectangular_button",
         "kwargs": {
             "x": 0.05,
             "y": 0.87,
@@ -53,7 +53,7 @@
         }
     },
     "zoom_out": {
-        "class": "rectangular",
+        "class": "rectangular_button",
         "kwargs": {
             "x": 0.05,
             "y": 0.9,
@@ -75,7 +75,7 @@
         }
     },
     "constellations_visibility": {
-        "class": "circular",
+        "class": "circular_button",
         "kwargs": {
             "x": 0.05,
             "y": 0.95,
@@ -96,7 +96,7 @@
         }
     },
     "test_button" : {
-        "class": "rectangular",
+        "class": "rectangular_button",
         "kwargs": {
             "x": 0.5,
             "y": 0.5,
@@ -116,7 +116,7 @@
             "hidden": false,
             "locked": false,
             "text": {
-                "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 "color": [
                     1.0,
                     0.0,
@@ -124,12 +124,10 @@
                 ],
                 "font_size": 34
             }
-
         }
-
     },
     "elipses" : {
-        "class": "circular",
+        "class": "circular_button",
         "kwargs": {
             "x": 0.95,
             "y": 0.9,
@@ -150,7 +148,7 @@
         }
     },
     "canvi_camera": {
-        "class": "rectangular",
+        "class": "rectangular_button",
         "kwargs": {
             "x": 0.05,
             "y": 0.9,
@@ -172,7 +170,7 @@
         }
     },
     "escala": {
-        "class": "rectangular",
+        "class": "rectangular_button",
         "kwargs": {
             "x": 0.1,
             "y": 0.9,
@@ -191,6 +189,31 @@
             "locked_color": null,
             "hidden": false,
             "locked": false
+        }
+    },
+    "test_text" : {
+        "class" : "text",
+        "kwargs": {
+            "x": 0.5,
+            "y": 0.8,
+            "width": 0.5,
+            "height": 0.05,
+            "background_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "hidden": false,
+            "locked": false,
+            "text" :{
+                "text": "bbbbbbbbbb",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "font_size": 34
+            }
         }
     }
 }

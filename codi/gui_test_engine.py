@@ -65,7 +65,7 @@ class TestEngine():
         with open("gui_layout.json", "r") as file:
             gui_layout = json.load(file)
 
-        self.gui.batch_add_buttons(gui_layout)
+        self.gui.batch_add_elements(gui_layout)
 
     def check_events(self):
         """Funcionalitat per controlar els events durant el temps de vida del programa.
@@ -137,8 +137,8 @@ class TestEngine():
 
 
 if __name__ == "__main__":
-    app = TestEngine(debug=True, fs=False)
+    app = TestEngine(debug=True, fs=True)
     try:
         app.run()
-    except:  # noqa
+    finally:  # noqa
         app.end()

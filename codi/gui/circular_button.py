@@ -16,11 +16,12 @@ import moderngl as mgl
 
 from math import acos, ceil, cos, pi, sin
 
+from .element import Element
 from .empty import Empty
 from .text_label import TextLabel
 
 
-class CircularButton():
+class CircularButton(Element):
 
     __slots__ = (
         "__app",

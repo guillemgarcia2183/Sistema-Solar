@@ -14,15 +14,16 @@ if __name__ == "__main__":
 import moderngl as mgl
 import numpy as np
 
+from .element import Element
 from .empty import Empty
 from .text_label import TextLabel
 
 
-class Text():
+class Text(Element):
 
     __slots__ = (
         "__app",
-        "__background_color"
+        "__background_color",
         "__height",
         "__is_hidden",
         "__is_hovered",
@@ -101,6 +102,13 @@ class Text():
     @__color.setter
     def __color(self, new_color):
         self.__shader_programs['in_colour'].value = new_color
+
+    def __containing(self, pos_x, pos_y):
+        return (
+            self.__x - self.__width / 2 <= pos_x <= self.__x + self.__width / 2
+        ) and (
+            self.__y - self.__height / 2 <= pos_y <= self.__y + self.__height / 2
+        )
 
     def __set_shader_programs(self):
         self.__shader_programs = self.__app.ctx.program(
@@ -279,6 +287,8 @@ class Text():
     def render(self) -> None:
         if self.__is_hidden:
             return None
+
+        self.__color = self.__background_color
 
         # Render text
         self.__text.render()

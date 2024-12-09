@@ -12,67 +12,73 @@ if __name__ == "__main__":
 
 
 from .circular_button import CircularButton
+from .element import Element
 from .rectangular_button import RectangularButton
+from .text import Text
 
 
 class GUIManager():
 
     __slots__ = (
         "__app",
-        "__buttons_buffer",
-        "__types_buttons"
+        "__elements_buffer",
+        "__types_elements"
     )
 
     def __init__(self, app):
         self.__app = app
 
-        self.__buttons_buffer = {}
+        self.__elements_buffer: dict[str, Element] = {}
 
-        self.__types_buttons = {
-            "circular": CircularButton,
-            "rectangular": RectangularButton,
+        self.__types_elements: dict[str, Element] = {
+            "circular_button": CircularButton,
+            "rectangular_button": RectangularButton,
+            "text": Text,
         }
 
-    def __add_button(self, new_button):
+    def __add_element(self, new_element: Element):
         """
-        Add a Button object with an uuid to the buttons buffer.
+        Add an Element object with an uuid to the buttons buffer.
 
         Parameters
         ----------
-        new_button : Button
+        new_element : Element
             DESCRIPTION.
 
         Raises
         ------
         ValueError
-            A Button with given uuid alredy exists.
+            An Element with given uuid alredy exists.
 
         Returns
         -------
         None.
 
         """
-        try:
-            self.__buttons_buffer[new_button.uuid]
+        if not issubclass(type(new_element), Element):
+            raise TypeError("Not a subclass of Element.")
 
-            raise ValueError(f'A button with uuid: {
-                             new_button.uuid} already exists.')
+        try:
+            self.__elements_buffer[new_element.uuid]
+
+            raise ValueError(f'An Element with uuid: {
+                             new_element.uuid} already exists.')
 
         except KeyError:
-            self.__buttons_buffer[new_button.uuid] = new_button
+            self.__elements_buffer[new_element.uuid] = new_element
 
-    def add_button(
+    def add_element(
         self,
-        button_type: str,
+        element_type: str,
         uuid: str,
         params: dict[str, object]
     ):
         """
-        Add a Button of a given type with a given uuid and the parametres.
+        Add an Element of a given type with a given uuid and the parametres.
 
         Parameters
         ----------
-        button_type : str
+        element_type : str
             DESCRIPTION.
         uuid : str
             DESCRIPTION.
@@ -90,18 +96,18 @@ class GUIManager():
 
         """
         try:
-            self.__types_buttons[button_type]
+            self.__types_elements[element_type]
         except KeyError as error:
-            raise ValueError(f'Type of button: {
-                             button_type} does not exist.') from error
+            raise ValueError(f'Type of Element: {
+                             element_type} does not exist.') from error
 
-        new_button = self.__types_buttons[button_type](
+        new_element = self.__types_elements[element_type](
             self.__app,
             uuid,
             **params
         )
 
-        self.__add_button(new_button)
+        self.__add_element(new_element)
 
     def add_circular_button(
         self,
@@ -128,7 +134,7 @@ class GUIManager():
 
         }
 
-        self.add_button('circular', uuid, params)
+        self.add_element('circular_button', uuid, params)
 
     def add_rectangular_button(
         self,
@@ -156,9 +162,9 @@ class GUIManager():
             "locked": locked,
         }
 
-        self.add_button('rectangular', uuid, params)
+        self.add_element('rectangular_button', uuid, params)
 
-    def batch_add_buttons(self, batch: dict[str, dict[str, object]]):
+    def batch_add_elements(self, batch: dict[str, dict[str, object]]):
         for uuid, meta in batch.items():
             for element in meta['kwargs'].keys():
                 if element == 'x':
@@ -168,33 +174,33 @@ class GUIManager():
                 elif element in ('radius', 'height', 'width', 'x', 'y'):
                     meta['kwargs'][element] *= min(self.__app.WIN_SIZE)
 
-            self.add_button(meta['class'], uuid, meta['kwargs'])
+            self.add_element(meta['class'], uuid, meta['kwargs'])
 
     def check_click(self, mouse_position: tuple[int, int]) -> str | None:
-        for button in self.__buttons_buffer.values():
-            if button.check_click(mouse_position):
-                return button.uuid
+        for element in self.__elements_buffer.values():
+            if element.check_click(mouse_position):
+                return element.uuid
         return None
 
     def check_hover(self, mouse_position: tuple[int, int]) -> None:
-        for button in self.__buttons_buffer.values():
-            button.check_hover(mouse_position)
+        for element in self.__elements_buffer.values():
+            element.check_hover(mouse_position)
 
     def destroy(self) -> None:
-        for button in list(self.__buttons_buffer.values()):
-            button.destroy()
-            del self.__buttons_buffer[button.uuid]
+        for element in list(self.__elements_buffer.values()):
+            element.destroy()
+            del self.__elements_buffer[element.uuid]
 
     def remove(self, uuid: str) -> None:
         try:
-            self.__buttons_buffer[uuid]
+            self.__elements_buffer[uuid]
         except KeyError as error:
-            raise ValueError(f'Button with uuid: {
+            raise ValueError(f'Element with uuid: {
                              uuid} ' + ' does not exist.') from error
 
-        self.__buttons_buffer[uuid].destroy()
-        del self.__buttons_buffer[uuid]
+        self.__elements_buffer[uuid].destroy()
+        del self.__elements_buffer[uuid]
 
     def render(self) -> None:
-        for button in self.__buttons_buffer.values():
-            button.render()
+        for element in self.__elements_buffer.values():
+            element.render()

@@ -14,11 +14,12 @@ if __name__ == "__main__":
 import moderngl as mgl
 import numpy as np
 
+from .element import Element
 from .empty import Empty
 from .text_label import TextLabel
 
 
-class RectangularButton():
+class RectangularButton(Element):
 
     __slots__ = (
         "__app",

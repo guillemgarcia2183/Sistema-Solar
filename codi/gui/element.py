@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*- noqa
 """
-Created on Thu Nov 28 04:03:13 2024
+Created on Mon Dec  9 02:43:03 2024
 
-@author: JoelT
+@author: Joel Tapia Salvador
 """
 
 if __name__ == "__main__":
@@ -11,10 +11,7 @@ if __name__ == "__main__":
         ' Execute a main instead and import the module.')
 
 
-from .element import Element
-
-
-class Empty(Element):
+class Element():
     """Empty class."""
 
     __slots__ = (
@@ -25,22 +22,21 @@ class Empty(Element):
         "__uuid",
     )
 
-    def __init__(self, app=None, uuid: str = None, **kwargs):
-        self.__app = None
-
-        self.__uuid = None
-
-        self.__is_hidden = None
-        self.__is_hovered = None
-        self.__is_locked = None
+    def __init__(self, app, uuid: str, **kwargs):
+        raise NotImplementedError
 
     def check_click(self, mouse_position: tuple[int, int]):
         """
-        Empty check_click method.
+        Template Element.
 
         Parameters
         ----------
         mouse_position : tuple[int, int]
+            DESCRIPTION.
+
+        Raises
+        ------
+        NotImplementedError
             DESCRIPTION.
 
         Returns
@@ -48,15 +44,20 @@ class Empty(Element):
         None.
 
         """
-        return None
+        raise NotImplementedError
 
     def check_hover(self, mouse_position: tuple[int, int]):
         """
-        Empty check_hover method.
+        Template Element.
 
         Parameters
         ----------
         mouse_position : tuple[int, int]
+            DESCRIPTION.
+
+        Raises
+        ------
+        NotImplementedError
             DESCRIPTION.
 
         Returns
@@ -64,26 +65,36 @@ class Empty(Element):
         None.
 
         """
-        return None
+        raise NotImplementedError
 
     def destroy(self):
         """
-        Empty destroy method.
+        Template Element.
+
+        Raises
+        ------
+        NotImplementedError
+            DESCRIPTION.
 
         Returns
         -------
         None.
 
         """
-        return None
+        raise NotImplementedError
 
     def render(self):
         """
-        Empty render method.
+        Template Element.
+
+        Raises
+        ------
+        NotImplementedError
+            DESCRIPTION.
 
         Returns
         -------
         None.
 
         """
-        return None
+        raise NotImplementedError

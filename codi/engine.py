@@ -101,7 +101,7 @@ class GraphicsEngine:
         with open("gui_layout.json", "r") as file:
             gui_layout = json.load(file)
 
-        self.gui.batch_add_buttons(gui_layout)
+        self.gui.batch_add_elements(gui_layout)
 
         self.create_objects()
         # axis
@@ -417,29 +417,29 @@ class GraphicsEngine:
                     self.camera.left_button_held = True
                     self.camera.last_mouse_pos = pg.mouse.get_pos()
 
-                button_event = self.gui.check_click(
+                element_event = self.gui.check_click(
                     pg.mouse.get_pos())
-                if button_event == "day_picker":
+                if element_event == "day_picker":
                     if self.DEBUG:
                         print("Day picker pressed.")
-                elif button_event == "zoom_in":
+                elif element_event == "zoom_in":
                     if self.DEBUG:
                         print("Zoom in pressed.")
-                elif button_event == "zoom_out":
+                elif element_event == "zoom_out":
                     if self.DEBUG:
                         print("Zoom out pressed.")
-                elif button_event == "constellations_visibility":
+                elif element_event == "constellations_visibility":
                     if self.DEBUG:
                         print("Constelations visibility pressed.")
-                elif button_event == "elipses":
+                elif element_event == "elipses":
                     self.ellipse = not self.ellipse
                     if self.DEBUG:
                         print(f'Ellipses: {self.ellipse}')
-                elif button_event == "canvi_camera":
+                elif element_event == "canvi_camera":
                     if self.DEBUG:
                         print("Canvi camera")
                     self.camera, self.second_cam = self.second_cam, self.camera
-                elif button_event == "escala":
+                elif element_event == "escala":
                     if self.DEBUG:
                         print("Canvi escala")
                     self.objects, self.aux_objects = self.aux_objects, self.objects
