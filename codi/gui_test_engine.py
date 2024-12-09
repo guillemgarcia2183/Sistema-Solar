@@ -7,6 +7,7 @@ Created on Thu Nov 28 12:52:06 2024
 import json
 import pygame as pg
 import moderngl as mgl
+import traceback
 import sys
 
 from gui import GUIManager
@@ -78,8 +79,9 @@ class TestEngine():
             ):
                 raise KeyboardInterrupt("Exit game via click.")
 
-                # button_event = self.button_manager.check_click(
-                #     pg.mouse.get_pos())
+            if event.type == pg.MOUSEBUTTONDOWN:
+                button_event = self.gui.check_click(
+                    pg.mouse.get_pos())
                 # if button_event == "day_picker":
                 #     print("Day picker pressed.")
                 # elif button_event == "zoom_in":
@@ -140,5 +142,8 @@ if __name__ == "__main__":
     app = TestEngine(debug=True, fs=True)
     try:
         app.run()
+    except Exception:
+        print(traceback.format_exc()[
+            :-1].replace("  ", "\t").replace("\n", "\n\t\t"))
     finally:  # noqa
         app.end()

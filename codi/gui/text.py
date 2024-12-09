@@ -260,6 +260,9 @@ class Text(Element):
         # Update hover state
         self.__is_hovered = self.__containing(mx, my)
 
+    def check_time(self, delta):
+        pass
+
     def destroy(self) -> None:
         self.__vbo.release()
 

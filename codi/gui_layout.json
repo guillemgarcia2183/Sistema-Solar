@@ -219,5 +219,38 @@
                 "scale_factor": 2
             }
         }
+    },
+    "test_toggle" : {
+        "class": "rectangular_toggle",
+        "kwargs": {
+            "x": 0.3,
+            "y": 0.3,
+            "width": 0.2,
+            "height": 0.1,
+            "default_color": [
+                0.0,
+                0.0,
+                1.0
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false,
+            "text": {
+                "text": "cccc",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "sys_font": "TimesNewRoman",
+                "font_size": 34,
+                "scale_factor": 2
+            }
+        }
     }
 }

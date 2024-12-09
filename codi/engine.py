@@ -40,7 +40,8 @@ class GraphicsEngine:
         "planets_data",
         "aux_objects",
         "aux_orbits",
-        "second_cam"
+        "second_cam",
+        "delta",
     )
 
     def __init__(self, testing=False, debug=False, fs=True, win_size=(1200, 800)):
@@ -491,7 +492,9 @@ class GraphicsEngine:
     def get_time(self):
         """Funció per obtenir el temps (en ticks) - Ús: Fer rotar objectes
         """
+        prev_time = self.time
         self.time = pg.time.get_ticks() * 0.001
+        self.delta = self.time - prev_time
 
     def move(self):
         """Funció per fer moure els objectes que es troben en orbitació

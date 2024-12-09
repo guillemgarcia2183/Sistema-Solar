@@ -116,14 +116,6 @@ class RectangularButton(Element):
             self.__y - self.__height / 2 <= pos_y <= self.__y + self.__height / 2
         )
 
-    @property
-    def __color(self) -> tuple[float, float, float]:
-        return self.__shader_programs['in_colour'].value
-
-    @__color.setter
-    def __color(self, new_color: tuple[float, float, float]):
-        self.__shader_programs['in_colour'].value = new_color
-
     def __set_shader_programs(self):
         self.__shader_programs = self.__app.ctx.program(
             vertex_shader='''
@@ -217,6 +209,22 @@ class RectangularButton(Element):
             dtype='f4'
         )
 
+    def _calculate_state(self):
+        # Set color based on state
+        if self.__is_locked:
+            self.color = self.__locked_color
+        elif self.__is_hovered:
+            self.color = self.__hover_color
+        else:
+            self.color = self.__default_color
+
+    def _render(self):
+        # Render possible text on button
+        self.__text.render()
+
+        # Render button (draw quad as two triangles)
+        self.__vao.render(mgl.TRIANGLE_STRIP)
+
     def check_click(self, mouse_pos: tuple[int, int]) -> bool:
         # Cannot be clicked if is locked
         if self.__is_locked or self.__is_hidden:
@@ -238,6 +246,14 @@ class RectangularButton(Element):
 
         # Update hover state
         self.__is_hovered = self.__containing(mx, my)
+
+    @property
+    def color(self) -> tuple[float, float, float]:
+        return self.__shader_programs['in_colour'].value
+
+    @color.setter
+    def color(self, new_color: tuple[float, float, float]):
+        self.__shader_programs['in_colour'].value = new_color
 
     @property
     def default_color(self) -> tuple[float, float, float]:
@@ -298,19 +314,9 @@ class RectangularButton(Element):
         if self.__is_hidden:
             return None
 
-        # Set color based on state
-        if self.__is_locked:
-            self.__color = self.__locked_color
-        elif self.__is_hovered:
-            self.__color = self.__hover_color
-        else:
-            self.__color = self.__default_color
+        self._calculate_state()
 
-        # Render possible text on button
-        self.__text.render()
-
-        # Render button (draw quad as two triangles)
-        self.__vao.render(mgl.TRIANGLE_STRIP)
+        self._render()
 
     def unhide(self):
         self.__is_hidden = False

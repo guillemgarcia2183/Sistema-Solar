@@ -14,6 +14,7 @@ if __name__ == "__main__":
 from .circular_button import CircularButton
 from .element import Element
 from .rectangular_button import RectangularButton
+from .rectangular_toggle import RectangularToggle
 from .text import Text
 
 
@@ -33,6 +34,7 @@ class GUIManager():
         self.__types_elements: dict[str, Element] = {
             "circular_button": CircularButton,
             "rectangular_button": RectangularButton,
+            "rectangular_toggle": RectangularToggle,
             "text": Text,
         }
 
