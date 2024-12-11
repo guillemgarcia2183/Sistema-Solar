@@ -45,7 +45,8 @@ class GraphicsEngine:
         "objects_index",
         "delta",
         "key_planet_map",
-        "initial_speed"
+        "initial_speed",
+        "realistic_mode"
     )
 
     def __init__(self, testing=False, debug=False, fs=True, win_size=(1200, 800)):
@@ -129,6 +130,7 @@ class GraphicsEngine:
                                 pg.K_7: "Uranus",
                                 pg.K_8: "Neptune",
                             }
+        self.realistic_mode = False
 
     def obtain_data_planets(self):
         """Obtenció de les dades dels planetes cridant al seu dataset
@@ -375,8 +377,8 @@ class GraphicsEngine:
             "textures/asteroids.jpg",  # You'll need an asteroid texture
             [0.2, 4, 5],  # Adjust these parameters as needed
             num_asteroids=250,  # Or however many you want
-            distance1=distance_objects["Jupiter"]+35,
-            distance2=distance_objects["Jupiter"]+45,
+            distance1=distance_objects["Jupiter"]+50,
+            distance2=distance_objects["Jupiter"]+60,
             velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"]/FPS,
             eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
             type="Trojan Right"
@@ -387,8 +389,8 @@ class GraphicsEngine:
             "textures/asteroids.jpg",  # You'll need an asteroid texture
             [0.2, 4, 5],  # Adjust these parameters as needed
             num_asteroids=250,  # Or however many you want
-            distance1=distance_objects["Jupiter"]+35,
-            distance2=distance_objects["Jupiter"]+45,
+            distance1=distance_objects["Jupiter"]+50,
+            distance2=distance_objects["Jupiter"]+60,
             velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"]/FPS,
             eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
             type="Trojan Left"
@@ -448,10 +450,11 @@ class GraphicsEngine:
                 if event.key == pg.K_p:
                     self.ellipse = not self.ellipse
 
-                elif event.key == pg.K_k:
+                elif event.key == pg.K_k and (not self.realistic_mode):
                     self.camera, self.second_cam = self.second_cam, self.camera
 
                 elif event.key == pg.K_m:
+                    self.realistic_mode = not self.realistic_mode
                     self.objects, self.aux_objects = self.aux_objects, self.objects
                     self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
 
