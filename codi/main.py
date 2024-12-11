@@ -9,5 +9,5 @@ if __name__ == '__main__':
     app = GraphicsEngine()
     try:
         app.run()
-    except:  # noqa
+    except:  
         app.end()

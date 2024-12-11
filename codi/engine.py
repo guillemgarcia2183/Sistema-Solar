@@ -222,7 +222,7 @@ class GraphicsEngine:
             try:
                 ideal_dists[planet] = max_dists[planet]
             except:
-                ideal_dists[planet] = normalized_radii[planet]*.25 # Si no té cap satèl·lit, la distància predeterminada serà 1/4 del radi del planeta
+                ideal_dists[planet] = normalized_radii[planet]*.5 # Si no té cap satèl·lit, la distància predeterminada serà 1/2 del radi del planeta
         # print(min_dists)
         # print(f"normalized_distances: {normalized_distances}")
         # print(ideal_dists)
@@ -414,8 +414,8 @@ class GraphicsEngine:
             "textures/uranus_rings.png",
             [0, 0, 0],
             planet_distance=distance_objects["Uranus"],
-            ring_inner_radius=radius_objects["Uranus"] - 4,
-            ring_outer_radius=radius_objects["Uranus"] - 5,
+            ring_inner_radius=radius_objects["Uranus"] - 3,
+            ring_outer_radius=radius_objects["Uranus"] - 4,
             velocity=self.planets_data["Uranus"].data["Orbital Velocity (km/s)"]/FPS,
             eccentricity=self.planets_data["Uranus"].data["Orbital Eccentricity"]
         ))
