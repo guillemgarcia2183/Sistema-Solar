@@ -15,7 +15,7 @@ import os
 
 ### VARIABLES GLOBALS ###
 UA_CONVERSION = 149_600_000  # 1 UA en kilómetros
-
+FPS = 120 # Adaptable als FPS que et pots permetre
 
 class GraphicsEngine:
     """Classe que farà corre l'aplicació controlant instàcies de les altres classes 
@@ -44,6 +44,8 @@ class GraphicsEngine:
         "ideal_dists",
         "objects_index",
         "delta",
+        "key_planet_map",
+        "initial_speed"
     )
 
     def __init__(self, testing=False, debug=False, fs=True, win_size=(1200, 800)):
@@ -112,10 +114,21 @@ class GraphicsEngine:
 
         # Establim un target a la càmera. Això hauria d'estar al check_events
         # Aquesta línia saltarà error si la càmera inicialitzada no és del tipus "FollowCamera"
-        self.second_cam.select_target("Earth")
+        self.initial_speed = self.second_cam.speed
+        self.second_cam.select_target("Mercury")
         # Informació relacionada amb el context de l'aplicació
         self.info = "Visualització del sol"
         self.ellipse = True
+        self.key_planet_map = {
+                                pg.K_1: "Mercury",
+                                pg.K_2: "Venus",
+                                pg.K_3: "Earth",
+                                pg.K_4: "Mars",
+                                pg.K_5: "Jupiter",
+                                pg.K_6: "Saturn",
+                                pg.K_7: "Uranus",
+                                pg.K_8: "Neptune",
+                            }
 
     def obtain_data_planets(self):
         """Obtenció de les dades dels planetes cridant al seu dataset
@@ -194,20 +207,20 @@ class GraphicsEngine:
 
         # Normalizar a los rangos deseados
         normalized_radii = {name: self.normalize(
-            radius, min_radius, max_radius, 0.0001, 20) for name, radius in raw_radii.items()}
+            radius, min_radius, max_radius, 0.001, 20) for name, radius in raw_radii.items()}
         normalized_distances = {name: self.normalize(
-            distance, min_distance, max_distance, 21, 500) for name, distance in raw_distances.items()}
+            distance, min_distance, max_distance, 22, 700) for name, distance in raw_distances.items()}
         
         for planet, value in distance_to_planet.items():
             for satellite in value:
                 distance_to_planet[planet][satellite] = abs(normalized_distances[satellite] - normalized_distances[planet])
 
-        min_dists = {key: min(sub_dict.values()) for key, sub_dict in distance_to_planet.items()}
-        #print(min_dists)
+
+        max_dists = {key: max(sub_dict.values()) for key, sub_dict in distance_to_planet.items()}
         ideal_dists = {}
         for planet in self.planets_list:
             try:
-                ideal_dists[planet] = min_dists[planet]/2
+                ideal_dists[planet] = max_dists[planet]
             except:
                 ideal_dists[planet] = normalized_radii[planet]*.25 # Si no té cap satèl·lit, la distància predeterminada serà 1/4 del radi del planeta
         # print(min_dists)
@@ -272,11 +285,11 @@ class GraphicsEngine:
                 self,
                 [sh.vertex_shader_PLANET, sh.fragment_shader_PLANET],
                 texture,
-                [radius_objects[planet], 15, 15],
+                [radius_objects[planet], 20, 20],
                 glm.vec3(1, 1, 1),
                 glm.vec3(distance_objects[planet], 0,
                          distance_objects[planet]),
-                self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
+                self.planets_data[planet].data["Orbital Velocity (km/s)"]/FPS,
                 self.planets_data[planet].data["Orbital Inclination (degrees)"],
                 self.planets_data[planet].data["Orbital Eccentricity"],
             ))
@@ -289,7 +302,7 @@ class GraphicsEngine:
                 [real_radius[planet], 15, 15],
                 glm.vec3(1, 1, 1),
                 glm.vec3(real_distance[planet], 0, real_distance[planet]),
-                self.planets_data[planet].data["Orbital Velocity (km/s)"]/100,
+                self.planets_data[planet].data["Orbital Velocity (km/s)"]/FPS,
                 self.planets_data[planet].data["Orbital Inclination (degrees)"],
                 self.planets_data[planet].data["Orbital Eccentricity"],
             ))
@@ -331,7 +344,7 @@ class GraphicsEngine:
                 position_satellite=glm.vec3(
                     distance_objects[name]+radius_objects[planet], 0, distance_objects[name]+radius_objects[planet]),
                 velocity_planet=self.planets_data[planet].data[
-                    "Orbital Velocity (km/s)"]/100,
+                    "Orbital Velocity (km/s)"]/FPS,
                 velocity_satellite=velocity,
                 inclination=self.planets_data[planet].data[
                     "Orbital Inclination (degrees)"],
@@ -340,7 +353,7 @@ class GraphicsEngine:
 
         # Add asteroids
         speed_asteroids = (self.planets_data["Mars"].data["Orbital Velocity (km/s)"] +
-                           self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"])/200
+                           self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"])/(FPS*2)
         # Main asteroid Belt
         self.objects.append(AsteroidBatch(
             self,
@@ -364,8 +377,7 @@ class GraphicsEngine:
             num_asteroids=250,  # Or however many you want
             distance1=distance_objects["Jupiter"]+35,
             distance2=distance_objects["Jupiter"]+45,
-            velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"] /
-            100,
+            velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"]/FPS,
             eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
             type="Trojan Right"
         ))
@@ -377,8 +389,7 @@ class GraphicsEngine:
             num_asteroids=250,  # Or however many you want
             distance1=distance_objects["Jupiter"]+35,
             distance2=distance_objects["Jupiter"]+45,
-            velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"] /
-            100,
+            velocity=self.planets_data["Jupiter"].data["Orbital Velocity (km/s)"]/FPS,
             eccentricity=self.planets_data["Jupiter"].data["Orbital Eccentricity"],
             type="Trojan Left"
         ))
@@ -392,8 +403,7 @@ class GraphicsEngine:
             planet_distance=distance_objects["Saturn"],
             ring_inner_radius=radius_objects["Saturn"] - 5,
             ring_outer_radius=radius_objects["Saturn"] - 10,
-            velocity=self.planets_data["Saturn"].data["Orbital Velocity (km/s)"] /
-            100,
+            velocity=self.planets_data["Saturn"].data["Orbital Velocity (km/s)"]/FPS,
             eccentricity=self.planets_data["Saturn"].data["Orbital Eccentricity"]
         ))
 
@@ -406,8 +416,7 @@ class GraphicsEngine:
             planet_distance=distance_objects["Uranus"],
             ring_inner_radius=radius_objects["Uranus"] - 4,
             ring_outer_radius=radius_objects["Uranus"] - 5,
-            velocity=self.planets_data["Uranus"].data["Orbital Velocity (km/s)"] /
-            100,
+            velocity=self.planets_data["Uranus"].data["Orbital Velocity (km/s)"]/FPS,
             eccentricity=self.planets_data["Uranus"].data["Orbital Eccentricity"]
         ))
 
@@ -456,15 +465,18 @@ class GraphicsEngine:
                     self.camera.change_lock()
                 
                 elif event.key == pg.K_MINUS:
-                    self.camera.speed *= 0.8
+                    self.camera.speed /= 1.25
                     if self.camera.speed < self.camera.minimum_speed:
                         self.camera.speed = self.camera.minimum_speed
 
                 elif event.key == pg.K_PLUS:
-                    self.camera.speed *= 1.2
+                    self.camera.speed *= 1.25
                     if self.camera.speed > self.camera.maximum_speed:
                         self.camera.speed = self.camera.maximum_speed
 
+                elif event.key in self.key_planet_map and isinstance(self.camera, FollowCamera):
+                    self.camera.speed = self.initial_speed
+                    self.camera.select_target(self.key_planet_map[event.key])
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
@@ -589,4 +601,4 @@ class GraphicsEngine:
             self.camera.follow_target()
             self.render()
             # Frame rate: Màxim podem anar a 120 FPS, és a dir, que podem realitzar el loop 120 cops per segon
-            self.clock.tick(120)
+            self.clock.tick(FPS)

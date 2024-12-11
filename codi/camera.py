@@ -291,7 +291,8 @@ class FollowCamera(Camera):
             DESPRÉS DE CREAR-LOS
         """
         self.target = self.app.objects[self.app.objects_index[target]]
-        self.distance = self.app.ideal_dists[target] + self.target.radius
+        self.distance = self.app.ideal_dists[target] + (3*self.target.radius)
+
         #print(f"distance: {self.distance}\n\nradius: {self.target.radius}")
         # TODO: calculate the speed so that it takes the same time to wrap around any planet
         if self.target.radius < 1:
