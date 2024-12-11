@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- noqa
 """
-Created on Mon Dec  9 13:03:42 2024
+Created on Wed Dec 11 22:19:55 2024
 
 @author: Joel Tapia Salvador
 """
@@ -15,10 +15,10 @@ import moderngl
 import numpy as np
 import pygame as pg
 
-from .rectangular_button import RectangularButton
+from .circular_button import CircularButton
 
 
-class RectangularToggle(RectangularButton):
+class CircularToggle(CircularButton):
 
     __slots__ = (
         "__app",

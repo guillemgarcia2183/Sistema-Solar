@@ -129,7 +129,7 @@
         }
     },
     "elipses" : {
-        "class": "circular_button",
+        "class": "circular_toggle",
         "kwargs": {
             "x": 0.95,
             "y": 0.9,
@@ -143,6 +143,11 @@
                 0.5,
                 0.5,
                 0.5
+            ],
+            "toggle_color": [
+                1.0,
+                1.0,
+                0.0
             ],
             "locked_color": null,
             "hidden": false,

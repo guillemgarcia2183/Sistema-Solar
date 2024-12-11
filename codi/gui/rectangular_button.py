@@ -109,6 +109,15 @@ class RectangularButton(Element):
         # Create all ModernGL objects
         self.__set_vao()
 
+    def __calculate_state(self):
+        # Set color based on state
+        if self.is_locked:
+            self.color = self.locked_color
+        elif self.is_hovered:
+            self.color = self.hover_color
+        else:
+            self.color = self.default_color
+
     def __containing(self, pos_x, pos_y):
         return (
             self.__x - self.__width / 2 <= pos_x <= self.__x + self.__width / 2
@@ -209,15 +218,6 @@ class RectangularButton(Element):
             dtype='f4'
         )
 
-    def _calculate_state(self):
-        # Set color based on state
-        if self.__is_locked:
-            self.color = self.__locked_color
-        elif self.__is_hovered:
-            self.color = self.__hover_color
-        else:
-            self.color = self.__default_color
-
     def _render(self):
         # Render possible text on button
         self.__text.render()
@@ -227,7 +227,7 @@ class RectangularButton(Element):
 
     def check_click(self, mouse_pos: tuple[int, int]) -> bool:
         # Cannot be clicked if is locked
-        if self.__is_locked or self.__is_hidden:
+        if self.is_locked or self.is_hidden:
             return False
 
         # Get mouse coordinates
@@ -296,25 +296,24 @@ class RectangularButton(Element):
         return self.__is_hidden
 
     @property
+    def is_hovered(self):
+        return self.__is_hovered
+
+    @property
     def is_locked(self):
         return self.__is_locked
 
     def lock(self):
         self.__is_locked = True
 
-    @property
-    def locked_color(self) -> tuple[float, float, float]:
-        return self.__locked_color
-
-    @locked_color.setter
     def locked_color(self, new_locked_color: tuple[float, float, float]):
         self.__locked_color = new_locked_color
 
     def render(self) -> None:
-        if self.__is_hidden:
+        if self.is_hidden:
             return None
 
-        self._calculate_state()
+        self.__calculate_state()
 
         self._render()
 

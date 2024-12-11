@@ -101,18 +101,19 @@ class CircularButton(Element):
         # Create all ModernGL objects
         self.__set_vao()
 
+    def __calculate_state(self):
+        # Set color based on state
+        if self.is_locked:
+            self.color = self.locked_color
+        elif self.is_hovered:
+            self.color = self.hover_color
+        else:
+            self.color = self.default_color
+
     def __containing(self, pos_x, pos_y) -> bool:
         return (
             (pos_x - self.__x) ** 2 + (pos_y - self.__y) ** 2
         ) <= self.__radius ** 2
-
-    @property
-    def __color(self) -> tuple[float, float, float]:
-        return self.__shader_programs['in_colour'].value
-
-    @__color.setter
-    def __color(self, new_color: tuple[float, float, float]):
-        self.__shader_programs['in_colour'].value = new_color
 
     def __set_shader_programs(self):
         self.__shader_programs = self.__app.ctx.program(
@@ -208,6 +209,13 @@ class CircularButton(Element):
             dtype='f4'
         ).flatten('C')
 
+    def _render(self):
+        # Render possible text on button
+        self.__text.render()
+
+        # Render button (draw quad as two triangles)
+        self.__vao.render(mgl.TRIANGLE_STRIP)
+
     def check_click(self, mouse_position: tuple[int, int]) -> bool:
         """
         Check if a click has been on the button,
@@ -224,7 +232,7 @@ class CircularButton(Element):
 
         """
         # Cannot be clicked if is locked
-        if self.__is_locked or self.__is_hidden:
+        if self.is_locked or self.is_hidden:
             return False
 
         # Get mouse coordinates
@@ -248,7 +256,7 @@ class CircularButton(Element):
 
         """
         # Cannot be hovered if is locked
-        if self.__is_locked or self.__is_hidden:
+        if self.is_locked or self.is_hidden:
             return None
 
         # Get mouse coordinates
@@ -256,6 +264,14 @@ class CircularButton(Element):
 
         # Update hover state
         self.__is_hovered = self.__containing(mx, my)
+
+    @property
+    def color(self) -> tuple[float, float, float]:
+        return self.__shader_programs['in_colour'].value
+
+    @color.setter
+    def color(self, new_color: tuple[float, float, float]):
+        self.__shader_programs['in_colour'].value = new_color
 
     @property
     def default_color(self) -> tuple[float, float, float]:
@@ -297,6 +313,10 @@ class CircularButton(Element):
         return self.__is_hidden
 
     @property
+    def is_hovered(self):
+        return self.__is_hovered
+
+    @property
     def is_locked(self):
         return self.__is_locked
 
@@ -322,22 +342,12 @@ class CircularButton(Element):
         self.__set_vao()
 
     def render(self):
-        if self.__is_hidden:
+        if self.is_hidden:
             return None
 
-        # Set color based on state
-        if self.__is_locked:
-            self.__color = self.__locked_color
-        elif self.__is_hovered:
-            self.__color = self.__hover_color
-        else:
-            self.__color = self.__default_color
+        self.__calculate_state()
 
-        # Render possible text on button
-        self.__text.render()
-
-        # Render button (draw quad as two triangles)
-        self.__vao.render(mgl.TRIANGLE_STRIP)
+        self._render()
 
     def unhide(self):
         self.__is_hidden = False
