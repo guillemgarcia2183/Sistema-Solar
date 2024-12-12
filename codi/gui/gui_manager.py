@@ -99,6 +99,8 @@ class GUIManager():
         None.
 
         """
+        if self.__app.DEBUG:
+            print(f'Adding: {element_type}')
         try:
             self.__types_elements[element_type]
         except KeyError as error:

@@ -11,10 +11,6 @@ if __name__ == "__main__":
         ' Execute a main instead and import the module.')
 
 
-import moderngl
-import numpy as np
-import pygame as pg
-
 from .rectangular_button import RectangularButton
 
 
@@ -22,25 +18,13 @@ class RectangularToggle(RectangularButton):
 
     __slots__ = (
         "__app",
-        "__default_color",
-        "__height",
-        "__hover_color",
-        "__is_hidden",
-        "__is_hovered",
-        "__is_locked",
         "__is_toggled",
-        "__locked_color",
-        "__shader_programs",
-        "__text",
         "__toggle_color",
         "__uuid",
-        "__vao",
-        "__vbo",
-        "__vertexes",
-        "__width",
-        "__x",
-        "__y",
     )
+
+###############################################################################
+#                             Overloaded Operators                            #
 
     def __init__(self, app, uuid: str, **kwargs):
 
@@ -68,6 +52,12 @@ class RectangularToggle(RectangularButton):
         # States information
         self.__is_toggled = kwargs["toggle"]
 
+###############################################################################
+
+
+###############################################################################
+#                               Private Methods                               #
+
     def __calculate_state(self):
         # Set color based on state
         if self.is_locked:
@@ -79,6 +69,12 @@ class RectangularToggle(RectangularButton):
         else:
             self.color = self.default_color
 
+###############################################################################
+
+
+###############################################################################
+#                                Public Methods                               #
+
     def check_click(self, mouse_pos: tuple[int, int]) -> bool:
         clicked = super().check_click(mouse_pos)
 
@@ -86,6 +82,24 @@ class RectangularToggle(RectangularButton):
             self.__is_toggled = not self.__is_toggled
 
         return clicked
+
+    def render(self):
+        if self.is_hidden:
+            return None
+
+        if self.__app.DEBUG:
+            print(f'Toggled: {self.is_toggled}')
+
+        self.__calculate_state()
+
+        super()._render()
+
+###############################################################################
+
+
+###############################################################################
+#                                  Properties                                 #
+
 
     @property
     def is_toggled(self):
@@ -99,13 +113,4 @@ class RectangularToggle(RectangularButton):
     def toggle_color(self, new_toggle_color: tuple[float, float, float]):
         self.toggle_color = new_toggle_color
 
-    def render(self):
-        if self.is_hidden:
-            return None
-
-        if self.__app.DEBUG:
-            print(f'Toggled: {self.is_toggled}')
-
-        self.__calculate_state()
-
-        super()._render()
+###############################################################################
