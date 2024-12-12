@@ -87,8 +87,8 @@ class RectangularToggle(RectangularButton):
         if self.is_hidden:
             return None
 
-        if self.__app.DEBUG:
-            print(f'Toggled: {self.is_toggled}')
+        # if self.__app.DEBUG:
+        #     print(f'Toggled: {self.is_toggled}')
 
         self.__calculate_state()
 

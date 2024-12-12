@@ -58,6 +58,7 @@ class TextLabel():
         self.__uuid = uuid
 
         if self.__app.DEBUG:
+            print("Text Label")
             print(kwargs)
 
         # Font information

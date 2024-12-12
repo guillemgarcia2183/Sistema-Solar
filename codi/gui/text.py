@@ -60,6 +60,7 @@ class Text(Element):
         self.__uuid = uuid
 
         if self.__app.DEBUG:
+            print("Text")
             print(kwargs)
 
         # Position information

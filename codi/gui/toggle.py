@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*- noqa
 """
-Created on Wed Dec 11 22:19:55 2024
+Created on Wed Dec 11 22:39:09 2024
 
 @author: Joel Tapia Salvador
 """
+from .rectangular_button import RectangularButton
+""
 
 if __name__ == "__main__":
     raise SystemExit(
@@ -11,10 +13,7 @@ if __name__ == "__main__":
         ' Execute a main instead and import the module.')
 
 
-from .circular_button import CircularButton
-
-
-class CircularToggle(CircularButton):
+class Toggle():
 
     __slots__ = (
         "__app",
@@ -27,36 +26,44 @@ class CircularToggle(CircularButton):
 #                             Overloaded Operators                            #
 
     def __init__(self, app, uuid: str, **kwargs):
+        raise NotImplementedError
 
-        super().__init__(app, uuid, **kwargs)
-
-        default_kwargs = {
-            "toggle_color": (0.0, 0.0, 0.0),
-            "toggle": False,
-        }
-
-        kwargs = default_kwargs | kwargs  # NOTE: Works for python 3.9+
-
-        # Engine
-        self.__app = app
-
-        # Button's unique id
-        self.__uuid = uuid
-
-        if self.__app.DEBUG:
-            print(kwargs)
-
-        # Color information
-        self.__toggle_color = kwargs["toggle_color"]
-
-        # States information
-        self.__is_toggled = kwargs["toggle"]
 
 ###############################################################################
 
 
 ###############################################################################
 #                               Private Methods                               #
+
+def _set_attributes(self, app, uuid: str, **kwargs):
+    default_kwargs = {
+        "toggle_color": (0.0, 0.0, 0.0),
+        "toggle": False,
+    }
+
+    kwargs = default_kwargs | kwargs  # NOTE: Works for python 3.9+
+
+    # Engine
+    self.__app = app
+
+    # Button's unique id
+    self.__uuid = uuid
+
+    if self.__app.DEBUG:
+        print("Toggle")
+        print(kwargs)
+
+    # Color information
+    self.__toggle_color = kwargs["toggle_color"]
+
+    # States information
+    self.__is_toggled = kwargs["toggle"]
+
+###############################################################################
+
+
+###############################################################################
+#                              Protected Methods                              #
 
     def __calculate_state(self):
         # Set color based on state
@@ -87,12 +94,13 @@ class CircularToggle(CircularButton):
         if self.is_hidden:
             return None
 
-        # if self.__app.DEBUG:
-        #     print(f'Toggled: {self.is_toggled}')
+        if self.__app.DEBUG:
+            print(f'Toggled: {self.is_toggled}')
 
         self.__calculate_state()
 
         super()._render()
+
 
 ###############################################################################
 

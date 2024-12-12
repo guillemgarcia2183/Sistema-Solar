@@ -1,100 +1,4 @@
 {
-    "day_picker": {
-        "class": "rectangular_button",
-        "kwargs": {
-            "x": 0.94,
-            "y": 0.035,
-            "width": 0.15,
-            "height": 0.0375,
-            "default_color": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "hover_color": [
-                0.5,
-                0.5,
-                0.5
-            ],
-            "locked_color": null,
-            "hidden": true,
-            "locked": false,
-            "text": {
-                "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                "color": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "font_size": 200
-            }
-        }
-    },
-    "zoom_in": {
-        "class": "rectangular_button",
-        "kwargs": {
-            "x": 0.05,
-            "y": 0.87,
-            "width": 0.03,
-            "height": 0.03,
-            "default_color": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "hover_color": [
-                0.5,
-                0.5,
-                0.5
-            ],
-            "locked_color": null,
-            "hidden": true,
-            "locked": false
-        }
-    },
-    "zoom_out": {
-        "class": "rectangular_button",
-        "kwargs": {
-            "x": 0.05,
-            "y": 0.9,
-            "width": 0.03,
-            "height": 0.03,
-            "default_color": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "hover_color": [
-                0.5,
-                0.5,
-                0.5
-            ],
-            "locked_color": null,
-            "hidden": true,
-            "locked": false
-        }
-    },
-    "constellations_visibility": {
-        "class": "circular_button",
-        "kwargs": {
-            "x": 0.05,
-            "y": 0.95,
-            "radius": 0.015,
-            "default_color": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "hover_color": [
-                0.5,
-                0.5,
-                0.5
-            ],
-            "locked_color": null,
-            "hidden": true,
-            "locked": false
-        }
-    },
     "test_button" : {
         "class": "rectangular_button",
         "kwargs": {
@@ -126,76 +30,6 @@
                 "font_size": 34,
                 "scale_factor": 2
             }
-        }
-    },
-    "elipses" : {
-        "class": "circular_toggle",
-        "kwargs": {
-            "x": 0.95,
-            "y": 0.9,
-            "radius": 0.015,
-            "default_color": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "hover_color": [
-                0.5,
-                0.5,
-                0.5
-            ],
-            "toggle_color": [
-                1.0,
-                1.0,
-                0.0
-            ],
-            "locked_color": null,
-            "hidden": true,
-            "locked": false
-        }
-    },
-    "canvi_camera": {
-        "class": "rectangular_button",
-        "kwargs": {
-            "x": 0.05,
-            "y": 0.9,
-            "width": 0.03,
-            "height": 0.03,
-            "default_color": [
-                0.0,
-                1.0,
-                0.0
-            ],
-            "hover_color": [
-                0.5,
-                0.5,
-                0.5
-            ],
-            "locked_color": null,
-            "hidden": true,
-            "locked": false
-        }
-    },
-    "escala": {
-        "class": "rectangular_button",
-        "kwargs": {
-            "x": 0.1,
-            "y": 0.9,
-            "width": 0.03,
-            "height": 0.03,
-            "default_color": [
-                1.0,
-                0.0,
-                0.0
-            ],
-            "hover_color": [
-                0.5,
-                0.5,
-                0.5
-            ],
-            "locked_color": null,
-            "hidden": true,
-            "locked": false
         }
     },
     "test_text" : {
@@ -254,6 +88,119 @@
                 ],
                 "sys_font": "TimesNewRoman",
                 "font_size": 34,
+                "scale_factor": 2
+            }
+        }
+    },
+    "elipses" : {
+        "class": "circular_toggle",
+        "kwargs": {
+            "x": 0.95,
+            "y": 0.875,
+            "radius": 0.05,
+            "default_color": [
+                0.53,
+                0.81,
+                0.98
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "toggle_color": [
+                1.0,
+                1.0,
+                0.0
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false,
+            "text": {
+                "text": "Orbites",
+                "color": [
+                    0.1,
+                    0.1,
+                    0.1
+                ],
+                "sys_font": "Arial",
+                "font_size": 24,
+                "scale_factor": 2
+            }
+        }
+    },
+    "canvi_camera": {
+        "class": "rectangular_toggle",
+        "kwargs": {
+            "x": 0.05,
+            "y": 0.9,
+            "width": 0.15,
+            "height": 0.03,
+            "default_color": [
+                0.53,
+                0.81,
+                0.98
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "toggle_color": [
+                1.0,
+                1.0,
+                0.0
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false,
+            "text": {
+                "text": "Mode Satelit",
+                "color": [
+                    0.1,
+                    0.1,
+                    0.1
+                ],
+                "sys_font": "Arial",
+                "font_size": 24,
+                "scale_factor": 2
+            }
+        }
+    },
+    "escala": {
+        "class": "rectangular_toggle",
+        "kwargs": {
+            "x": 0.05,
+            "y": 0.85,
+            "width": 0.15,
+            "height": 0.03,
+            "default_color": [
+                0.53,
+                0.81,
+                0.98
+            ],
+            "hover_color": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "toggle_color": [
+                1.0,
+                1.0,
+                0.0
+            ],
+            "locked_color": null,
+            "hidden": false,
+            "locked": false,
+            "text": {
+                "text": "Mode Realistic",
+                "color": [
+                    0.1,
+                    0.1,
+                    0.1
+                ],
+                "sys_font": "Arial",
+                "font_size": 24,
                 "scale_factor": 2
             }
         }
