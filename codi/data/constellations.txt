@@ -13,3 +13,14 @@ Cas {
     Cih -- Ruchbah
     Ruchbah -- Segin
 };
+Ari {
+    Bharani -- Hamal
+    Hamal -- Sheratan
+    Sheratan -- Mesarthim
+};
+Tau {
+    Elnath -- Ain
+    Ain -- Prima Hyadum
+    Prima Hyadum -- Aldebaran
+    Aldebaran -- Tianguan
+};

@@ -67,7 +67,7 @@ class Camera:
         Returns:
             glm.vec4: Matriu projecció 
         """
-        return glm.perspective(glm.radians(45), self.aspec_ratio, 0.1, 2000)
+        return glm.perspective(glm.radians(45), self.aspec_ratio, 0.1, 7000)
     
     def get_type(self):
         return "Camera"

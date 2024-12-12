@@ -65,8 +65,7 @@ class GUIManager():
         try:
             self.__elements_buffer[new_element.uuid]
 
-            raise ValueError(f'An Element with uuid: {
-                             new_element.uuid} already exists.')
+            raise ValueError(f'An Element with uuid: {new_element.uuid} already exists.')
 
         except KeyError:
             self.__elements_buffer[new_element.uuid] = new_element
@@ -102,8 +101,7 @@ class GUIManager():
         try:
             self.__types_elements[element_type]
         except KeyError as error:
-            raise ValueError(f'Type of Element: {
-                             element_type} does not exist.') from error
+            raise ValueError(f'Type of Element: {element_type} does not exist.') from error
 
         new_element = self.__types_elements[element_type](
             self.__app,
@@ -199,8 +197,7 @@ class GUIManager():
         try:
             self.__elements_buffer[uuid]
         except KeyError as error:
-            raise ValueError(f'Element with uuid: {
-                             uuid} ' + ' does not exist.') from error
+            raise ValueError(f'Element with uuid: {uuid} ' + ' does not exist.') from error
 
         self.__elements_buffer[uuid].destroy()
         del self.__elements_buffer[uuid]

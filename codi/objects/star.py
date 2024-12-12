@@ -184,7 +184,7 @@ class StarBatch(Object):
                     current_const = None
                 elif (line.find('};') < 0):
                     constellations[current_const].append(
-                        tuple(line.replace(' ', '').strip('\n').split('--'))
+                        tuple(part.strip() for part in line.strip().rstrip(" ").strip('\n').split('--'))
                     )
 
         return constellations
