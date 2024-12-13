@@ -61,3 +61,15 @@ Sco {
     Acrab -- Jabbah
     Jabbah -- Graffias
 };
+Lib {
+    48Libra -- ThetaLibra
+    ThetaLibra -- EtaLibra
+    EtaLibra -- Zubenelhakrabi
+    Zubenelhakrabi -- Zubeneschamali
+    Zubeneschamali -- Zubenelgenubi
+    Zubenelgenubi -- Brachium
+    Zubeneschamali -- Brachium
+    Brachium -- 36Libra
+    36Libra -- UpsilonLibra
+    UpsilonLibra -- TauLibra
+};

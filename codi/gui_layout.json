@@ -117,7 +117,7 @@
             "hidden": false,
             "locked": false,
             "text": {
-                "text": "Orbites",
+                "text": "Orbits",
                 "color": [
                     0.1,
                     0.1,
@@ -134,7 +134,7 @@
         "kwargs": {
             "x": 0.05,
             "y": 0.9,
-            "width": 0.15,
+            "width": 0.18,
             "height": 0.03,
             "default_color": [
                 0.53,
@@ -155,7 +155,7 @@
             "hidden": false,
             "locked": false,
             "text": {
-                "text": "Mode Satelit",
+                "text": "Satellite mode",
                 "color": [
                     0.1,
                     0.1,
@@ -172,7 +172,7 @@
         "kwargs": {
             "x": 0.05,
             "y": 0.85,
-            "width": 0.15,
+            "width": 0.18,
             "height": 0.03,
             "default_color": [
                 0.53,
@@ -193,7 +193,7 @@
             "hidden": false,
             "locked": false,
             "text": {
-                "text": "Mode Realistic",
+                "text": "Realistic mode",
                 "color": [
                     0.1,
                     0.1,
