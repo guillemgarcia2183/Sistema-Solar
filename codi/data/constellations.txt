@@ -42,6 +42,12 @@ Gem {
     Mebsuta -- Tejat
     Tejat -- Propus
 };
+Cnc {
+    Acubens -- Asellus Australis
+    Asellus Australis -- Tarf
+    Asellus Australis -- Asellus Borealis
+    Asellus Borealis -- IotaCancer
+};
 Leo {
     Denebola -- Zosma
     Denebola -- Chertan
@@ -75,6 +81,18 @@ Vir {
     Heze -- TauVirgo
     TauVirgo -- 109Virgo
 };
+Lib {
+    48Libra -- ThetaLibra
+    ThetaLibra -- EtaLibra
+    EtaLibra -- Zubenelhakrabi
+    Zubenelhakrabi -- Zubeneschamali
+    Zubeneschamali -- Zubenelgenubi
+    Zubenelgenubi -- Brachium
+    Zubeneschamali -- Brachium
+    Brachium -- 36Libra
+    36Libra -- UpsilonLibra
+    UpsilonLibra -- TauLibra
+};
 Sco {
     Shaula -- KappaScorpius
     KappaScorpius -- Lesath
@@ -94,17 +112,30 @@ Sco {
     Acrab -- Jabbah
     Jabbah -- Graffias
 };
-Lib {
-    48Libra -- ThetaLibra
-    ThetaLibra -- EtaLibra
-    EtaLibra -- Zubenelhakrabi
-    Zubenelhakrabi -- Zubeneschamali
-    Zubeneschamali -- Zubenelgenubi
-    Zubenelgenubi -- Brachium
-    Zubeneschamali -- Brachium
-    Brachium -- 36Libra
-    36Libra -- UpsilonLibra
-    UpsilonLibra -- TauLibra
+Sgr {
+    Arkab Prior -- IotaSagitarius
+    IotaSagitarius -- Rukbat
+    IotaSagitarius -- ThetaSagitarius1 
+    ThetaSagitarius1 -- ThetaSagitarius2
+    ThetaSagitarius2 -- 62Sagitarius
+    62Sagitarius -- 59Sagitarius
+    59Sagitarius -- 52Sagitarius
+    52Sagitarius -- TauSagitarius
+    TauSagitarius -- Ascella
+    TauSagitarius -- Nunki
+    Nunki -- PhiSagitarius
+    Ascella -- PhiSagitarius
+    Nunki -- OmicronSagitarius
+    OmicronSagitarius -- XiSagitarius
+    XiSagitarius -- Albaldah
+    Albaldah -- 43Sagitarius
+    43Sagitarius -- RhoSagitarius
+    PhiSagitarius -- Kaus Borealis
+    Kaus Borealis -- Kaus Media
+    Kaus Media -- Alnasl
+    Alnasl -- 3Sagitarius
+    Kaus Media -- Kaus Australis
+    Kaus Australis -- EtaSagitarius
 };
 Cap {
     Algedi -- Dabih
@@ -118,6 +149,19 @@ Cap {
     Nashira -- ThetaCapricornus
     ThetaCapricornus -- Alshat
     Alshat -- Algedi
+};
+Aqr{
+    Skat -- TauAquarius
+    TauAquarius -- LambdaAquarius
+    LambdaAquarius -- PhiAquarius
+    PhiAquarius -- OmegaAquarius
+    PhiAquarius -- Situla
+    Situla -- Sadachbia
+    Sadachbia -- Sadalmelik
+    Sadalmelik -- Ancha
+    Ancha -- IotaAquarius
+    Sadalmelik -- Sadalsuud
+    Sadalsuud -- Albali
 };
 Psc {
     Alpherg -- PhiPisces
