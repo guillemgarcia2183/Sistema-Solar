@@ -42,6 +42,39 @@ Gem {
     Mebsuta -- Tejat
     Tejat -- Propus
 };
+Leo {
+    Denebola -- Zosma
+    Denebola -- Chertan
+    Chertan -- IotaLeo
+    IotaLeo -- SigmaLeo
+    Zosma -- Algieba
+    Chertan -- EtaLeo
+    Algieba -- EtaLeo
+    EtaLeo -- Regulus
+    Algieba -- Adhafera
+    Adhafera -- Rasalas
+    Rasalas -- Ras Elased Australis
+    Ras Elased Australis -- EtaLeo
+    Ras Elased Australis -- Alterf
+    Alterf -- KappaLeo
+    KappaLeo -- Rasalas
+};
+Vir {
+    Spica -- ThetaVirgo
+    ThetaVirgo -- Porrima
+    Porrima -- Zaniah
+    Zaniah -- Zavijava
+    Zavijava -- NuVirgo
+    NuVirgo -- OmicronVirgo
+    OmicronVirgo -- Zaniah
+    Porrima -- Minelauva
+    Minelauva -- Vindemiatrix
+    Porrima -- Heze
+    Heze -- Syrma
+    Syrma -- Kang
+    Heze -- TauVirgo
+    TauVirgo -- 109Virgo
+};
 Sco {
     Shaula -- KappaScorpius
     KappaScorpius -- Lesath
@@ -72,4 +105,35 @@ Lib {
     Brachium -- 36Libra
     36Libra -- UpsilonLibra
     UpsilonLibra -- TauLibra
+};
+Cap {
+    Algedi -- Dabih
+    Dabih -- PsiCapricornus
+    PsiCapricornus -- OmegaCapricornus
+    OmegaCapricornus -- ZetaCapricornus
+    ZetaCapricornus -- EpsilonCapricornus
+    EpsilonCapricornus -- KappaCapricornus
+    KappaCapricornus -- Deneb Algedi
+    Deneb Algedi -- Nashira
+    Nashira -- ThetaCapricornus
+    ThetaCapricornus -- Alshat
+    Alshat -- Algedi
+};
+Psc {
+    Alpherg -- PhiPisces
+    PhiPisces -- UpsilonPisces
+    PhiPisces -- TauPisces
+    UpsilonPisces -- TauPisces
+    Alpherg -- Torcular
+    Torcular -- Alrescha
+    Alrescha -- NuPisces
+    NuPisces -- MuPisces
+    MuPisces -- Revati
+    Revati -- DeltaPisces
+    DeltaPisces -- OmegaPisces
+    OmegaPisces -- IotaPisces
+    IotaPisces -- ThetaPisces
+    ThetaPisces -- GammaPisces
+    GammaPisces -- KappaPisces
+    KappaPisces -- IotaPisces
 };
