@@ -1,0 +1,56 @@
+{
+    "menu_dreta": {
+        "class": "menu",
+        "kwargs": {
+            "toggle_button": {
+                "x": 0.95,
+                "y": 0.5,
+                "width": 0.04,
+                "height": 0.04,
+                "default_color": [0.8, 0.8, 0.8],
+                "hover_color": [0.5, 0.5, 0.5],
+                "text": {"text": ">", "color": [0.0, 0.0, 0.0], "font_size": 24}
+            },
+            "buttons": {
+                "option_1": {
+                    "class": "rectangular",
+                    "x": 0.85,
+                    "y": 0.4,
+                    "width": 0.02,
+                    "height": 0.02,
+                    "default_color": [1.0, 1.0, 1.0],
+                    "hover_color": [0.7, 0.7, 0.7],
+                    "text": {"text": "Option 1", "color": [0.0, 0.0, 0.0], "font_size": 14}
+                },
+                "option_2": {
+                    "class": "rectangular",
+                    "x": 0.85,
+                    "y": 0.25,
+                    "width": 0.02,
+                    "height": 0.02,
+                    "default_color": [1.0, 1.0, 1.0],
+                    "hover_color": [0.7, 0.7, 0.7],
+                    "text": {"text": "Option 2", "color": [0.0, 0.0, 0.0], "font_size": 14}
+                }
+            }
+        }
+    },
+    "time": {
+        "class": "slider",
+        "kwargs": {
+            "x": 0.5,
+            "y": 0.9,
+            "width": 0.3,
+            "height": 0.03,
+            "min_value": -10,
+            "max_value": 100,
+            "initial_value": 50,
+            "slices": 7,
+            "track_color": [1, 0, 0],
+            "handle_color": [0, 1, 0],
+            "hover_color": [0, 0, 1],
+            "hidden": false,
+            "locked": false
+        }
+    }
+}
