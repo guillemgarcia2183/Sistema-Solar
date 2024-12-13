@@ -23,4 +23,41 @@ Tau {
     Ain -- Prima Hyadum
     Prima Hyadum -- Aldebaran
     Aldebaran -- Tianguan
+    Prima Hyadum -- TaurusLambda
+    TaurusLambda -- XiTaurus
+};
+Gem {
+    Alzirr -- LambdaGemini
+    LambdaGemini -- Wasat
+    Wasat -- Alhena
+    Wasat -- UpsilonGemini
+    UpsilonGemini -- KappaGemini
+    UpsilonGemini -- Pollux
+    UpsilonGemini -- IotaGemini
+    IotaGemini -- TauGemini
+    TauGemini -- Castor
+    TauGemini -- ThetaGemini
+    TauGemini -- Mebsuta
+    Mebsuta -- NuGemini
+    Mebsuta -- Tejat
+    Tejat -- Propus
+};
+Sco {
+    Shaula -- KappaScorpius
+    KappaScorpius -- Lesath
+    KappaScorpius -- Sargas
+    Sargas -- EtaScorpius
+    EtaScorpius -- ZetaScorpius
+    ZetaScorpius -- Xamidimura
+    Xamidimura -- Larawag
+    Larawag -- Paikauhale
+    Paikauhale -- Antares
+    Antares -- Alniyat
+    Alniyat -- Fang
+    Fang -- Iklil
+    Fang -- Dschubba
+    Dschubba -- Acrab
+    Alniyat -- Acrab
+    Acrab -- Jabbah
+    Jabbah -- Graffias
 };

@@ -543,9 +543,15 @@ class GraphicsEngine:
 
         for objecte in self.objects:
             objecte.destroy()
-
+        
+        for aux_object in self.aux_objects:
+            aux_object.destroy()
+        
         for orbit in self.orbits:
             orbit.destroy()
+
+        for aux_orbit in self.aux_orbits:
+            aux_orbit.destroy()
 
         self.stars.destroy()
 
