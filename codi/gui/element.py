@@ -15,7 +15,7 @@ from abc import ABC, abstractmethod
 
 
 class Element(ABC):
-    """Empty class."""
+    """Template class."""
 
     __slots__ = (
         "__app",
@@ -28,6 +28,23 @@ class Element(ABC):
 #                             Overloaded Operators                            #
 
     def __init__(self, app, uuid: str, **kwargs):
+        """
+        Initialize Element.
+
+        Parameters
+        ----------
+        app : TYPE
+            The GraphicsEngine instance.
+        uuid : string
+            Unique identifier for the menu.
+        **kwargs : Optional[dict[str, Any]]
+            Dictionary containing menu layout and button properties.
+
+        Returns
+        -------
+        None.
+
+        """
         # Engine
         self.__app = app
 
@@ -53,65 +70,78 @@ class Element(ABC):
 #                                Public Methods                               #
 
     @abstractmethod  # noqa
-    def check_click(self, mouse_position: tuple[int, int]):
+    def check_click(self, mouse_position: tuple[int, int]) -> str | None:
         """
         Template Element.
+
+        Must check if it has been clicked on the Element.
 
         Parameters
         ----------
         mouse_position : tuple[int, int]
-            DESCRIPTION.
+            Mouse position in x and y coordinates of the window.
 
         Raises
         ------
         NotImplementedError
-            DESCRIPTION.
+            Method not implemented, child class must implement it.
 
         Returns
         -------
-        None.
+        string or None
+            UUID of the Element if clicked or None if not.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            "Method not implemented, child class must implement it."
+        )
 
     @abstractmethod
     def check_hover(self, mouse_position: tuple[int, int]):
         """
         Template Element.
 
+        Must check if the mouse is hovering above the Element.
+
         Parameters
         ----------
-        mouse_position : tuple[int, int]
-            DESCRIPTION.
+        mouse_position : tuple[integer, integer]
+            Mouse position in x and y coordinates of the window.
 
         Raises
         ------
         NotImplementedError
-            DESCRIPTION.
+            Method not implemented, child class must implement it.
 
         Returns
         -------
         None.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            "Method not implemented, child class must implement it."
+        )
 
     @abstractmethod
     def destroy(self):
         """
         Template Element.
 
+        Must destroy the element and release all OpenGL objects it had.
+
         Raises
         ------
         NotImplementedError
-            DESCRIPTION.
+            Method not implemented, child class must implement it..
 
         Returns
         -------
         None.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            "Method not implemented, child class must implement it."
+        )
 
     def hide(self):
         """
@@ -140,34 +170,42 @@ class Element(ABC):
         """
         Template Element.
 
+        Must render the Element in OpenGL.
+
         Raises
         ------
         NotImplementedError
-            DESCRIPTION.
+            Method not implemented, child class must implement it.
 
         Returns
         -------
         None.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            "Method not implemented, child class must implement it."
+        )
 
     @abstractmethod
     def toggle(self):
         """
         Template Element.
 
+        Must toggle Element.
+
         Raises
         ------
         NotImplementedError
-            DESCRIPTION.
+            Method not implemented, child class must implement it.
 
         Returns
         -------
         None.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            "Method not implemented, child class must implement it."
+        )
 
     def unhide(self):
         """
@@ -196,17 +234,21 @@ class Element(ABC):
         """
         Template Element.
 
+        Must untoggle Element.
+
         Raises
         ------
         NotImplementedError
-            DESCRIPTION.
+            Method not implemented, child class must implement it.
 
         Returns
         -------
         None.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            "Method not implemented, child class must implement it."
+        )
 
 ###############################################################################
 
@@ -222,7 +264,7 @@ class Element(ABC):
         Returns
         -------
         TYPE
-            DESCRIPTION.
+            The GraphicsEngine instance.
 
         """
         return self.__app
@@ -251,7 +293,7 @@ class Element(ABC):
         Raises
         ------
         NotImplementedError
-            Method not implemented.
+            Method not implemented, child class must implement it.
 
         Returns
         -------
@@ -259,7 +301,9 @@ class Element(ABC):
             Is hovered.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            "Method not implemented, child class must implement it."
+        )
 
     @property
     def is_locked(self) -> bool:
