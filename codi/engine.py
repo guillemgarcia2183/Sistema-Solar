@@ -366,7 +366,7 @@ class GraphicsEngine:
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",
             [0.3, 4, 5],
-            num_asteroids=650,  # Or however many you want
+            num_asteroids=700,  # Or however many you want
             distance1=distance_objects["Mars"]+25,
             distance2=distance_objects["Jupiter"]-20,
             velocity=speed_asteroids,
@@ -467,6 +467,10 @@ class GraphicsEngine:
                 # ???
                 elif event.key == pg.K_l:
                     self.camera.change_lock()
+
+                elif event.key == pg.K_r:
+                    self.camera.position = glm.vec3( 66.8807,      66.8807,      66.8807)
+                    self.camera.yaw, self.camera.pitch = self.camera.calculate_initial_orientation(self.camera.position, glm.vec3(0, 0, 0))
 
                 elif event.key == pg.K_MINUS:
                     self.camera.speed /= 1.25
