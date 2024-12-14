@@ -39,7 +39,7 @@ class GUIManager(Element):
         from .menu import Menu
         from .rectangular_button import RectangularButton
         from .rectangular_toggle import RectangularToggle
-        # from .slider import Slider
+        from .slider import Slider
         from .text import Text
 
         self.__types_elements: dict[str, type[Element]] = {
@@ -48,7 +48,7 @@ class GUIManager(Element):
             "menu": Menu,
             "rectangular_button": RectangularButton,
             "rectangular_toggle": RectangularToggle,
-            # "slider": Slider,
+            "slider": Slider,
             "text": Text,
         }
 
@@ -117,8 +117,7 @@ class GUIManager(Element):
         try:
             self.__elements_buffer[new_element.uuid]
 
-            raise ValueError(f'An Element with uuid: "{
-                             new_element.uuid}" already exists.')
+            raise ValueError(f'An Element with uuid: "{new_element.uuid}" already exists.')
 
         except KeyError:
             self.__elements_buffer[new_element.uuid] = new_element
@@ -234,8 +233,7 @@ class GUIManager(Element):
         try:
             self.__types_elements[element_type]
         except KeyError as error:
-            raise ValueError(f'Type of Element: "{
-                             element_type}" does not exist.') from error
+            raise ValueError(f'Type of Element: "{element_type}" does not exist.') from error
 
         new_element = self.__types_elements[element_type](
             self.app,
@@ -432,8 +430,7 @@ class GUIManager(Element):
         try:
             self.__elements_buffer[uuid]
         except KeyError as error:
-            raise ValueError(f'Element with uuid: "{uuid}" ' +
-                             'does not exist.') from error
+            raise ValueError(f'Element with uuid: "{uuid}" ' + 'does not exist.') from error
 
         self.__elements_buffer[uuid].destroy()
         del self.__elements_buffer[uuid]

@@ -554,5 +554,23 @@
             }
 
         }
+    },
+    "time": {
+        "class": "slider",
+        "kwargs": {
+            "x": 0.5,
+            "y": 0.9,
+            "width": 0.3,
+            "height": 0.03,
+            "min_value": -10,
+            "max_value": 100,
+            "initial_value": 50,
+            "slices": 7,
+            "track_color": [1, 0, 0],
+            "handle_color": [0, 1, 0],
+            "hover_color": [0, 0, 1],
+            "hidden": false,
+            "locked": false
+        }
     }
 }
