@@ -315,7 +315,7 @@ class Button(Element):
         # Get mouse coordinates
         mx, my = mouse_position
 
-        # Return True if button is clicked
+        # Return UUID if button is clicked
         if self._containing(mx, my):
             return self.uuid
 
@@ -342,6 +342,32 @@ class Button(Element):
 
         # Update hover state
         self.__is_hovered = self._containing(mx, my)
+
+    def check_unclick(self, mouse_position: tuple[int, int]) -> str | None:
+        """
+        Check if it has been unclicked on the Element.
+
+        Parameters
+        ----------
+        mouse_position : tuple[integer, integer]
+            Mouse position in x and y coordinates of the window.
+
+        Returns
+        -------
+        None.
+            UUID of the Element if clicked or None if not.
+
+        """
+        # Cannot be unclicked if is locked
+        if self.is_locked or self.is_hidden:
+            return None
+
+        # Get mouse coordinates
+        mx, my = mouse_position
+
+        # Return UUID if button is unclicked
+        if self._containing(mx, my):
+            return self.uuid
 
     def destroy(self):
         """

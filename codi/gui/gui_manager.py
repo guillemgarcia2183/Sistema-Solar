@@ -89,6 +89,7 @@ class GUIManager(Element):
 ###############################################################################
 #                              Protected Methods                              #
 
+
     def __add_element(self, new_element: type[Element]):  # noqa
         """
         Add an Element object with an uuid to the elements buffer.
@@ -127,6 +128,7 @@ class GUIManager(Element):
 
 ###############################################################################
 #                               Private Methods                               #
+
 
     def _autosize(  # noqa
         self,
@@ -196,6 +198,7 @@ class GUIManager(Element):
 
 ###############################################################################
 #                                Public Methods                               #
+
 
     def add_element(  # noqa
         self,
@@ -314,7 +317,7 @@ class GUIManager(Element):
         Returns
         -------
         string or None
-            Returns the uuid of the element that recived an action with the
+            Returns the UUID of the element that recived an action with the
             click or None if no element recived an action.
 
         """
@@ -341,6 +344,34 @@ class GUIManager(Element):
         """
         for element in self.__elements_buffer.values():
             element.check_hover(mouse_position)
+
+    def check_unclick(self, mouse_position: tuple[int, int]) -> str | None:
+        """
+        Check actions when unclick event.
+
+        Checks action when unclicked and returns the uuid of the element that
+        recived an action with the unclick or None if no element recived an
+        action. Will return only one string of the first Element in order of
+        addition found with an action.
+
+        Parameters
+        ----------
+        mouse_position : tuple[integer, integer]
+            Tuple with the (x, y) coordinate of the mouse in the window.
+
+        Returns
+        -------
+        None.
+            Returns the UUID of the element that recived an action with the
+            unclick or None if no element recived an action.
+
+        """
+        for element in self.__elements_buffer.values():
+            unclick = element.check_unclick(mouse_position)
+            if unclick:
+                return unclick
+
+        return None
 
     def destroy(self):
         """
@@ -472,6 +503,7 @@ class GUIManager(Element):
 
 ###############################################################################
 #                                  Properties                                 #
+
 
     @property  # noqa
     def app(self):

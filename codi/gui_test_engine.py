@@ -82,14 +82,10 @@ class TestEngine():
             if event.type == pg.MOUSEBUTTONDOWN:
                 button_event = self.gui.check_click(
                     pg.mouse.get_pos())
-                # if button_event == "day_picker":
-                #     print("Day picker pressed.")
-                # elif button_event == "zoom_in":
-                #     print("Zoom in pressed.")
-                # elif button_event == "zoom_out":
-                #     print("Zoom out pressed.")
-                # elif button_event == "constellations_visibility":
-                #     print("Constelations visibility pressed.")
+
+            elif event.type == pg.MOUSEBUTTONUP:
+                element_event = self.gui.check_unclick(
+                    pg.mouse.get_pos())
 
     def end(self):
         """

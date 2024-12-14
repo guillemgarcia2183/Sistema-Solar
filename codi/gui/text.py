@@ -230,20 +230,19 @@ class Text(Element):
 ###############################################################################
 #                                Public Methods                               #
 
-
-    def check_click(self, mouse_position: tuple[int, int]) -> bool:
+    def check_click(self, mouse_position: tuple[int, int]) -> str | None:  # noqa
         """
         Check if a click has been on the button,
 
         Parameters
         ----------
-        mouse_position : Tuple[int, int]
+        mouse_position : Tuple[integer, integer]
             Position of the mouse, tuple of integers (pixels) x, y.
 
         Returns
         -------
-        bool
-            If the click has been on the button.
+        string or None
+            UUID of the Element if clicked or None if not.
 
         """
         # Cannot be clicked if is locked
@@ -253,7 +252,7 @@ class Text(Element):
         # Get mouse coordinates
         mx, my = mouse_position
 
-        # Return True if button is clicked
+        # Return UUID if button is clicked
         if self._containing(mx, my):
             return self.uuid
 
@@ -263,7 +262,7 @@ class Text(Element):
 
         Parameters
         ----------
-        mouse_position : Tuple[int, int]
+        mouse_position : Tuple[integer, integer]
             Position of the mouse, tuple of integers (pixels) x, y.
 
         Returns
@@ -280,6 +279,32 @@ class Text(Element):
 
         # Update hover state
         self.__is_hovered = self._containing(mx, my)
+
+    def check_unclick(self, mouse_position: tuple[int, int]) -> str | None:
+        """
+        Check if it has been unclicked on the Element.
+
+        Parameters
+        ----------
+        mouse_position : tuple[int, int]
+            Mouse position in x and y coordinates of the window.
+
+        Returns
+        -------
+        string or None
+            UUID of the Element if clicked or None if not.
+
+        """
+        # Cannot be unclicked if is locked
+        if self.is_locked or self.is_hidden:
+            return None
+
+        # Get mouse coordinates
+        mx, my = mouse_position
+
+        # Return UUID if button is unclicked
+        if self._containing(mx, my):
+            return self.uuid
 
     def check_time(self, delta):
         pass

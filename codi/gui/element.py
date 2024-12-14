@@ -78,7 +78,7 @@ class Element(ABC):
 
         Parameters
         ----------
-        mouse_position : tuple[int, int]
+        mouse_position : tuple[integer, integer]
             Mouse position in x and y coordinates of the window.
 
         Raises
@@ -116,6 +116,33 @@ class Element(ABC):
         Returns
         -------
         None.
+
+        """
+        raise NotImplementedError(
+            "Method not implemented, child class must implement it."
+        )
+
+    @abstractmethod
+    def check_unclick(self, mouse_position: tuple[int, int]) -> str | None:
+        """
+        Template Element.
+
+        Must check if it has been unclicked on the Element.
+
+        Parameters
+        ----------
+        mouse_position : tuple[integer, integer]
+            Mouse position in x and y coordinates of the window.
+
+        Raises
+        ------
+        NotImplementedError
+            Method not implemented, child class must implement it.
+
+        Returns
+        -------
+        string or None
+            UUID of the Element if clicked or None if not.
 
         """
         raise NotImplementedError(

@@ -503,6 +503,9 @@ class GraphicsEngine:
                 if event.button == 1:  # Left click
                     self.camera.left_button_held = False
 
+                element_event = self.gui.check_unclick(
+                    pg.mouse.get_pos())
+
             elif event.type == pg.MOUSEMOTION and self.camera.left_button_held:
                 current_mouse_pos = pg.mouse.get_pos()
                 # Calculate difference in mouse movement
