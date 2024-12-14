@@ -17,10 +17,8 @@ from .rectangular_button import RectangularButton
 class RectangularToggle(RectangularButton):
 
     __slots__ = (
-        "__app",
         "__is_toggled",
         "__toggle_color",
-        "__uuid",
     )
 
 ###############################################################################
@@ -37,13 +35,7 @@ class RectangularToggle(RectangularButton):
 
         kwargs = default_kwargs | kwargs  # NOTE: Works for python 3.9+
 
-        # Engine
-        self.__app = app
-
-        # Button's unique id
-        self.__uuid = uuid
-
-        if self.__app.DEBUG:
+        if self.app.DEBUG:
             print(kwargs)
 
         # Color information
@@ -76,23 +68,32 @@ class RectangularToggle(RectangularButton):
 #                                Public Methods                               #
 
     def check_click(self, mouse_pos: tuple[int, int]) -> bool:
-        clicked = super().check_click(mouse_pos)
+        click = super().check_click(mouse_pos)
 
-        if clicked:
-            self.__is_toggled = not self.__is_toggled
+        if click:
+            if self.is_toggled:
+                self.untoggle()
+            else:
+                self.toggle()
 
-        return clicked
+        return click
 
     def render(self):
         if self.is_hidden:
             return None
 
-        # if self.__app.DEBUG:
+        # if self.app.DEBUG:
         #     print(f'Toggled: {self.is_toggled}')
 
         self.__calculate_state()
 
         super()._render()
+
+    def toggle(self):
+        self.__is_toggled = True
+
+    def untoggle(self):
+        self.__is_toggled = False
 
 ###############################################################################
 

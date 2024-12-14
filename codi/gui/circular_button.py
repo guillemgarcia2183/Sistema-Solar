@@ -22,9 +22,7 @@ from .button import Button
 class CircularButton(Button):
 
     __slots__ = (
-        "__app",
         "__radius",
-        "__uuid",
         "__vertexes",
     )
 
@@ -48,8 +46,7 @@ class CircularButton(Button):
 ###############################################################################
 #                               Private Methods                               #
 
-
-    def _containing(self, pos_x, pos_y) -> bool:
+    def _containing(self, pos_x, pos_y) -> bool:  # noqa
         return (
             (pos_x - self.x) ** 2 + (pos_y - self.y) ** 2
         ) <= self.radius ** 2
@@ -61,13 +58,7 @@ class CircularButton(Button):
 
         kwargs = default_kwargs | kwargs  # NOTE: Works for python 3.9+
 
-        # Engine
-        self.__app = app
-
-        # Button's unique id
-        self.__uuid = uuid
-
-        if self.__app.DEBUG:
+        if self.app.DEBUG:
             print(kwargs)
 
         # Shape information
@@ -85,26 +76,26 @@ class CircularButton(Button):
         angle = 2 * pi / number_circumference_vertexes
 
         origin_vertex = [2 * (
-            (self.x - (self.__app.WIN_SIZE[0] / 2)
+            (self.x - (self.app.WIN_SIZE[0] / 2)
              ) / (
-                self.__app.WIN_SIZE[0]
+                self.app.WIN_SIZE[0]
             )), - 2 * ((
-                self.y - (self.__app.WIN_SIZE[1] / 2)
+                self.y - (self.app.WIN_SIZE[1] / 2)
             ) / (
-                self.__app.WIN_SIZE[1]
+                self.app.WIN_SIZE[1]
             )), 0.0]
 
         circumference_vertexes = [
             [2 * (
                 (self.x + self.radius *
-                 cos(angle * i) - (self.__app.WIN_SIZE[0] / 2)
+                 cos(angle * i) - (self.app.WIN_SIZE[0] / 2)
                  ) / (
-                    self.__app.WIN_SIZE[0]
+                    self.app.WIN_SIZE[0]
                 )), - 2 * ((
                     self.y + self.radius *
-                    sin(angle * i) - (self.__app.WIN_SIZE[1] / 2)
+                    sin(angle * i) - (self.app.WIN_SIZE[1] / 2)
                 ) / (
-                    self.__app.WIN_SIZE[1]
+                    self.app.WIN_SIZE[1]
                 )), 0.0
              ] for i in range(number_circumference_vertexes)]
 
@@ -128,7 +119,7 @@ class CircularButton(Button):
 #                                  Properties                                 #
 
 
-    @property
+    @property  # noqa
     def radius(self) -> int:
         return self.__radius
 
@@ -141,3 +132,5 @@ class CircularButton(Button):
     @property
     def vertexes(self):
         return self.__vertexes
+
+###############################################################################

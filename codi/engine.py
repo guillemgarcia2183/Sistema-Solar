@@ -109,6 +109,7 @@ class GraphicsEngine:
             gui_layout = json.load(file)
 
         self.gui.batch_add_elements(gui_layout)
+        self.gui["planet_menu"]["Mercury"].toggle()
 
         self.create_objects()
         # axis
@@ -454,23 +455,16 @@ class GraphicsEngine:
                 raise KeyboardInterrupt("Exit game via click.")
 
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_p:
-                    self.ellipse = not self.ellipse
+                if event.key == pg.K_p and (not self.realistic_mode):
+                    self.event_change_ellipse()
 
                 elif event.key == pg.K_k and (not self.realistic_mode):
-                    self.camera, self.second_cam = self.second_cam, self.camera
+                    self.event_change_camera()
 
-                elif event.key == pg.K_m:
-                    self.realistic_mode = not self.realistic_mode
-                    self.objects, self.aux_objects = self.aux_objects, self.objects
-                    self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
+                elif event.key == pg.K_m and not (isinstance(self.camera, FollowCamera)):
+                    self.event_change_mode()
 
-                    # Update the view matrix
-                    m_view = self.camera.get_view_matrix()
-                    for object in self.objects:
-                        object.shader['m_view'].write(m_view)
-                    self.stars.shader['m_view'].write(m_view)
-
+                # ???
                 elif event.key == pg.K_l:
                     self.camera.change_lock()
 
@@ -485,8 +479,7 @@ class GraphicsEngine:
                         self.camera.speed = self.camera.maximum_speed
 
                 elif event.key in self.key_planet_map and isinstance(self.camera, FollowCamera):
-                    self.camera.speed = self.initial_speed
-                    self.camera.select_target(self.key_planet_map[event.key])
+                    self.event_change_planet(self.key_planet_map[event.key])
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
@@ -495,25 +488,15 @@ class GraphicsEngine:
 
                 element_event = self.gui.check_click(
                     pg.mouse.get_pos())
-                if element_event == "elipses":
-                    self.ellipse = not self.ellipse
-                    if self.DEBUG:
-                        print(f'Ellipses: {self.ellipse}')
-                elif element_event == "canvi_camera":
-                    if self.DEBUG:
-                        print("Canvi camera")
-                    self.camera, self.second_cam = self.second_cam, self.camera
-                elif element_event == "escala":
-                    if self.DEBUG:
-                        print("Canvi escala")
-                    self.objects, self.aux_objects = self.aux_objects, self.objects
-                    self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
 
-                    # Update the view matrix
-                    m_view = self.camera.get_view_matrix()
-                    for object in self.objects:
-                        object.shader['m_view'].write(m_view)
-                    self.stars.shader['m_view'].write(m_view)
+                if element_event == "elipses":
+                    self.event_change_ellipse()
+                elif element_event == "canvi_camera":
+                    self.event_change_camera()
+                elif element_event == "escala":
+                    self.event_change_mode()
+                elif element_event in self.key_planet_map.values():
+                    self.event_change_planet(element_event)
 
             # Mouse button released
             elif event.type == pg.MOUSEBUTTONUP:
@@ -532,6 +515,85 @@ class GraphicsEngine:
                 # Update last mouse position
                 self.camera.last_mouse_pos = current_mouse_pos
 
+    def event_change_camera(self):
+        """
+        Handle event of changing camera mode.
+
+        Returns
+        -------
+        None.
+
+        """
+        if self.DEBUG:
+            print("Canvi camera")
+        self.camera, self.second_cam = self.second_cam, self.camera
+        if isinstance(self.camera, FollowCamera):
+            self.gui["escala"].hide()
+            self.gui["planet_menu"].unhide()
+        else:
+            self.gui["escala"].unhide()
+            self.gui["planet_menu"].hide()
+
+    def event_change_ellipse(self):
+        """
+        Handle event of changing visibility of orbits.
+
+        Returns
+        -------
+        None.
+
+        """
+        if self.DEBUG:
+            print(f'Ellipses: {self.ellipse}')
+        self.ellipse = not self.ellipse
+
+    def event_change_mode(self):
+        """
+        Handle event of changing scale.
+
+        Returns
+        -------
+        None.
+
+        """
+        if self.DEBUG:
+            print("Canvi escala")
+        self.realistic_mode = not self.realistic_mode
+        self.objects, self.aux_objects = self.aux_objects, self.objects
+        self.orbits, self.aux_orbits = self.aux_orbits, self.orbits
+
+        # Update the view matrix
+        m_view = self.camera.get_view_matrix()
+        for object in self.objects:
+            object.shader['m_view'].write(m_view)
+        self.stars.shader['m_view'].write(m_view)
+
+        if self.realistic_mode:
+            self.gui["elipses"].hide()
+            self.gui["canvi_camera"].hide()
+        else:
+            self.gui["elipses"].unhide()
+            self.gui["canvi_camera"].unhide()
+
+    def event_change_planet(self, target_planet):
+        """
+        Handle event of changing targeted player of satellite camera.
+
+        Parameters
+        ----------
+        target_planet : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.camera.speed = self.initial_speed
+        self.camera.select_target(target_planet)
+        self.gui["planet_menu"].untoggle()
+        self.gui["planet_menu"][target_planet].toggle()
+
     def end(self):
         """
         Destruir tots els objectes i finalitzar la simulació.
@@ -543,10 +605,10 @@ class GraphicsEngine:
 
         for objecte in self.objects:
             objecte.destroy()
-        
+
         for aux_object in self.aux_objects:
             aux_object.destroy()
-        
+
         for orbit in self.orbits:
             orbit.destroy()
 

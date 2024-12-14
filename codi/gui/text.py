@@ -22,44 +22,77 @@ from .text_label import TextLabel
 class Text(Element):
 
     __slots__ = (
-        "__app",
         "__background_color",
         "__height",
-        "__is_hidden",
         "__is_hovered",
-        "__is_locked",
         "__shader_programs",
         "__text",
-        "__uuid",
         "__vao",
+        "__vbo",
         "__vertexes",
         "__width",
-        "__vbo",
         "__x",
         "__y",
     )
 
+###############################################################################
+#                             Overloaded Operators                            #
+
     def __init__(self, app, uuid: str, **kwargs):
+        # Inicialize attributes
+        self._set_attributes(app, uuid, **kwargs)
+
+        # Write the shader
+        self._set_shader_programs()
+
+        # Create all ModernGL objects
+        self._set_vao()
+
+###############################################################################
+
+
+###############################################################################
+#                              Protected Methods                              #
+
+
+    def __calculate_state(self):  # noqa
+        self.color = self.__background_color
+
+###############################################################################
+
+
+###############################################################################
+#                               Private Methods                               #
+
+    def _containing(self, pos_x, pos_y):  # noqa
+        return (
+            self.x - self.width / 2 <= pos_x <= self.x + self.width / 2
+        ) and (
+            self.y - self.height / 2 <= pos_y <= self.y + self.height / 2
+        )
+
+    def _render(self):
+        # Render text
+        self.__text.render()
+
+        # Render backgound (draw quad as two triangles)
+        self.__vao.render(mgl.TRIANGLE_STRIP)
+
+    def _set_attributes(self, app, uuid: str, **kwargs):
+        super().__init__(app, uuid, **kwargs)
+
         default_kwargs = {
             "x": 0,
             "y": 0,
             "width": 1,
             "height": 1,
             "background_color": (1.0, 1.0, 1.0),
-            "hidden": False,
-            "locked": False,
             "text": None,
         }
 
         kwargs = default_kwargs | kwargs  # NOTE: Works for python 3.9+
 
-        # Engine
-        self.__app = app
-
-        # Button's unique id
-        self.__uuid = uuid
-
-        if self.__app.DEBUG:
+        if self.app.DEBUG:
             print("Text")
             print(kwargs)
 
@@ -73,46 +106,33 @@ class Text(Element):
         self.__background_color = kwargs["background_color"]
 
         # States information
-        self.__is_hidden = kwargs["hidden"]
         self.__is_hovered = False
-        self.__is_locked = kwargs["locked"]
 
         # Text
         if kwargs['text'] is None:
-            self.__text = Empty()
-        else:
-            kwargs['text'] = kwargs['text'] | {"x": self.__x, "y": self.__y}
-            if self.__app.DEBUG:
-                print(kwargs['text'])
-            self.__text = TextLabel(
-                self.__app,
-                self.__uuid + "_text",
-                **kwargs['text'],
-            )
+            kwargs['text'] = {
+                'text': "",
+                'x': 0,
+                'y': 0,
+                'color': (0.0, 0.0, 0.0),
+                'sys_font': 'Arial',
+                'font_size': 1,
+                'scale_factor': 1,
+            }
 
-        # Write the shader
-        self.__set_shader_programs()
+        kwargs['text'] = kwargs['text'] | {"x": self.x, "y": self.y}
 
-        # Create all ModernGL objects
-        self.__set_vao()
+        if self.app.DEBUG:
+            print(kwargs['text'])
 
-    @property
-    def __color(self):
-        return self.__shader_programs['in_colour'].value
-
-    @__color.setter
-    def __color(self, new_color):
-        self.__shader_programs['in_colour'].value = new_color
-
-    def __containing(self, pos_x, pos_y):
-        return (
-            self.__x - self.__width / 2 <= pos_x <= self.__x + self.__width / 2
-        ) and (
-            self.__y - self.__height / 2 <= pos_y <= self.__y + self.__height / 2
+        self.__text: TextLabel = TextLabel(
+            self.app,
+            self.uuid + "_text_label",
+            **kwargs['text'],
         )
 
-    def __set_shader_programs(self):
-        self.__shader_programs = self.__app.ctx.program(
+    def _set_shader_programs(self):
+        self.__shader_programs = self.app.ctx.program(
             vertex_shader='''
             #version 330
 
@@ -140,37 +160,37 @@ class Text(Element):
             '''
         )
 
-    def __set_vao(self):
+    def _set_vao(self):
 
-        self.__set_vbo()
+        self._set_vbo()
 
-        self.__vao = self.__app.ctx.vertex_array(
+        self.__vao = self.app.ctx.vertex_array(
             self.__shader_programs, [(self.__vbo, '3f', 'in_vert')])
 
-    def __set_vbo(self):
+    def _set_vbo(self):
 
-        self.__set_vertexes()
+        self._set_vertexes()
 
-        self.__vbo = self.__app.ctx.buffer(self.__vertexes.tobytes())
+        self.__vbo = self.app.ctx.buffer(self.vertexes.tobytes())
 
-    def __set_vertexes(self):
+    def _set_vertexes(self):
 
         # Vertex data (rectangle for the button)
         gl_x = (
             2 * (
                 (
-                    self.__x - (self.__width / 2) -
-                    (self.__app.WIN_SIZE[0] / 2)
+                    self.x - (self.width / 2) -
+                    (self.app.WIN_SIZE[0] / 2)
                 ) / (
-                    self.__app.WIN_SIZE[0]
+                    self.app.WIN_SIZE[0]
                 )
             ),
             2 * (
                 (
-                    self.__x + (self.__width / 2) -
-                    (self.__app.WIN_SIZE[0] / 2)
+                    self.x + (self.width / 2) -
+                    (self.app.WIN_SIZE[0] / 2)
                 ) / (
-                    self.__app.WIN_SIZE[0]
+                    self.app.WIN_SIZE[0]
                 )
             )
         )
@@ -178,18 +198,18 @@ class Text(Element):
         gl_y = (
             -2 * (
                 (
-                    self.__y - (self.__height / 2) -
-                    (self.__app.WIN_SIZE[1] / 2)
+                    self.y - (self.__height / 2) -
+                    (self.app.WIN_SIZE[1] / 2)
                 ) / (
-                    self.__app.WIN_SIZE[1]
+                    self.app.WIN_SIZE[1]
                 )
             ),
             -2 * (
                 (
-                    self.__y + (self.__height / 2) -
-                    (self.__app.WIN_SIZE[1] / 2)
+                    self.y + (self.height / 2) -
+                    (self.app.WIN_SIZE[1] / 2)
                 ) / (
-                    self.__app.WIN_SIZE[1]
+                    self.app.WIN_SIZE[1]
                 )
             )
         )
@@ -204,13 +224,12 @@ class Text(Element):
             dtype='f4'
         )
 
-    @property
-    def background_color(self) -> tuple[float, float, float]:
-        return self.__background_color
+###############################################################################
 
-    @background_color.setter
-    def background_color(self, new_background_color: tuple[float, float, float]):
-        self.__default_color = new_background_color
+
+###############################################################################
+#                                Public Methods                               #
+
 
     def check_click(self, mouse_position: tuple[int, int]) -> bool:
         """
@@ -228,14 +247,15 @@ class Text(Element):
 
         """
         # Cannot be clicked if is locked
-        if self.__is_locked or self.__is_hidden:
-            return False
+        if self.is_locked or self.is_hidden:
+            return None
 
         # Get mouse coordinates
         mx, my = mouse_position
 
         # Return True if button is clicked
-        return self.__containing(mx, my)
+        if self._containing(mx, my):
+            return self.uuid
 
     def check_hover(self, mouse_position: tuple[int, int]):
         """
@@ -252,14 +272,14 @@ class Text(Element):
 
         """
         # Cannot be hovered if is locked
-        if self.__is_locked or self.__is_hidden:
+        if self.is_locked or self.is_hidden:
             return None
 
         # Get mouse coordinates
         mx, my = mouse_position
 
         # Update hover state
-        self.__is_hovered = self.__containing(mx, my)
+        self.__is_hovered = self._containing(mx, my)
 
     def check_time(self, delta):
         pass
@@ -271,6 +291,59 @@ class Text(Element):
 
         self.__shader_programs.release()
 
+    def render(self) -> None:
+        if self.is_hidden:
+            return None
+
+        self.__calculate_state()
+
+        self._render()
+
+    def toggle(self):
+        return None
+
+    def untoggle(self):
+        return None
+
+###############################################################################
+
+
+###############################################################################
+#                                  Properties                                 #
+
+
+    @property  # noqa
+    def background_color(self) -> tuple[float, float, float]:
+        return self.__background_color
+
+    @background_color.setter
+    def background_color(self, new_background_color: tuple[float, float, float]):
+        self.__default_color = new_background_color
+
+    @property
+    def color(self):
+        return self.__shader_programs['in_colour'].value
+
+    @color.setter
+    def color(self, new_color):
+        self.__shader_programs['in_colour'].value = new_color
+
+    @property
+    def font(self) -> str:
+        return self.__text.font
+
+    @font.setter
+    def font(self, new_font: str):
+        self.__text.font = new_font
+
+    @property
+    def font_size(self) -> int:
+        return self.__text.font_size
+
+    @font_size.setter
+    def font_size(self, new_font_size: int):
+        self.__text.font_size = new_font_size
+
     @property
     def height(self) -> int:
         return self.__height
@@ -279,33 +352,31 @@ class Text(Element):
     def height(self, new_height: int):
         self.__height = new_height
 
-        self.__set_vao()
-
-    def hide(self):
-        self.__is_hidden = True
+        self._set_vao()
 
     @property
-    def is_hidden(self):
-        return self.__is_hidden
-
-    def render(self) -> None:
-        if self.__is_hidden:
-            return None
-
-        self.__color = self.__background_color
-
-        # Render text
-        self.__text.render()
-
-        # Render backgound (draw quad as two triangles)
-        self.__vao.render(mgl.TRIANGLE_STRIP)
-
-    def unhide(self):
-        self.__is_hidden = False
+    def is_hovered(self) -> bool:
+        return self.__is_hovered
 
     @property
-    def uuid(self) -> str:
-        return self.__uuid
+    def scale_factor(self) -> int:
+        return self.__text.scale_factor
+
+    @scale_factor.setter
+    def scale_factor(self, new_scale_factor: int):
+        self.__text.scale_factor = new_scale_factor
+
+    @property
+    def text_color(self) -> tuple[float, float, float]:
+        return self.__text.text_color
+
+    @text_color.setter
+    def text_color(self, new_color: tuple[float, float, float]):
+        self.__text.text_color = new_color
+
+    @property
+    def vertexes(self):
+        return self.__vertexes
 
     @property
     def width(self) -> int:
@@ -315,7 +386,7 @@ class Text(Element):
     def width(self, new_width: int):
         self.__width = new_width
 
-        self.__set_vao()
+        self._set_vao()
 
     @property
     def x(self) -> int:
@@ -325,7 +396,9 @@ class Text(Element):
     def x(self, new_x: int):
         self.__x = new_x
 
-        self.__set_vao()
+        self.__text.x = new_x
+
+        self._set_vao()
 
     @property
     def y(self) -> int:
@@ -335,4 +408,8 @@ class Text(Element):
     def y(self, new_y: int):
         self.__y = new_y
 
-        self.__set_vao()
+        self.__text.y = new_y
+
+        self._set_vao()
+
+###############################################################################

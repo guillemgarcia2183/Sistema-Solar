@@ -38,6 +38,9 @@ class TextLabel():
         "__y",
     )
 
+###############################################################################
+#                             Overloaded Operators                            #
+
     def __init__(self, app, uuid: str, **kwargs):
         default_kwargs = {
             'text': "",
@@ -57,7 +60,7 @@ class TextLabel():
         # Text Labels's unique id
         self.__uuid = uuid
 
-        if self.__app.DEBUG:
+        if self.app.DEBUG:
             print("Text Label")
             print(kwargs)
 
@@ -73,71 +76,26 @@ class TextLabel():
         self.__y = kwargs['y']
 
         # Write the shader
-        self.__set_shader_programs()
+        self._set_shader_programs()
 
         # Create all ModernGL objects
-        self.__set_vao()
+        self._set_vao()
 
-    def __set_text_texture(self):
-        # Set font
-        self.__set_font()
+###############################################################################
 
-        # Render Pygame text
-        text = self.__font.render(
-            self.__text,
-            True,
-            (
-                self.__color[0] * 255,
-                self.__color[1] * 255,
-                self.__color[2] * 255,
-                255,
-            )
-        )
 
-        # Flip Pygame text vertically
-        text = pg.transform.flip(
-            text, False, True)
+###############################################################################
+#                               Private Methods                               #
 
-        # Transform text into bytes
-        bytes_text = pg.image.tobytes(text, 'RGBA', True)
 
-        # Get size of the text
-        text_width, text_height = text.get_size()
-
-        # Transform into a ModernGL texture
-        texture = self.__app.ctx.texture(
-            (text_width, text_height),
-            4,
-            bytes_text,
-        )
-
-        # Use linear filtering for smoother text
-        texture.filter = (moderngl.LINEAR, moderngl.LINEAR)
-
-        texture.build_mipmaps()
-
-        # Set text texture parameters in object
-        self.__width = text_width // self.__scale_factor
-        self.__height = text_height // self.__scale_factor
-        self.__texture = texture
-
-        # Bind texture
-        self.__texture.use()
-
-        if self.__app.DEBUG:
-            print(f"Rendering text: '{self.__text}'")
-            print(f"Text size: {self.__font.size(self.__text)}")
-            print(f"Text surface size: {text.get_size()}")
-            print(f"Bytes length: {len(bytes_text)}")
-
-    def __set_font(self):
+    def _set_font(self):  # noqa
         # Load Pygame font object from system font
         self.__font = pg.font.SysFont(
             self.__sys_font,
             self.__font_size * self.__scale_factor,
         )
 
-    def __set_shader_programs(self) -> moderngl.Program:
+    def _set_shader_programs(self) -> moderngl.Program:
         """
         Generate the shader program that will render this object.
 
@@ -147,7 +105,7 @@ class TextLabel():
             Shader Program.
 
         """
-        self.__shader_programs = self.__app.ctx.program(
+        self.__shader_programs = self.app.ctx.program(
             vertex_shader='''
             #version 330
 
@@ -181,10 +139,62 @@ class TextLabel():
             '''
         )
 
-        if self.__app.DEBUG:
+        if self.app.DEBUG:
             print("Shader program compiled and linked successfully.")
 
-    def __set_vao(self):
+    def _set_text_texture(self):
+        # Set font
+        self._set_font()
+
+        # Render Pygame text
+        text = self.__font.render(
+            self.__text,
+            True,
+            (
+                self.__color[0] * 255,
+                self.__color[1] * 255,
+                self.__color[2] * 255,
+                255,
+            )
+        )
+
+        # Flip Pygame text vertically
+        text = pg.transform.flip(
+            text, False, True)
+
+        # Transform text into bytes
+        bytes_text = pg.image.tobytes(text, 'RGBA', True)
+
+        # Get size of the text
+        text_width, text_height = text.get_size()
+
+        # Transform into a ModernGL texture
+        texture = self.app.ctx.texture(
+            (text_width, text_height),
+            4,
+            bytes_text,
+        )
+
+        # Use linear filtering for smoother text
+        texture.filter = (moderngl.LINEAR, moderngl.LINEAR)
+
+        texture.build_mipmaps()
+
+        # Set text texture parameters in object
+        self.__width = text_width // self.__scale_factor
+        self.__height = text_height // self.__scale_factor
+        self.__texture = texture
+
+        # Bind texture
+        self.__texture.use()
+
+        if self.app.DEBUG:
+            print(f"Rendering text: '{self.__text}'")
+            print(f"Text size: {self.__font.size(self.__text)}")
+            print(f"Text surface size: {text.get_size()}")
+            print(f"Bytes length: {len(bytes_text)}")
+
+    def _set_vao(self):
         """
         Set the vao of the object.
 
@@ -195,20 +205,20 @@ class TextLabel():
         None.
 
         """
-        self.__set_vbo()
+        self._set_vbo()
 
-        if self.__app.DEBUG:
+        if self.app.DEBUG:
             print("Program attributes:",
                   self.__shader_programs._attribute_locations)
 
-        self.__vao = self.__app.ctx.simple_vertex_array(
+        self.__vao = self.app.ctx.simple_vertex_array(
             self.__shader_programs,
             self.__vbo,
             'in_position',
             'in_texcoord',
         )
 
-    def __set_vbo(self):
+    def _set_vbo(self):
         """
         Set the vbo of the object.
 
@@ -219,28 +229,28 @@ class TextLabel():
         None.
 
         """
-        self.__set_vertexes()
+        self._set_vertexes()
 
-        bytes_vertex = self.__vertexes.tobytes()
+        bytes_vertex = self.vertexes.tobytes()
 
-        if self.__app.DEBUG:
+        if self.app.DEBUG:
             print(bytes_vertex)
 
-        self.__vbo = self.__app.ctx.buffer(bytes_vertex)
+        self.__vbo = self.app.ctx.buffer(bytes_vertex)
 
-        if self.__app.DEBUG:
-            print(self.__app.ctx.buffer)
+        if self.app.DEBUG:
+            print(self.app.ctx.buffer)
 
-    def __set_vertexes(self):
+    def _set_vertexes(self):
         # Set text texture
-        self.__set_text_texture()
+        self._set_text_texture()
 
-        ndc_x_center = (self.__x / self.__app.WIN_SIZE[0]) * 2 - 1
-        ndc_y_center = -((self.__y / self.__app.WIN_SIZE[1]) * 2 - 1)
+        ndc_x_center = (self.x / self.app.WIN_SIZE[0]) * 2 - 1
+        ndc_y_center = -((self.y / self.app.WIN_SIZE[1]) * 2 - 1)
 
         # Half-width and half-height in NDC
-        ndc_half_w = self.__width / self.__app.WIN_SIZE[0]
-        ndc_half_h = self.__height / self.__app.WIN_SIZE[1]
+        ndc_half_w = self.width / self.app.WIN_SIZE[0]
+        ndc_half_h = self.height / self.app.WIN_SIZE[1]
 
         # Define quad vertices centered at (ndc_x_center, ndc_y_center)
         self.__vertexes = np.array([
@@ -263,8 +273,15 @@ class TextLabel():
         #     0.5,  0.5,  # 1.0, 0.0,  # Top-right
         # ], dtype='f4')
 
-        if self.__app.DEBUG:
-            print(f"Vertices (NDC): {self.__vertexes}")
+        if self.app.DEBUG:
+            print(f"Vertices (NDC): {self.vertexes}")
+
+###############################################################################
+
+
+###############################################################################
+#                                Public Methods                               #
+
 
     def destroy(self):
         """
@@ -296,3 +313,106 @@ class TextLabel():
         self.__texture.use()
 
         self.__vao.render(moderngl.TRIANGLE_STRIP)
+
+###############################################################################
+
+
+###############################################################################
+#                                  Properties                                 #
+
+
+    @property  # noqa
+    def app(self):
+        """
+        Return app engine.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+        return self.__app
+
+    @property
+    def font(self) -> str:
+        return self.__sys_font
+
+    @font.setter
+    def font(self, new_font: str):
+        self.__sys_font = new_font
+        self._set_vao()
+
+    @property
+    def font_size(self) -> int:
+        return self.__font_size
+
+    @font_size.setter
+    def font_size(self, new_font_size: int):
+        self.__font_size = new_font_size
+        self._set_vao()
+
+    @property
+    def height(self) -> int:
+        return self.__height
+
+    @property
+    def scale_factor(self) -> int:
+        return self.__scale_factor
+
+    @scale_factor.setter
+    def scale_factor(self, new_scale_factor: int):
+        self.__scale_factor = new_scale_factor
+        self._set_vao()
+
+    @property
+    def text_color(self) -> tuple[float, float, float]:
+        return self.__color
+
+    @text_color.setter
+    def text_color(self, new_color: tuple[float, float, float]):
+        self.__color = new_color
+        self._set_vao()
+
+    @property
+    def uuid(self) -> str:
+        """
+        Return Element UUID.
+
+        Returns
+        -------
+        str
+            Element UUID.
+
+        """
+        return self.__uuid
+
+    @property
+    def vertexes(self):
+        return self.__vertexes
+
+    @property
+    def width(self) -> int:
+        return self.__width
+
+    @property
+    def x(self) -> int:
+        return self.__x
+
+    @x.setter
+    def x(self, new_x: int):
+        self.__x = new_x
+
+        self._set_vao()
+
+    @property
+    def y(self) -> int:
+        return self.__y
+
+    @y.setter
+    def y(self, new_y: int):
+        self.__y = new_y
+
+        self._set_vao()
+
+###############################################################################

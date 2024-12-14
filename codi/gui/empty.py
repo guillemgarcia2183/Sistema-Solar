@@ -18,23 +18,24 @@ class Empty(Element):
     """Empty class."""
 
     __slots__ = (
-        "__app",
-        "__is_hidden",
         "__is_hovered",
-        "__is_locked",
-        "__uuid",
     )
 
+###############################################################################
+#                             Overloaded Operators                            #
+
     def __init__(self, app=None, uuid: str = None, **kwargs):
-        self.__app = None
+        super().__init__(app, uuid, **kwargs)
 
-        self.__uuid = None
-
-        self.__is_hidden = None
         self.__is_hovered = None
-        self.__is_locked = None
 
-    def check_click(self, mouse_position: tuple[int, int]):
+###############################################################################
+
+
+###############################################################################
+#                                Public Methods                               #
+
+    def check_click(self, mouse_position: tuple[int, int]):  # noqa
         """
         Empty check_click method.
 
@@ -77,6 +78,28 @@ class Empty(Element):
         """
         return None
 
+    def hide(self):
+        """
+        Emty hide method.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.__is_hidden = None
+
+    def lock(self):
+        """
+        Empty lock method.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.__is_locked = None
+
     def render(self):
         """
         Empty render method.
@@ -87,3 +110,27 @@ class Empty(Element):
 
         """
         return None
+
+    def unhide(self):
+        """
+        Empty unhide method.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.__is_hidden = None
+
+    def unlock(self):
+        """
+        Empty unlock method.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.__is_locked = None
+
+###############################################################################

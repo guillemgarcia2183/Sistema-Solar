@@ -12,4 +12,4 @@ if sys.version_info[0] < 3:
     raise RuntimeError("Python version lower than 3.")
 
 if sys.version_info[1] < 9:
-    raise RuntimeError("Pythoin version lower than 3.9.")
+    raise RuntimeError("Python version lower than 3.9.")

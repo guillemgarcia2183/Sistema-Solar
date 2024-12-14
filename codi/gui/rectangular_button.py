@@ -19,9 +19,7 @@ from .button import Button
 class RectangularButton(Button):
 
     __slots__ = (
-        "__app",
         "__height",
-        "__uuid",
         "__vertexes",
         "__width",
     )
@@ -46,7 +44,7 @@ class RectangularButton(Button):
 ###############################################################################
 #                               Private Methods                               #
 
-    def _containing(self, pos_x, pos_y):
+    def _containing(self, pos_x, pos_y):  # noqa
         return (
             self.x - self.width / 2 <= pos_x <= self.x + self.width / 2
         ) and (
@@ -61,13 +59,7 @@ class RectangularButton(Button):
 
         kwargs = default_kwargs | kwargs  # NOTE: Works for python 3.9+
 
-        # Engine
-        self.__app = app
-
-        # Button's unique id
-        self.__uuid = uuid
-
-        if self.__app.DEBUG:
+        if self.app.DEBUG:
             print("Rectangular Button")
             print(kwargs)
 
@@ -82,17 +74,17 @@ class RectangularButton(Button):
             2 * (
                 (
                     self.x - (self.width / 2) -
-                    (self.__app.WIN_SIZE[0] / 2)
+                    (self.app.WIN_SIZE[0] / 2)
                 ) / (
-                    self.__app.WIN_SIZE[0]
+                    self.app.WIN_SIZE[0]
                 )
             ),
             2 * (
                 (
                     self.x + (self.width / 2) -
-                    (self.__app.WIN_SIZE[0] / 2)
+                    (self.app.WIN_SIZE[0] / 2)
                 ) / (
-                    self.__app.WIN_SIZE[0]
+                    self.app.WIN_SIZE[0]
                 )
             )
         )
@@ -101,17 +93,17 @@ class RectangularButton(Button):
             -2 * (
                 (
                     self.y - (self.height / 2) -
-                    (self.__app.WIN_SIZE[1] / 2)
+                    (self.app.WIN_SIZE[1] / 2)
                 ) / (
-                    self.__app.WIN_SIZE[1]
+                    self.app.WIN_SIZE[1]
                 )
             ),
             -2 * (
                 (
                     self.y + (self.height / 2) -
-                    (self.__app.WIN_SIZE[1] / 2)
+                    (self.app.WIN_SIZE[1] / 2)
                 ) / (
-                    self.__app.WIN_SIZE[1]
+                    self.app.WIN_SIZE[1]
                 )
             )
         )
@@ -132,7 +124,8 @@ class RectangularButton(Button):
 ###############################################################################
 #                                  Properties                                 #
 
-    @property
+
+    @property  # noqa
     def height(self) -> int:
         return self.__height
 
@@ -140,7 +133,7 @@ class RectangularButton(Button):
     def height(self, new_height: int):
         self.__height = new_height
 
-        self.__set_vao()
+        self._set_vao()
 
     @property
     def width(self) -> int:
@@ -150,7 +143,7 @@ class RectangularButton(Button):
     def width(self, new_width: int):
         self.__width = new_width
 
-        self.__set_vao()
+        self._set_vao()
 
     @property
     def vertexes(self):

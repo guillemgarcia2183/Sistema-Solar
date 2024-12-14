@@ -204,5 +204,355 @@
                 "scale_factor": 2
             }
         }
+    },
+    "planet_menu" : {
+        "class": "menu",
+        "kwargs": {
+            "toggle_button": {
+                "class": "rectangular_toggle",
+                "kwargs": {
+                    "x": 0.05,
+                    "y": 0.05,
+                    "width": 0.18,
+                    "height": 0.03,
+                    "default_color": [
+                        0.53,
+                        0.81,
+                        0.98
+                    ],
+                    "hover_color": [
+                        0.5,
+                        0.5,
+                        0.5
+                    ],
+                    "toggle_color": [
+                        1.0,
+                        1.0,
+                        0.0
+                    ],
+                    "locked_color": null,
+                    "text": {
+                        "text": "Planets",
+                        "color": [
+                            0.1,
+                            0.1,
+                            0.1
+                        ],
+                        "sys_font": "Arial",
+                        "font_size": 24,
+                        "scale_factor": 2
+                    }
+                }
+            },
+            "hidden": true,
+            "locked": false,
+            "elements": {
+                "Mercury": {
+                    "class": "rectangular_toggle",
+                    "kwargs": {
+                        "x": 0.05,
+                        "y": 0.08,
+                        "width": 0.18,
+                        "height": 0.03,
+                        "default_color": [
+                            0.53,
+                            0.81,
+                            0.98
+                        ],
+                        "hover_color": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "toggle_color": [
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "locked_color": null,
+                        "hidden": false,
+                        "locked": false,
+                        "text": {
+                            "text": "Mercury",
+                            "color": [
+                                0.1,
+                                0.1,
+                                0.1
+                            ],
+                            "sys_font": "Arial",
+                            "font_size": 24,
+                            "scale_factor": 2
+                        }
+                    }
+                },
+                "Venus": {
+                    "class": "rectangular_toggle",
+                    "kwargs": {
+                        "x": 0.05,
+                        "y": 0.11,
+                        "width": 0.18,
+                        "height": 0.03,
+                        "default_color": [
+                            0.53,
+                            0.81,
+                            0.98
+                        ],
+                        "hover_color": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "toggle_color": [
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "locked_color": null,
+                        "hidden": false,
+                        "locked": false,
+                        "text": {
+                            "text": "Venus",
+                            "color": [
+                                0.1,
+                                0.1,
+                                0.1
+                            ],
+                            "sys_font": "Arial",
+                            "font_size": 24,
+                            "scale_factor": 2
+                        }
+                    }
+                },
+                "Earth": {
+                    "class": "rectangular_toggle",
+                    "kwargs": {
+                        "x": 0.05,
+                        "y": 0.14,
+                        "width": 0.18,
+                        "height": 0.03,
+                        "default_color": [
+                            0.53,
+                            0.81,
+                            0.98
+                        ],
+                        "hover_color": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "toggle_color": [
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "locked_color": null,
+                        "hidden": false,
+                        "locked": false,
+                        "text": {
+                            "text": "Earth",
+                            "color": [
+                                0.1,
+                                0.1,
+                                0.1
+                            ],
+                            "sys_font": "Arial",
+                            "font_size": 24,
+                            "scale_factor": 2
+                        }
+                    }
+                },
+                "Mars": {
+                    "class": "rectangular_toggle",
+                    "kwargs": {
+                        "x": 0.05,
+                        "y": 0.17,
+                        "width": 0.18,
+                        "height": 0.03,
+                        "default_color": [
+                            0.53,
+                            0.81,
+                            0.98
+                        ],
+                        "hover_color": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "toggle_color": [
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "locked_color": null,
+                        "hidden": false,
+                        "locked": false,
+                        "text": {
+                            "text": "Mars",
+                            "color": [
+                                0.1,
+                                0.1,
+                                0.1
+                            ],
+                            "sys_font": "Arial",
+                            "font_size": 24,
+                            "scale_factor": 2
+                        }
+                    }
+                },
+                "Jupiter": {
+                    "class": "rectangular_toggle",
+                    "kwargs": {
+                        "x": 0.05,
+                        "y": 0.20,
+                        "width": 0.18,
+                        "height": 0.03,
+                        "default_color": [
+                            0.53,
+                            0.81,
+                            0.98
+                        ],
+                        "hover_color": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "toggle_color": [
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "locked_color": null,
+                        "hidden": false,
+                        "locked": false,
+                        "text": {
+                            "text": "Jupiter",
+                            "color": [
+                                0.1,
+                                0.1,
+                                0.1
+                            ],
+                            "sys_font": "Arial",
+                            "font_size": 24,
+                            "scale_factor": 2
+                        }
+                    }
+                },
+                "Saturn": {
+                    "class": "rectangular_toggle",
+                    "kwargs": {
+                        "x": 0.05,
+                        "y": 0.23,
+                        "width": 0.18,
+                        "height": 0.03,
+                        "default_color": [
+                            0.53,
+                            0.81,
+                            0.98
+                        ],
+                        "hover_color": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "toggle_color": [
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "locked_color": null,
+                        "hidden": false,
+                        "locked": false,
+                        "text": {
+                            "text": "Saturn",
+                            "color": [
+                                0.1,
+                                0.1,
+                                0.1
+                            ],
+                            "sys_font": "Arial",
+                            "font_size": 24,
+                            "scale_factor": 2
+                        }
+                    }
+                },
+                "Uranus": {
+                    "class": "rectangular_toggle",
+                    "kwargs": {
+                        "x": 0.05,
+                        "y": 0.26,
+                        "width": 0.18,
+                        "height": 0.03,
+                        "default_color": [
+                            0.53,
+                            0.81,
+                            0.98
+                        ],
+                        "hover_color": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "toggle_color": [
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "locked_color": null,
+                        "hidden": false,
+                        "locked": false,
+                        "text": {
+                            "text": "Uranus",
+                            "color": [
+                                0.1,
+                                0.1,
+                                0.1
+                            ],
+                            "sys_font": "Arial",
+                            "font_size": 24,
+                            "scale_factor": 2
+                        }
+                    }
+                },
+                "Neptune": {
+                    "class": "rectangular_toggle",
+                    "kwargs": {
+                        "x": 0.05,
+                        "y": 0.29,
+                        "width": 0.18,
+                        "height": 0.03,
+                        "default_color": [
+                            0.53,
+                            0.81,
+                            0.98
+                        ],
+                        "hover_color": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "toggle_color": [
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "locked_color": null,
+                        "hidden": false,
+                        "locked": false,
+                        "text": {
+                            "text": "Neptune",
+                            "color": [
+                                0.1,
+                                0.1,
+                                0.1
+                            ],
+                            "sys_font": "Arial",
+                            "font_size": 24,
+                            "scale_factor": 2
+                        }
+                    }
+                }
+            }
+
+        }
     }
 }

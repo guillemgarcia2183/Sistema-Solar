@@ -2,7 +2,7 @@
 """
 Created on Thu Nov 28 12:52:06 2024
 
-@author: JoelT
+@author: Joel Tapia Salvador
 """
 import json
 import pygame as pg
