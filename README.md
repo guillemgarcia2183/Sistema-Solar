@@ -31,7 +31,33 @@ Si es vol executar el codi, has de seguir els passos de a continuació:
 * 1: Clonar el repositori Github localment. 
 * 2: Executar el arxiu main.py del repositori /codi.
 
-## 2. Resultats
+## 2. Controls del teclat
+Es poden usar l'interfície d'usuari creada de l'aplicació, però també existeixen les següents keybinds:
+- Tecles genèriques:
+    * M: Canviar a mode realista/suavitzat. Sistema Solar a escala real o amb els paràmetres modificats per comoditat
+    * K: Canviar el mode de càmera lliure/satèl·lit. El mode lliure et permet desplaçar-te com vols i el satèl·lit segueix els planetes 
+    * P: Visualitzar o ocultar òrbites dels planetes. 
+
+- Camera lliure:
+    * W: Desplaçar càmera cap endevant
+    * A: Desplaçar càmera cap a l'esquerra
+    * S: Desplaçar càmera cap enrere
+    * D: Desplaçar càmera cap a la dreta
+    * Barra espaiadora: Elevar la càmera
+    * Ctrl: Baixar la càmera
+    * R: Resetejar la posició de la càmera a l'inici
+
+- En mode satèl·lit:
+    * W: Rotar càmera cap endevant
+    * A: Rotar càmera cap a l'esquerra
+    * S: Rotar càmera cap enrere
+    * D: Rotar càmera cap a la dreta
+    * E i Q: Roll de la càmera.
+    * L: Fixar/Desfixar la càmera
+    * 1-8: Canvi de planeta (Mercuri a Neptú)
+
+
+## 3. Resultats
 Us mostrem una seqüència d'imatges del què es pot trobar quan s'executi /codi/main.py:
 
 ![Mode satèl·lit](images/planetes.png)
@@ -39,7 +65,7 @@ Us mostrem una seqüència d'imatges del què es pot trobar quan s'executi /codi
 ![Estrelles i constel·lacions](images/satellites2.png)
 
 
-## 3. Repositoris 
+## 4. Repositoris 
 * /actes: Conté fitxers esmentant els comentaris de les reunions de grup. En les actes es pot veure com ha anat evolucionant el treball durant les setmanes de projecte. 
 * /controls: Aquest directori conté els informes de les primeres entregues del treball. 
 * /disseny: Estan tota mena d'arxius que ha servit d'ajuda a nivell de disseny de l'aplicació. 
