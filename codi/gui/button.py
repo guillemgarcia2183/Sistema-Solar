@@ -132,11 +132,11 @@ class Button(Element):
         None.
 
         """
-        # Render possible text on button
-        self.__text.render()
-
         # Render button (draw quad as two triangles)
         self.__vao.render(mgl.TRIANGLE_STRIP)
+
+        # Render possible text on button
+        self.__text.render()
 
     def _set_attributes(self, app, uuid: str, **kwargs):
         """

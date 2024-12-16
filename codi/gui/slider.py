@@ -264,13 +264,13 @@ class Slider(Element):
         """
         if self.is_hidden:
             return None
-        # Render handle
-        self.__shader_programs['in_color'].value = self.__handle_color
-        self.__handle_vao.render(mgl.TRIANGLE_STRIP)
-
         # Render track
         self.__shader_programs['in_color'].value = self.__track_color
         self.__track_vao.render(mgl.TRIANGLE_STRIP)
+
+        # Render handle
+        self.__shader_programs['in_color'].value = self.__handle_color
+        self.__handle_vao.render(mgl.TRIANGLE_STRIP)
 
     def destroy(self) -> None:
         self.__handle_vao.release()

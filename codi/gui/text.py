@@ -72,11 +72,11 @@ class Text(Element):
         )
 
     def _render(self):
-        # Render text
-        self.__text.render()
-
         # Render backgound (draw quad as two triangles)
         self.__vao.render(mgl.TRIANGLE_STRIP)
+
+        # Render text
+        self.__text.render()
 
     def _set_attributes(self, app, uuid: str, **kwargs):
         super().__init__(app, uuid, **kwargs)

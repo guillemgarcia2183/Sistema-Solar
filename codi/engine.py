@@ -87,7 +87,6 @@ class GraphicsEngine:
         # create opengl context
         pg.display.set_mode(self.WIN_SIZE, flags=pg.OPENGL | pg.DOUBLEBUF)
         self.ctx = mgl.create_context()
-        self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.BLEND)
 
         # camera
         self.camera = Camera(self)
@@ -674,6 +673,8 @@ class GraphicsEngine:
     def render(self):
         """Renderització dels objectes 
         """
+        self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.BLEND)
+
         # clear framebuffer
         self.ctx.clear(color=(0, 0, 0))
 
@@ -686,6 +687,8 @@ class GraphicsEngine:
         if self.ellipse:
             for orbit in self.orbits:
                 orbit.render()
+
+        self.ctx.disable(flags=mgl.DEPTH_TEST | mgl.BLEND)
 
         # render gui
         self.gui.render()

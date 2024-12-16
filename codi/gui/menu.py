@@ -270,9 +270,9 @@ class Menu(GUIManager):
         if self.is_hidden:
             return None
 
-        self.__menu_button.render()
-
         super().render()
+
+        self.__menu_button.render()
 
     def unhide(self):
         """
