@@ -1,6 +1,8 @@
 # Simulació del sistema solar i constel·lacions en Realitat Augmentada
 
-Aquest projecte tracta de fer un simulador interactiu que permet visualitzar les constel·lacions tal com es veurien des de diferents punts del Sistema Solar en un moment determinat. A través d'aquest simulador, podràs desplaçar-te espacialment i temporalment per observar com canvia el cel nocturn en funció de la teva posició i del temps. A més de la representació del Sistema Solar, es vol afegir un mini-joc per poder endevinar els planetes i constel·lacions de manera arbitrària.
+Aquest projecte tracta de fer un simulador interactiu que permet visualitzar el Sistema Solar i les seves constel·lacions utilitzant principalment
+les llibreries de moderngl i pygames de Python. L'objectiu és representar el Sistema Solar el més fidelment possible utilitzant les tècniques que s'han ensenyat
+en Entorns Gràfics i Realitat Augmentada.
 
 ## 0. Estat de l'art
 
@@ -21,13 +23,27 @@ Alguns sistemes de visualització del sistema solar ja existents son els següen
  - L'usuari pot activar i desactivar algunes opcions per visualitzar el cel. Per exemple, les constel·lacions, els planetes...
 
 ## 1. Requeriments
-(*Què fa falta per realitzar-lo?)
+Tots els requisits necessaris per executar el codi es troben en la carpeta /environment. 
+
+Si es vol executar el codi, has de seguir els passos de a continuació:
+* 1: Clonar el repositori Github localment. 
+* 2: Executar el arxiu main.py del repositori /codi.
 
 ## 2. Resultats
-(*Mostrar resultats)
+Us mostrem una seqüència d'imatges del què es pot trobar quan s'executi /codi/main.py:
+
+[FOTO ENTRADA](images/entrada.png)
+
+[FOTO MODE SATÈL·LIT](images/planetes.png)
+
+[FOTO ESTRELLES I CONSTEL·LACIONS](images/satellites.png)
 
 ## 3. Repositoris 
 * /actes: Conté fitxers esmentant els comentaris de les reunions de grup. En les actes es pot veure com ha anat evolucionant el treball durant les setmanes de projecte. 
+* /controls: Aquest directori conté els informes de les primeres entregues del treball. 
+* /disseny: Estan tota mena d'arxius que ha servit d'ajuda a nivell de disseny de l'aplicació. 
+* /environment: Es tenen els requisits per executar el codi.
+* /codi: Tots els arxius i directoris necessaris per fer córrer l'aplicació.
 
 
 ## Referències i Motivacions
@@ -42,7 +58,7 @@ Alguns sistemes de visualització del sistema solar ja existents son els següen
 * Banerjee, Sourav (2024): "Planet Dataset." Disponible a https://www.kaggle.com/datasets/iamsouravbanerjee/planet-dataset. Darrer accés: 16 de Octubre de 2024.
 
 
-## Participants - Grup 2
+## Participants - Grup 2 EGRA
 Guillem Garcia (NIU: 1636279)
 
 Martí Llinés (NIU: 1637804)
