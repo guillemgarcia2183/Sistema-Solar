@@ -1,4 +1,4 @@
-# Simulació del sistema solar i constel·lacions en Realitat Augmentada
+# Simulació del Sistema Solar i constel·lacions en Entorns Gràfics i Realitat Augmentada
 
 ![Foto d'entrada](images/entrada2.png)
 
