@@ -1,5 +1,7 @@
 # Simulació del sistema solar i constel·lacions en Realitat Augmentada
 
+![Foto d'entrada](images/entrada2.png)
+
 Aquest projecte tracta de fer un simulador interactiu que permet visualitzar el Sistema Solar i les seves constel·lacions utilitzant principalment
 les llibreries de moderngl i pygames de Python. L'objectiu és representar el Sistema Solar el més fidelment possible utilitzant les tècniques que s'han ensenyat
 en Entorns Gràfics i Realitat Augmentada.
@@ -31,8 +33,6 @@ Si es vol executar el codi, has de seguir els passos de a continuació:
 
 ## 2. Resultats
 Us mostrem una seqüència d'imatges del què es pot trobar quan s'executi /codi/main.py:
-
-![Foto d'entrada](images/entrada2.png)
 
 ![Mode satèl·lit](images/planetes.png)
 
