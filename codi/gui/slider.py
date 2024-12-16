@@ -74,11 +74,12 @@ class Slider(Element):
         self.shader_programs = self.__create_shader_programs()
         self.track_vao = self.__create_track_vao()
         self.handle_vao = self.__create_handle_vao()"""
-        self._set_attributes(app, uuid, **kwargs)
+        self._set_attributes(app, uuid + "_slider", **kwargs)
         # Write the shader
         self._set_shader_programs()
         # Create all ModernGL objects
-        self._set_vao()
+        self._set_track_vao()
+        self._set_handle_vao()
 
     def _set_attributes(self, app, uuid: str, **kwargs):
         """
@@ -164,36 +165,22 @@ class Slider(Element):
         if self.app.DEBUG:
             print("Shader program compiled and linked successfully.")
 
-    def _set_vao(self):
-        """
-        Set the vertex array object.
-
-        Returns
-        -------
-        None.
-
-        """
-        self._set_vbo()
-
+    def _set_track_vao(self):
+        self._set_track_vbo()
         self.__track_vao = self.app.ctx.vertex_array(
             self.__shader_programs, [(self.__track_vbo, '3f', 'in_vert')])
-
+        
+    def _set_handle_vao(self):
+        self._set_handle_vbo()
         self.__handle_vao = self.app.ctx.vertex_array(
             self.__shader_programs, [(self.__handle_vbo, '3f', 'in_vert')])
-
-    def _set_vbo(self):
-        """
-        Set the vertex buffer object.
-
-        Returns
-        -------
-        None.
-
-        """
+    
+    def _set_track_vbo(self):
         self._set_track_vertices()
-        self._set_handle_vertices()
-        
         self.__track_vbo = self.app.ctx.buffer(self.__track_vertices.tobytes())
+
+    def _set_handle_vbo(self):
+        self._set_handle_vertices()
         self.__handle_vbo = self.app.ctx.buffer(self.__handle_vertices.tobytes())
 
     def _set_track_vertices(self):
@@ -252,9 +239,6 @@ class Slider(Element):
     def check_hover(self, mouse_position: tuple[int, int]):
         pass
     
-    def check_unclick(self, mouse_position):
-        pass
-    
     def is_hovered(self):
         pass
 
@@ -285,17 +269,30 @@ class Slider(Element):
 
         self.__shader_programs.release()
 
-    def check_click(self, mouse_pos):
+    def check_click(self, mouse_position):
         """
         Check if the slider is clicked and begin dragging if necessary.
         """
-        mx, my = mouse_pos
+        if self.is_locked or self.is_hidden:
+            return None
+        mx, my = mouse_position
         handle_x = self._value_to_position()
         if abs(mx - handle_x) <= self.__width / 2 and abs(my - self.__y) <= self.__height / 2:
             self.__is_dragging = True
-            return True
-        return False
+            return self.uuid
+        return None
+    
+    def check_unclick(self, mouse_position):
+        if self.is_locked or self.is_hidden:
+            return None
 
+        mx, my = mouse_position
+        handle_x = self._value_to_position()
+        if abs(mx - handle_x) <= self.__width / 2 and abs(my - self.__y) <= self.__height / 2:
+            self.__is_dragging = False
+            return self.uuid
+        return None
+        
     def update_value(self, mouse_x):
         """
         Update the slider value based on mouse x position.
@@ -307,8 +304,7 @@ class Slider(Element):
                 self.__width * (self.__max_value - self.__min_value)
             self.__current_slice = min(range(len(self.__handle_values)), key=lambda i: abs(
                 self.__handle_values[i] - new_value))
-            self.__handle_vao = self.__create_handle_vao()
-            # print(f"mouse X: {mouse_x}\tnew_value: {new_value}")
+            self._set_handle_vao()
         return self.__handle_values[self.__current_slice]
 
     def release(self):

@@ -464,7 +464,6 @@ class GraphicsEngine:
                 elif event.key == pg.K_m and not (isinstance(self.camera, FollowCamera)):
                     self.event_change_mode()
 
-                # ???
                 elif event.key == pg.K_l:
                     self.camera.change_lock()
 
@@ -486,21 +485,25 @@ class GraphicsEngine:
                     self.event_change_planet(self.key_planet_map[event.key])
 
             if event.type == pg.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left click
-                    self.camera.left_button_held = True
-                    self.camera.last_mouse_pos = pg.mouse.get_pos()
+                mouse_pos = pg.mouse.get_pos()
+                element_event = self.gui.check_click(mouse_pos)
 
-                element_event = self.gui.check_click(
-                    pg.mouse.get_pos())
-
-                if element_event == "elipses":
-                    self.event_change_ellipse()
-                elif element_event == "canvi_camera":
-                    self.event_change_camera()
-                elif element_event == "escala":
-                    self.event_change_mode()
-                elif element_event in self.key_planet_map.values():
-                    self.event_change_planet(element_event)
+                if element_event is not None:
+                    if element_event == "elipses":
+                        self.event_change_ellipse()
+                    elif element_event == "canvi_camera":
+                        self.event_change_camera()
+                    elif element_event == "escala":
+                        self.event_change_mode()
+                    elif element_event in self.key_planet_map.values():
+                        self.event_change_planet(element_event)
+                    elif element_event[-7:] == "_slider" and event.button == 1:
+                        value = self.event_move_slider(element_event, mouse_pos[0])
+                        print(f"Current time rate: {value}")
+                else:
+                    if event.button == 1:  # Left click
+                        self.camera.left_button_held = True
+                        self.camera.last_mouse_pos = mouse_pos
 
             # Mouse button released
             elif event.type == pg.MOUSEBUTTONUP:
@@ -510,18 +513,25 @@ class GraphicsEngine:
                 element_event = self.gui.check_unclick(
                     pg.mouse.get_pos())
 
-            elif event.type == pg.MOUSEMOTION and self.camera.left_button_held:
+            elif event.type == pg.MOUSEMOTION:
+                
                 current_mouse_pos = pg.mouse.get_pos()
-                # Calculate difference in mouse movement
-                dx = current_mouse_pos[0] - self.camera.last_mouse_pos[0]
-                dy = current_mouse_pos[1] - self.camera.last_mouse_pos[1]
+                element_event = self.gui.check_click(current_mouse_pos)
+                if element_event is not None:
+                    if element_event[-7:] == "_slider" and event.buttons[0]:
+                        value = self.event_move_slider(element_event, current_mouse_pos[0])
+                        print(f"Dragging. Value: {value}")
+                if self.camera.left_button_held:
+                    # Calculate difference in mouse movement
+                    dx = current_mouse_pos[0] - self.camera.last_mouse_pos[0]
+                    dy = current_mouse_pos[1] - self.camera.last_mouse_pos[1]
 
-                # Process the mouse movement to update camera rotation
-                self.camera.process_mouse_movement(dx, dy)
+                    # Process the mouse movement to update camera rotation
+                    self.camera.process_mouse_movement(dx, dy)
 
-                # Update last mouse position
-                self.camera.last_mouse_pos = current_mouse_pos
-
+                    # Update last mouse position
+                    self.camera.last_mouse_pos = current_mouse_pos
+                
     def event_change_camera(self):
         """
         Handle event of changing camera mode.
@@ -600,6 +610,9 @@ class GraphicsEngine:
         self.camera.select_target(target_planet)
         self.gui["planet_menu"].untoggle()
         self.gui["planet_menu"][target_planet].toggle()
+
+    def event_move_slider(self, uuid, x):
+        return self.gui[uuid].update_value(x)
 
     def end(self):
         """
