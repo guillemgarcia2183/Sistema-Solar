@@ -184,6 +184,7 @@ class Menu(GUIManager):
                 self.unvisualize()
             else:
                 self.visualize()
+            return self.uuid
 
         if self.is_visible:
             click = super().check_click(mouse_position)
@@ -191,8 +192,8 @@ class Menu(GUIManager):
                 self.unvisualize()
                 self.__menu_button.untoggle()
             return click
-        else:
-            return self.uuid
+
+        return None
 
     def check_hover(self, mouse_position: tuple[int, int]):
         """

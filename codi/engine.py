@@ -45,12 +45,14 @@ class GraphicsEngine:
         "second_cam",
         "ideal_dists",
         "objects_index",
-        "delta",
+        # "delta",
         "key_planet_map",
         "initial_speed",
         "realistic_mode",
         "capture_value",
         "capture_element",
+        "time_map",
+        "step",
     )
 
     def __init__(self, testing=False, debug=False, fs=True, win_size=(1200, 800)):
@@ -104,6 +106,7 @@ class GraphicsEngine:
 
         self.clock = pg.time.Clock()
         self.time = 0
+        self.step = 0.001
 
         # gui
         self.gui = GUIManager(self)
@@ -139,13 +142,13 @@ class GraphicsEngine:
             pg.K_8: "Neptune",
         }
         self.time_map = {
-            0:
-            1:
-            2:
-            3:
-            4:
-            5:
-            6:
+            0: -0.1,
+            1: -0.01,
+            2: -0.001,
+            3: 0.001,
+            4: 0.01,
+            5: 0.1,
+            6: 1,
         }
         self.realistic_mode = False
 
@@ -514,9 +517,6 @@ class GraphicsEngine:
                         self.event_change_mode()
                     elif element_event in self.key_planet_map.values():
                         self.event_change_planet(element_event)
-                    # elif self.capture_element.search(element_event)[1] == "time":
-                    #     value = self.capture_value.search(element_event)[1]
-                    #     print(f"Current time rate: {value}")
                 else:
                     if event.button == 1:  # Left click
                         self.camera.left_button_held = True
@@ -535,13 +535,12 @@ class GraphicsEngine:
                 current_mouse_pos = pg.mouse.get_pos()
                 element_event = self.gui.check_motion(current_mouse_pos)
 
-                print(element_event)
-
                 if element_event is not None:
                     if self.capture_element.search(element_event)[1] == "time":
                         value = float(
                             self.capture_value.search(element_event)[1])
                         print(f"Current time rate: {value}")
+                        self.step = self.time_map[value]
 
                 if self.camera.left_button_held and element_event is None:
                     # Calculate difference in mouse movement
@@ -659,12 +658,12 @@ class GraphicsEngine:
         pg.quit()
         sys.exit()
 
-    def get_time(self):
+    def set_time(self):
         """Funció per obtenir el temps (en ticks) - Ús: Fer rotar objectes
         """
         prev_time = self.time
-        self.time = pg.time.get_ticks() * 0.001
-        self.delta = self.time - prev_time
+        self.time = pg.time.get_ticks() * self.step
+        # self.delta = self.time - prev_time
 
     def move(self):
         """Funció per fer moure els objectes que es troben en orbitació
@@ -678,9 +677,6 @@ class GraphicsEngine:
         # clear framebuffer
         self.ctx.clear(color=(0, 0, 0))
 
-        # render gui
-        self.gui.render()
-
         # render scene + axis
         for objecte in self.objects:
             objecte.render()
@@ -691,6 +687,9 @@ class GraphicsEngine:
             for orbit in self.orbits:
                 orbit.render()
 
+        # render gui
+        self.gui.render()
+
         # Swap buffers + display caption
         pg.display.set_caption(self.info)
         pg.display.flip()
@@ -699,7 +698,7 @@ class GraphicsEngine:
         """Funció per fer anar el programa.
         """
         while True:
-            self.get_time()
+            self.set_time()
             self.check_events()
             self.camera.process_keyboard()
             self.move()
