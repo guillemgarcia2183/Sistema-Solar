@@ -89,7 +89,6 @@ class GUIManager(Element):
 ###############################################################################
 #                              Protected Methods                              #
 
-
     def __add_element(self, new_element: type[Element]):  # noqa
         """
         Add an Element object with an uuid to the elements buffer.
@@ -117,7 +116,8 @@ class GUIManager(Element):
         try:
             self.__elements_buffer[new_element.uuid]
 
-            raise ValueError(f'An Element with uuid: "{new_element.uuid}" already exists.')
+            raise ValueError(f'An Element with uuid: "{
+                             new_element.uuid}" already exists.')
 
         except KeyError:
             self.__elements_buffer[new_element.uuid] = new_element
@@ -127,7 +127,6 @@ class GUIManager(Element):
 
 ###############################################################################
 #                               Private Methods                               #
-
 
     def _autosize(  # noqa
         self,
@@ -198,7 +197,6 @@ class GUIManager(Element):
 ###############################################################################
 #                                Public Methods                               #
 
-
     def add_element(  # noqa
         self,
         element_type: str,
@@ -233,7 +231,8 @@ class GUIManager(Element):
         try:
             self.__types_elements[element_type]
         except KeyError as error:
-            raise ValueError(f'Type of Element: "{element_type}" does not exist.') from error
+            raise ValueError(f'Type of Element: "{
+                             element_type}" does not exist.') from error
 
         new_element = self.__types_elements[element_type](
             self.app,
@@ -343,6 +342,14 @@ class GUIManager(Element):
         for element in self.__elements_buffer.values():
             element.check_hover(mouse_position)
 
+    def check_motion(self, mouse_position: tuple[int, int]):
+        for element in self.__elements_buffer.values():
+            motion = element.check_motion(mouse_position)
+            if motion:
+                return motion
+
+        return None
+
     def check_unclick(self, mouse_position: tuple[int, int]) -> str | None:
         """
         Check actions when unclick event.
@@ -430,7 +437,8 @@ class GUIManager(Element):
         try:
             self.__elements_buffer[uuid]
         except KeyError as error:
-            raise ValueError(f'Element with uuid: "{uuid}" ' + 'does not exist.') from error
+            raise ValueError(f'Element with uuid: "{
+                             uuid}" ' + 'does not exist.') from error
 
         self.__elements_buffer[uuid].destroy()
         del self.__elements_buffer[uuid]
@@ -500,7 +508,6 @@ class GUIManager(Element):
 
 ###############################################################################
 #                                  Properties                                 #
-
 
     @property  # noqa
     def app(self):

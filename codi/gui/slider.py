@@ -34,7 +34,8 @@ class Slider(Element):
         "__x",
         "__y",
     )
-    def __init__(self, app, uuid: str, **kwargs):     
+
+    def __init__(self, app, uuid: str, **kwargs):
         """    # Previous version:
         default_kwargs = {'x': 0, 'y': 0, 'width': 0, 'height': 0,
                           'min_value': 0, 'max_value': 4, 'initial_value': 2, 'track_color': (0.8, 0.8, 0.8),
@@ -74,12 +75,16 @@ class Slider(Element):
         self.shader_programs = self.__create_shader_programs()
         self.track_vao = self.__create_track_vao()
         self.handle_vao = self.__create_handle_vao()"""
-        self._set_attributes(app, uuid + "_slider", **kwargs)
+        self._set_attributes(app, uuid, **kwargs)
         # Write the shader
         self._set_shader_programs()
         # Create all ModernGL objects
         self._set_track_vao()
         self._set_handle_vao()
+
+    def _containing(self, mx, my):
+        handle_x = self._value_to_position()
+        return abs(mx - handle_x) <= self.__width / 2 and abs(my - self.__y) <= self.__height / 2
 
     def _set_attributes(self, app, uuid: str, **kwargs):
         """
@@ -102,9 +107,9 @@ class Slider(Element):
         super().__init__(app, uuid, **kwargs)
 
         default_kwargs = {
-            'x': 0, 
-            'y': 0, 
-            'width': 0, 
+            'x': 0,
+            'y': 0,
+            'width': 0,
             'height': 0,
             'min_value': 0,
             'max_value': 4,
@@ -130,7 +135,7 @@ class Slider(Element):
         self.__max_value = kwargs["max_value"]
         dif = self.__max_value - self.__min_value
         self.__handle_values = [self.__min_value + i*dif /
-                              (self.__slices-1) for i in range(self.__slices)]
+                                (self.__slices-1) for i in range(self.__slices)]
         # Color information
         self.__track_color = kwargs["track_color"]
         self.__handle_color = kwargs["handle_color"]
@@ -169,19 +174,20 @@ class Slider(Element):
         self._set_track_vbo()
         self.__track_vao = self.app.ctx.vertex_array(
             self.__shader_programs, [(self.__track_vbo, '3f', 'in_vert')])
-        
+
     def _set_handle_vao(self):
         self._set_handle_vbo()
         self.__handle_vao = self.app.ctx.vertex_array(
             self.__shader_programs, [(self.__handle_vbo, '3f', 'in_vert')])
-    
+
     def _set_track_vbo(self):
         self._set_track_vertices()
         self.__track_vbo = self.app.ctx.buffer(self.__track_vertices.tobytes())
 
     def _set_handle_vbo(self):
         self._set_handle_vertices()
-        self.__handle_vbo = self.app.ctx.buffer(self.__handle_vertices.tobytes())
+        self.__handle_vbo = self.app.ctx.buffer(
+            self.__handle_vertices.tobytes())
 
     def _set_track_vertices(self):
         gl_x = (
@@ -211,13 +217,17 @@ class Slider(Element):
     def _set_handle_vertices(self):
         handle_x = self._value_to_position()
         gl_x = (
-            2*((handle_x - self.__width / self.__slices) - self.app.WIN_SIZE[0] / 2) / (self.app.WIN_SIZE[0]),
-            2*((handle_x + self.__width / self.__slices) - self.app.WIN_SIZE[0] / 2) / (self.app.WIN_SIZE[0])
+            2*((handle_x - self.__width / self.__slices) -
+               self.app.WIN_SIZE[0] / 2) / (self.app.WIN_SIZE[0]),
+            2*((handle_x + self.__width / self.__slices) -
+               self.app.WIN_SIZE[0] / 2) / (self.app.WIN_SIZE[0])
         )
 
         gl_y = (
-            -2*((self.__y - self.__height / 2) - self.app.WIN_SIZE[1] / 2) / (self.app.WIN_SIZE[1]),
-            -2*((self.__y + self.__height / 2) - self.app.WIN_SIZE[1] / 2) / (self.app.WIN_SIZE[1])
+            -2*((self.__y - self.__height / 2) -
+                self.app.WIN_SIZE[1] / 2) / (self.app.WIN_SIZE[1]),
+            -2*((self.__y + self.__height / 2) -
+                self.app.WIN_SIZE[1] / 2) / (self.app.WIN_SIZE[1])
         )
 
         self.__handle_vertices = np.array(
@@ -231,23 +241,23 @@ class Slider(Element):
         )
 
     def _value_to_position(self):
-            """
-            Map a slider value to a screen position.
-            """
-            return self.__x - self.__width / 2 + (self.__handle_values[self.__current_slice] - self.__min_value) / (self.__max_value - self.__min_value) * self.__width
+        """
+        Map a slider value to a screen position.
+        """
+        return self.__x - self.__width / 2 + (self.__handle_values[self.__current_slice] - self.__min_value) / (self.__max_value - self.__min_value) * self.__width
 
     def check_hover(self, mouse_position: tuple[int, int]):
         pass
-    
+
     def is_hovered(self):
         pass
 
     def toggle(self):
         pass
-    
+
     def untoggle(self):
         pass
-    
+
     def render(self):
         """
         Render the slider.
@@ -276,35 +286,39 @@ class Slider(Element):
         if self.is_locked or self.is_hidden:
             return None
         mx, my = mouse_position
-        handle_x = self._value_to_position()
-        if abs(mx - handle_x) <= self.__width / 2 and abs(my - self.__y) <= self.__height / 2:
+        if self._containing(mx, my):
             self.__is_dragging = True
-            return self.uuid
+
+    def check_motion(self, mouse_position: tuple[int, int]):
+        if self.is_locked or self.is_hidden:
+            return None
+        mx, my = mouse_position
+
+        if self._containing(mx, my):
+            if self.__is_dragging:
+                value = self.update_value(mx)
+                return self.uuid + ":" + str(value)
+
         return None
-    
+
     def check_unclick(self, mouse_position):
         if self.is_locked or self.is_hidden:
             return None
 
-        mx, my = mouse_position
-        handle_x = self._value_to_position()
-        if abs(mx - handle_x) <= self.__width / 2 and abs(my - self.__y) <= self.__height / 2:
-            self.__is_dragging = False
-            return self.uuid
-        return None
-        
+        self.__is_dragging = False
+        return self.uuid
+
     def update_value(self, mouse_x):
         """
         Update the slider value based on mouse x position.
         """
+        new_value = self.__min_value + \
+            (mouse_x - (self.__x - self.__width / 2)) / \
+            self.__width * (self.__max_value - self.__min_value)
+        self.__current_slice = min(range(len(self.__handle_values)), key=lambda i: abs(
+            self.__handle_values[i] - new_value))
+        self._set_handle_vao()
 
-        if self.__is_dragging:
-            new_value = self.__min_value + \
-                (mouse_x - (self.__x - self.__width / 2)) / \
-                self.__width * (self.__max_value - self.__min_value)
-            self.__current_slice = min(range(len(self.__handle_values)), key=lambda i: abs(
-                self.__handle_values[i] - new_value))
-            self._set_handle_vao()
         return self.__handle_values[self.__current_slice]
 
     def release(self):

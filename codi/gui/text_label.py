@@ -282,8 +282,7 @@ class TextLabel():
 ###############################################################################
 #                                Public Methods                               #
 
-
-    def destroy(self):
+    def destroy(self):  # noqa
         """
         Destroy moderngl object to free memory when deleting.
 
@@ -319,7 +318,6 @@ class TextLabel():
 
 ###############################################################################
 #                                  Properties                                 #
-
 
     @property  # noqa
     def app(self):

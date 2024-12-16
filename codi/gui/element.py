@@ -122,6 +122,9 @@ class Element(ABC):
             "Method not implemented, child class must implement it."
         )
 
+    def check_motion(self, moise_position):
+        return None
+
     @abstractmethod
     def check_unclick(self, mouse_position: tuple[int, int]) -> str | None:
         """
