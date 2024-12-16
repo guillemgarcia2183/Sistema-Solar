@@ -36,8 +36,8 @@ Es poden usar l'interfície d'usuari creada de l'aplicació, però també existe
 - Tecles genèriques:
     * M: Canviar a mode realista/suavitzat. Sistema Solar a escala real o amb els paràmetres modificats per comoditat
     * K: Canviar el mode de càmera lliure/satèl·lit. El mode lliure et permet desplaçar-te com vols i el satèl·lit segueix els planetes 
-    * P: Visualitzar o ocultar òrbites dels planetes. 
-
+    * P: Visualitzar o ocultar òrbites dels planetes.
+   
 - Camera lliure:
     * W: Desplaçar càmera cap endevant
     * A: Desplaçar càmera cap a l'esquerra
@@ -46,6 +46,7 @@ Es poden usar l'interfície d'usuari creada de l'aplicació, però també existe
     * Barra espaiadora: Elevar la càmera
     * Ctrl: Baixar la càmera
     * R: Resetejar la posició de la càmera a l'inici
+    * "+" i "-": Augmentar i disminuir velocitat de la càmera
 
 - En mode satèl·lit:
     * W: Rotar càmera cap endevant
