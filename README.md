@@ -32,11 +32,11 @@ Si es vol executar el codi, has de seguir els passos de a continuació:
 ## 2. Resultats
 Us mostrem una seqüència d'imatges del què es pot trobar quan s'executi /codi/main.py:
 
-![Foto d'entrada](images/entrada.png)
+![Foto d'entrada](images/entrada2.png)
 
 ![Mode satèl·lit](images/planetes.png)
 
-![Estrelles i constel·lacions](images/satellites.png)
+![Estrelles i constel·lacions](images/satellites2.png)
 
 
 ## 3. Repositoris 
