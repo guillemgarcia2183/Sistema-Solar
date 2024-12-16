@@ -32,11 +32,11 @@ Si es vol executar el codi, has de seguir els passos de a continuació:
 ## 2. Resultats
 Us mostrem una seqüència d'imatges del què es pot trobar quan s'executi /codi/main.py:
 
-![FOTO ENTRADA](images/entrada.png)
+![Foto d'entrada](images/entrada.png)
 
-![FOTO MODE SATÈL·LIT](images/planetes.png)
+![Mode satèl·lit](images/planetes.png)
 
-![FOTO ESTRELLES I CONSTEL·LACIONS](images/satellites.png)
+![Estrelles i constel·lacions](images/satellites.png)
 
 ## 3. Repositoris 
 * /actes: Conté fitxers esmentant els comentaris de les reunions de grup. En les actes es pot veure com ha anat evolucionant el treball durant les setmanes de projecte. 
