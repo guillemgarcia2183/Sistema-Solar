@@ -256,6 +256,8 @@ class Text(Element):
         if self._containing(mx, my):
             return self.uuid
 
+        return None
+
     def check_hover(self, mouse_position: tuple[int, int]):
         """
         Check if the mouse is hovering on top of the button.
@@ -279,6 +281,39 @@ class Text(Element):
 
         # Update hover state
         self.__is_hovered = self._containing(mx, my)
+
+    def check_motion(self, mouse_position: tuple[int, int]) -> str | None:
+        """
+        Check if when moving the mouse is inside the button when moved.
+
+        Parameters
+        ----------
+        mouse_position : tuple[integer, integer]
+            Mouse position in x and y coordinates of the window.
+
+        Raises
+        ------
+        NotImplementedError
+            Method not implemented, child class must implement it.
+
+        Returns
+        -------
+        string or None
+            UUID of the Element if moved on or None if not.
+
+        """
+        # Cannot be moved on if is locked
+        if self.is_locked or self.is_hidden:
+            return None
+
+        # Get mouse coordinates
+        mx, my = mouse_position
+
+        # Return UUID if button is unclicked
+        if self._containing(mx, my):
+            return self.uuid
+
+        return None
 
     def check_unclick(self, mouse_position: tuple[int, int]) -> str | None:
         """
@@ -306,10 +341,17 @@ class Text(Element):
         if self._containing(mx, my):
             return self.uuid
 
-    def check_time(self, delta):
-        pass
+        return None
 
     def destroy(self) -> None:
+        """
+        Destroy all OpenGL object and release memory.
+
+        Returns
+        -------
+        None.
+
+        """
         self.__vbo.release()
 
         self.__vao.release()
@@ -317,6 +359,14 @@ class Text(Element):
         self.__shader_programs.release()
 
     def render(self) -> None:
+        """
+        Render logic.
+
+        Returns
+        -------
+        None.
+
+        """
         if self.is_hidden:
             return None
 
@@ -325,9 +375,25 @@ class Text(Element):
         self._render()
 
     def toggle(self):
+        """
+        Text has no toggle position, return None always.
+
+        Returns
+        -------
+        None.
+
+        """
         return None
 
     def untoggle(self):
+        """
+        Text has no toggle position, return None always.
+
+        Returns
+        -------
+        None.
+
+        """
         return None
 
 ###############################################################################

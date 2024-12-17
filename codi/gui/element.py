@@ -122,8 +122,32 @@ class Element(ABC):
             "Method not implemented, child class must implement it."
         )
 
-    def check_motion(self, moise_position):
-        return None
+    @abstractmethod
+    def check_motion(self, mouse_position: tuple[int, int]) -> str | None:
+        """
+        Template Element.
+
+        Must check if it has been moved on the Element.
+
+        Parameters
+        ----------
+        mouse_position : tuple[integer, integer]
+            Mouse position in x and y coordinates of the window.
+
+        Raises
+        ------
+        NotImplementedError
+            Method not implemented, child class must implement it.
+
+        Returns
+        -------
+        string or None
+            UUID of the Element if clicked or None if not.
+
+        """
+        raise NotImplementedError(
+            "Method not implemented, child class must implement it."
+        )
 
     @abstractmethod
     def check_unclick(self, mouse_position: tuple[int, int]) -> str | None:

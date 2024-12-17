@@ -121,16 +121,47 @@ class CircularButton(Button):
 
     @property  # noqa
     def radius(self) -> int:
+        """
+        Get Radius.
+
+        Returns
+        -------
+        integer
+            Radius in pixels of the button.
+
+        """
         return self.__radius
 
     @radius.setter
     def radius(self, new_radius: int):
+        """
+        Set Radius.
+
+        Parameters
+        ----------
+        new_radius : integer
+            New radius in pixels of the button.
+
+        Returns
+        -------
+        None.
+
+        """
         self.__radius = new_radius
 
         self._set_vao()
 
     @property
-    def vertexes(self):
+    def vertexes(self) -> np.ndarray:
+        """
+        Get vertex arrays.
+
+        Returns
+        -------
+        Numpy array.
+            Array with vertexes positions.
+
+        """
         return self.__vertexes
 
 ###############################################################################

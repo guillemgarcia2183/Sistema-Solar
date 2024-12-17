@@ -104,7 +104,7 @@ class GraphicsEngine:
 
         self.clock = pg.time.Clock()
         self.time = 0
-        self.step = 1.1574e-8 # Velocitat real
+        self.step = 1.1574e-8  # Velocitat real
 
         # gui
         self.gui = GUIManager(self)
@@ -142,9 +142,9 @@ class GraphicsEngine:
         self.time_map = {
             0: -0.1,
             1: -0.01,
-            2: -0.001, 
-            3: 1.1574e-8, # Velocitat real
-            4: 0.0012, # 1 dia per segon
+            2: -0.001,
+            3: 1.1574e-8,  # Velocitat real
+            4: 0.0012,  # 1 dia per segon
             5: 0.5,
             6: 1,
         }
@@ -538,7 +538,8 @@ class GraphicsEngine:
                         value = float(
                             self.capture_value.search(element_event)[1])
                         self.step = self.time_map[value]
-                        print(f"Current step rate: {self.step}")
+                        if self.DEBUG:
+                            print(f"Current step rate: {self.step}")
 
                 if self.camera.left_button_held and element_event is None:
                     # Calculate difference in mouse movement
@@ -666,7 +667,9 @@ class GraphicsEngine:
         """
         for objecte in self.objects:
             objecte.move()
-        print(f"Posició de la terra: {self.objects[3].actual_pos}")
+
+        if self.DEBUG:
+            print(f"Posició de la terra: {self.objects[3].actual_pos}")
 
     def render(self):
         """Renderització dels objectes 

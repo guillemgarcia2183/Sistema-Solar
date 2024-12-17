@@ -319,6 +319,8 @@ class Button(Element):
         if self._containing(mx, my):
             return self.uuid
 
+        return None
+
     def check_hover(self, mouse_position: tuple[int, int]):
         """
         Check if the mouse is hovering on top of the button.
@@ -343,6 +345,39 @@ class Button(Element):
         # Update hover state
         self.__is_hovered = self._containing(mx, my)
 
+    def check_motion(self, mouse_position: tuple[int, int]) -> str | None:
+        """
+        Check if when moving the mouse is inside the button when moved.
+
+        Parameters
+        ----------
+        mouse_position : tuple[integer, integer]
+            Mouse position in x and y coordinates of the window.
+
+        Raises
+        ------
+        NotImplementedError
+            Method not implemented, child class must implement it.
+
+        Returns
+        -------
+        string or None
+            UUID of the Element if moved on or None if not.
+
+        """
+        # Cannot be moved on if is locked
+        if self.is_locked or self.is_hidden:
+            return None
+
+        # Get mouse coordinates
+        mx, my = mouse_position
+
+        # Return UUID if button is unclicked
+        if self._containing(mx, my):
+            return self.uuid
+
+        return None
+
     def check_unclick(self, mouse_position: tuple[int, int]) -> str | None:
         """
         Check if it has been unclicked on the Element.
@@ -355,7 +390,7 @@ class Button(Element):
         Returns
         -------
         None.
-            UUID of the Element if clicked or None if not.
+            UUID of the Element if unclicked or None if not.
 
         """
         # Cannot be unclicked if is locked
@@ -368,6 +403,8 @@ class Button(Element):
         # Return UUID if button is unclicked
         if self._containing(mx, my):
             return self.uuid
+
+        return None
 
     def destroy(self):
         """
@@ -402,7 +439,7 @@ class Button(Element):
 
     def toggle(self):
         """
-
+        Button has no toggle position, return None always.
 
         Returns
         -------
@@ -413,7 +450,7 @@ class Button(Element):
 
     def untoggle(self):
         """
-
+        Button has no toggle position, return None always.
 
         Returns
         -------
@@ -430,10 +467,32 @@ class Button(Element):
 
     @property  # noqa
     def color(self) -> tuple[float, float, float]:
+        """
+        Get OpenGL color from the shader.
+
+        Returns
+        -------
+        tuple[float, float, float]
+            Tuple describing the RGB color as floats from 0 to 1.
+
+        """
         return self.__shader_programs['in_colour'].value
 
     @color.setter
     def color(self, new_color: tuple[float, float, float]):
+        """
+        Set OpenGL color from the shader.
+
+        Parameters
+        ----------
+        new_color : tuple[float, float, float]
+            Tuple describing the RGB color as floats from 0 to 1.
+
+        Returns
+        -------
+        None.
+
+        """
         self.__shader_programs['in_colour'].value = new_color
 
     @property
