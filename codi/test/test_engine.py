@@ -9,7 +9,7 @@ sys.path.insert(0, parent_dir)
 
 from engine import GraphicsEngine
 from camera import Camera, FollowCamera
-from gui import ButtonManager
+from gui import GUIManager
 from light import Light
 from objects import *
 
@@ -31,7 +31,7 @@ class TestEngine(unittest.TestCase):
         self.assertIsInstance(self.object.light, Light)
         self.assertIsInstance(self.object.objects, list)
         self.assertIsInstance(self.object.time, int)
-        self.assertIsInstance(self.object.button_manager, ButtonManager)
+        self.assertIsInstance(self.object.gui, GUIManager)
         self.assertIsInstance(self.object.info, str)
         self.assertIsInstance(self.object.ellipse, bool)
 
