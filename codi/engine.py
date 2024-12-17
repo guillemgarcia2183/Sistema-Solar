@@ -104,7 +104,7 @@ class GraphicsEngine:
 
         self.clock = pg.time.Clock()
         self.time = 0
-        self.step = 1.1574e-8  # Velocitat real
+        self.step = 1.1574e-8 # Velocitat real
 
         # gui
         self.gui = GUIManager(self)
@@ -140,13 +140,13 @@ class GraphicsEngine:
             pg.K_8: "Neptune",
         }
         self.time_map = {
-            0: -0.1,
-            1: -0.01,
-            2: -0.001,
-            3: 1.1574e-8,  # Velocitat real
-            4: 0.0012,  # 1 dia per segon
-            5: 0.5,
-            6: 1,
+            0: -0.573,
+            1: -0.0191,
+            2: -0.000796,
+            3: 2.2106e-8, # Velocitat real
+            4: 0.000796, # 1 hora per segon executat
+            5: 0.0191, # 1 dia per segon executat
+            6: 0.573, # 1 mes per segon executat
         }
         self.realistic_mode = False
 
@@ -538,8 +538,7 @@ class GraphicsEngine:
                         value = float(
                             self.capture_value.search(element_event)[1])
                         self.step = self.time_map[value]
-                        if self.DEBUG:
-                            print(f"Current step rate: {self.step}")
+                        #print(f"Current step rate: {self.step}")
 
                 if self.camera.left_button_held and element_event is None:
                     # Calculate difference in mouse movement
@@ -660,16 +659,14 @@ class GraphicsEngine:
     def set_time(self):
         """Funció per obtenir el temps (en ticks) - Ús: Fer rotar objectes
         """
-        self.time = pg.time.get_ticks() * self.step
-
+        self.time += self.step
+        
     def move(self):
         """Funció per fer moure els objectes que es troben en orbitació
         """
         for objecte in self.objects:
             objecte.move()
-
-        if self.DEBUG:
-            print(f"Posició de la terra: {self.objects[3].actual_pos}")
+        #print(f"Posició de la terra: {self.objects[3].actual_pos}")
 
     def render(self):
         """Renderització dels objectes 
