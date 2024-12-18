@@ -135,12 +135,13 @@ class RingBatch(Object):
         # Semieje mayor y menor basados en la distancia inicial del planeta al Sol
         a = glm.length(glm.vec2(self.planet_distance, self.planet_distance))  # La magnitud en XZ como semieje mayor
         b = a * (1 - self.eccentricity_planet ** 2) ** 0.5 # Semieje menor (ajústalo según el grado de excentricidad que desees)
+        focal_distance = a * self.eccentricity_planet
 
         # Calcular el ángulo en función del tiempo
         theta = self.app.time * self.velocity_planet   # Ajusta la velocidad de la órbita
 
         # Posición del planeta en la órbita elíptica (plano XZ)
-        x = a * glm.cos(theta)
+        x = a * glm.cos(theta) - focal_distance
         z = b * glm.sin(theta)
 
         # Trasladar el anillo a la posición de Saturno

@@ -82,11 +82,12 @@ class Planet(Object):
         a = glm.length(glm.vec2(self.original_pos.x, self.original_pos.z))  # La magnitud en XZ como semieje mayor
         b = a * (1 - self.eccentricity ** 2) ** 0.5 # Semieje menor (ajústalo según el grado de excentricidad que desees)
 
+        focal_distance = a * self.eccentricity
         # Calcular el ángulo en función del tiempo
         theta = self.app.time * self.velocity  # Ajusta la velocidad de la órbita
 
         # Posición del planeta en la órbita elíptica (plano XZ)
-        x = a * glm.cos(theta)
+        x = a * glm.cos(theta) - focal_distance
         z = b * glm.sin(theta)
         y = self.original_pos.y  # Mantener la altura constante o ajustarla si deseas órbitas inclinadas
 

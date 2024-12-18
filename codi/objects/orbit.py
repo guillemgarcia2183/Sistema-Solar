@@ -51,11 +51,12 @@ class Orbit(Object):
         a = glm.length(glm.vec2(self.position.x, self.position.z))  # Semieix major
         b = a * (1 - self.eccentricity ** 2) ** 0.5  # Semieix menor
 
+        focal_distance = a * self.eccentricity  # Distancia del centro al foco
         orbit_points = []
 
         for i in range(num_points):
             theta = 2 * np.pi * i / num_points  # Ángulo en radianes
-            x = a * np.cos(theta)
+            x = a * np.cos(theta) - focal_distance
             z = b * np.sin(theta)
             orbit_points.append((x, 0, z))
 

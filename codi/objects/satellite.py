@@ -79,9 +79,9 @@ class Satellite(Object):
         a = glm.length(glm.vec2(distance.x, distance.z))
         b = a * (1 - self.eccentricity ** 2) ** 0.5  # Excentricidad de la órbita del satélite
         theta = self.app.time * self.velocity_satellite
-
+        focal_distance = a * self.eccentricity  
         # Calcular la posición en la órbita alrededor del planeta (eje XZ)
-        x = a * glm.cos(theta)
+        x = a * glm.cos(theta) - focal_distance
         z = b * glm.sin(theta)
         y = 0  # Mantén la órbita en el plano XZ o ajusta para órbitas inclinadas
         
@@ -101,9 +101,9 @@ class Satellite(Object):
         a = glm.length(glm.vec2(self.position_planet.x, self.position_planet.z))
         b = a * (1 - self.eccentricity ** 2) ** 0.5
         theta = self.app.time * self.velocity_planet
-
+        focal_distance = a * self.eccentricity 
         # Calcular la posición en la órbita elíptica (eje XZ) respecto al Sol
-        x = a * glm.cos(theta)
+        x = a * glm.cos(theta) - focal_distance
         z = b * glm.sin(theta)
         y = self.position_planet.y
 
