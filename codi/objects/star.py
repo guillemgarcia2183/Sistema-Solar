@@ -148,7 +148,7 @@ class StarBatch(Object):
 
                 line_vector = points[1] - points[0]
                 camera_vector = self.app.camera.position - points[0]
-                delta = 50*glm.normalize(
+                delta = 5*glm.normalize(
                     glm.cross(
                         glm.normalize(line_vector),
                         glm.normalize(camera_vector)
