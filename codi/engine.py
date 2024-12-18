@@ -379,7 +379,7 @@ class GraphicsEngine:
             self,
             [sh.vertex_shader_ASTEROID, sh.fragment_shader_ASTEROID],
             "textures/asteroids.jpg",
-            [0.3, 4, 5],
+            [0.2, 4, 5],
             num_asteroids=700,  # Or however many you want
             distance1=distance_objects["Mars"]+25,
             distance2=distance_objects["Jupiter"]-20,

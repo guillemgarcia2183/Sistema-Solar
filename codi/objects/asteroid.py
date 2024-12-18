@@ -146,7 +146,7 @@ class AsteroidBatch(Object):
             b = a * (1 - self.eccentricity ** 2) ** 0.5  # Semi-minor axis
             angle = self.angles[i]
             # Increment the angle based on velocity and time
-            angle += self.velocity_asteroids[i] * self.app.time  # Use velocity and time for orbit speed
+            angle += self.velocity_asteroids[i] * self.app.time * 0.055  # Use velocity and time for orbit speed
             # angle %= 2*np.pi 
             focal_distance = a * self.eccentricity 
             # Update position based on the new angle
