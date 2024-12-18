@@ -297,7 +297,7 @@ class FollowCamera(Camera):
         else:
             self.speed *= self.target.radius
 
-        self.speed *= 0.1 # Atenuate speed regardless of radius
+        self.speed *= 0.7 # Atenuate speed regardless of radius
 
     def synchronize_yaw_pitch(self):
         """Synchronize yaw and pitch with the current forward direction."""
