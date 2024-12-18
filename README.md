@@ -39,7 +39,7 @@ Es poden usar l'interfície d'usuari creada de l'aplicació, però també existe
     * P: Visualitzar o ocultar òrbites dels planetes.
    
 - Camera lliure:
-    * W: Desplaçar càmera cap endevant
+    * W: Desplaçar càmera cap endavant
     * A: Desplaçar càmera cap a l'esquerra
     * S: Desplaçar càmera cap enrere
     * D: Desplaçar càmera cap a la dreta
@@ -49,7 +49,7 @@ Es poden usar l'interfície d'usuari creada de l'aplicació, però també existe
     * "+" i "-": Augmentar i disminuir velocitat de la càmera
 
 - En mode satèl·lit:
-    * W: Rotar càmera cap endevant
+    * W: Rotar càmera cap endavant
     * A: Rotar càmera cap a l'esquerra
     * S: Rotar càmera cap enrere
     * D: Rotar càmera cap a la dreta
