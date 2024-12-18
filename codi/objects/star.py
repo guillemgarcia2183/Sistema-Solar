@@ -1,6 +1,7 @@
 import glm
 import moderngl as mgl
 import numpy as np
+
 from objects.object import Object
 
 class StarBatch(Object):
@@ -10,7 +11,7 @@ class StarBatch(Object):
         "positions",
         "constellations",
         "constellations_shader",
-        "constellations_vao"
+        "constellations_vao",
     )
     def __init__(self, app, shader, texture, info, positions, constellations=True, **kwargs):
 
@@ -51,7 +52,6 @@ class StarBatch(Object):
             moderngl.VertexArray: Array VAO
         """
         vao = self.ctx.vertex_array(self.shader,[(self.vbo, '3f 3f', 'in_color', 'in_position')])
-
         return vao
     
     def on_init(self):
@@ -61,6 +61,14 @@ class StarBatch(Object):
         self.shader['m_proj'].write(self.app.camera.m_proj)
         self.shader['m_view'].write(self.app.camera.m_view)
         self.shader['m_model'].write(self.m_model)
+
+    def load_texture(self, filepath="textures/constellation_lines.png"):
+        from PIL import Image
+        with Image.open("textures/constellation_lines.png", 'r') as fTex:
+            tex = self.ctx.texture([fTex.width, fTex.height], 4, np.array(fTex))
+            #tex.filter = (mgl.GL_TEXTURE_MAG_FILTER, mgl.LINEAR)
+            tex.repeat_x = True
+            return tex
 
     def on_init_2(self):
         """Post-Post-inicialització de la classe StarBatch
@@ -108,43 +116,62 @@ class StarBatch(Object):
         self.vao.render(mgl.POINTS)
 
         if self.constellations:
-            default_line_width = self.ctx.line_width
-            self.ctx.line_width = 2.0
-            self.constellations_vao.render(mgl.LINES)
-            self.ctx.line_width = default_line_width 
+            self.texture.use()
+            self.constellations_vao.render(mgl.TRIANGLES)
 
     def get_constellations_vao(self):
         """ 
-        Crea un index buffer que apunta a les estrelles que tenen una constel·lació en comú.
+        Crea un nou vao que conté les estrelles que formen constelacions
         """
         if (not self.constellations):
             return None
 
-        star_indices = dict()
-        index = 0
-        for _, _, _, _, con, proper in self.positions:
+        data = list()
+        star_coords = dict()
+        # Per millorar la visualització es projectaran les constelacion a la esfera de radi 750
+        for x, y, z, _, _, proper in self.positions:
             if isinstance(proper, str):
-                star_indices[proper] = index
-            index += 1
-
+                star_coords[proper] = 1000*glm.normalize(glm.vec3(x, y, z))
+        
         consts = self.parse_constellations()
-        constellation_indices = list()
-
-        #print(consts)
-
+        
+        tex_coords = [
+            (0, 1),
+            (0, 0),
+            (1, 1),
+            (1, 0)
+        ]
+        vertices = list()
         for v in consts.values():
             for pair in v:
-                constellation_indices.append(star_indices[pair[0]]) 
-                constellation_indices.append(star_indices[pair[1]])
+                points = [star_coords[pair[0]], star_coords[pair[1]]]
 
+                line_vector = points[1] - points[0]
+                camera_vector = self.app.camera.position - points[0]
+                delta = 50*glm.normalize(
+                    glm.cross(
+                        glm.normalize(line_vector),
+                        glm.normalize(camera_vector)
+                    )
+                )
 
-        ibo = self.ctx.buffer(np.array(constellation_indices, dtype='i4').tobytes())
+                for i in range(2):
+                    p = points[i]
+                    px = list(p+delta)
+                    py = list(p-delta)
+                    vertices.append(tuple([*px, *tex_coords[2*i]]))
+                    vertices.append(tuple([*py, *tex_coords[2*i+1]]))
 
-        # TODO: We don't need color here but it doesn't work without it 
+        indices = list()
+        for i in range(0, len(vertices), 4):
+            indices.append((i,   i+1, i+2))
+            indices.append((i+2, i+3, i+1))
+        
+        consts_vbo = self.ctx.buffer(np.array([vertices[i] for idx in indices for i in idx], dtype='f4').tobytes())
+
         return self.ctx.vertex_array(
             self.constellations_shader,
-            [(self.vbo, '3f 3f', 'in_color', 'in_position')], 
-            index_buffer=ibo
+            [(consts_vbo, '3f 2f', 'in_position', 'in_texcoords')]
         )
 
     def get_data(self):
