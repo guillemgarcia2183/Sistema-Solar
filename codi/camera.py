@@ -280,7 +280,6 @@ class FollowCamera(Camera):
                 # Recalculem 'right' per a que tenir la nova base
                 self.right = glm.normalize(glm.cross(self.direction, self.up))
                 
-            #print(f"right:{self.right}\nup:{self.up}")
             return glm.lookAt(self.position, self.position + self.direction, self.up)
         else:
             return glm.lookAt(self.position, self.position + self.direction, self.up)
@@ -293,12 +292,12 @@ class FollowCamera(Camera):
         self.target = self.app.objects[self.app.objects_index[target]]
         self.distance = self.app.ideal_dists[target] + (3*self.target.radius)
 
-        #print(f"distance: {self.distance}\n\nradius: {self.target.radius}")
-        # TODO: calculate the speed so that it takes the same time to wrap around any planet
         if self.target.radius < 1:
             self.speed /= self.target.radius
         else:
             self.speed *= self.target.radius
+
+        self.speed *= 0.1 # Atenuate speed regardless of radius
 
     def synchronize_yaw_pitch(self):
         """Synchronize yaw and pitch with the current forward direction."""
@@ -314,37 +313,42 @@ class FollowCamera(Camera):
         # Get the current key state
         keys = pg.key.get_pressed()
 
-        # Change the elevation relative to the object
+        # Change the elevation relative to the object. 
+        # While lock_target, it takes the same time to wrap around any planet.
         increment = glm.vec3(0, 0, 0)
         if keys[pg.K_w]:
             if self.lock_target:
                 self.keep_up = False
-                increment += self.up * 0.1##self.speed
+                increment += self.up * 0.1
             else:
                 self.elevation = (self.elevation + self.speed) % 360
         if keys[pg.K_s]:
             if self.lock_target:
                 self.keep_up = False
-                increment -= self.up * 0.1#self.speed
+                increment -= self.up * 0.1
             else:
                 self.elevation = (self.elevation - self.speed) % 360
+        # Change the azimuth relative to the object. 
+        # While lock_target, it takes the same time to wrap around any planet.
         if keys[pg.K_a]:
             if self.lock_target:
                 self.keep_up = True
-                increment -= self.right * 0.1#self.speed
+                increment -= self.right * 0.1
             else:
                 self.azimuth = (self.azimuth + self.speed) % 360
         if keys[pg.K_d]:
             if self.lock_target:
                 self.keep_up = True
-                increment += self.right * 0.1#self.speed
+                increment += self.right * 0.1
             else:
                 self.azimuth = (self.azimuth - self.speed) % 360
                 # Update the relative position
+
+        # Roll movement, defined by an arbitrary rotation angle in radians
         if keys[pg.K_q]:  # Roll counterclockwise
-            self.roll(-self.speed)
+            self.roll(-1)
         if keys[pg.K_e]:  # Roll clockwise
-            self.roll(self.speed)
+            self.roll(1)
 
         self.relative_position += increment
 
