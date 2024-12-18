@@ -84,7 +84,7 @@ class Planet(Object):
 
         focal_distance = a * self.eccentricity
         # Calcular el ángulo en función del tiempo
-        theta = self.app.time * self.velocity  # Ajusta la velocidad de la órbita
+        theta = self.app.time * self.velocity  * 0.055 # Ajusta la velocidad de la órbita
 
         # Posición del planeta en la órbita elíptica (plano XZ)
         x = a * glm.cos(theta) - focal_distance

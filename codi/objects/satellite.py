@@ -100,7 +100,7 @@ class Satellite(Object):
         """
         a = glm.length(glm.vec2(self.position_planet.x, self.position_planet.z))
         b = a * (1 - self.eccentricity ** 2) ** 0.5
-        theta = self.app.time * self.velocity_planet
+        theta = self.app.time * self.velocity_planet * 0.055 # Ajusta la velocidad de la órbita
         focal_distance = a * self.eccentricity 
         # Calcular la posición en la órbita elíptica (eje XZ) respecto al Sol
         x = a * glm.cos(theta) - focal_distance

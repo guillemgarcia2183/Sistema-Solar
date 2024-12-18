@@ -245,9 +245,7 @@ class GraphicsEngine:
             except:
                 # Si no té cap satèl·lit, la distància predeterminada serà 1/2 del radi del planeta
                 ideal_dists[planet] = normalized_radii[planet]*.5
-        # print(min_dists)
-        # print(f"normalized_distances: {normalized_distances}")
-        # print(ideal_dists)
+                
         normalized_radii_real = {name: radius *
                                  100 for name, radius in raw_radii.items()}
         normalized_distances_real = {
@@ -667,7 +665,7 @@ class GraphicsEngine:
         """
         for objecte in self.objects:
             objecte.move()
-        # print(f"Posició de la terra: {self.objects[3].actual_pos}")
+        
 
     def render(self):
         """Renderització dels objectes 

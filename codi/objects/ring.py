@@ -138,7 +138,7 @@ class RingBatch(Object):
         focal_distance = a * self.eccentricity_planet
 
         # Calcular el ángulo en función del tiempo
-        theta = self.app.time * self.velocity_planet   # Ajusta la velocidad de la órbita
+        theta = self.app.time * self.velocity_planet * 0.055 # Ajusta la velocidad de la órbita
 
         # Posición del planeta en la órbita elíptica (plano XZ)
         x = a * glm.cos(theta) - focal_distance
