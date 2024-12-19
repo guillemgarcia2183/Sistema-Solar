@@ -124,7 +124,7 @@
                     0.1
                 ],
                 "sys_font": "Arial",
-                "font_size": 24,
+                "font_size": 20,
                 "scale_factor": 2
             }
         }
@@ -162,7 +162,7 @@
                     0.1
                 ],
                 "sys_font": "Arial",
-                "font_size": 24,
+                "font_size": 20,
                 "scale_factor": 2
             }
         }
@@ -200,7 +200,7 @@
                     0.1
                 ],
                 "sys_font": "Arial",
-                "font_size": 24,
+                "font_size": 20,
                 "scale_factor": 2
             }
         }

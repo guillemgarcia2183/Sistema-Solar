@@ -111,8 +111,8 @@ class StarBatch(Object):
     def render(self):
         """Renderització de l'estrella
         """
-        self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
-        self.ctx.point_size = 3
+        #self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
+        self.ctx.point_size = 4
         self.vao.render(mgl.POINTS)
 
         if self.constellations:
